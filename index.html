@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Manual Operacional da CRV — Central de Regulação de Vagas. Polícia Penal de Santa Catarina. SEJURI/DPP/CRV." />
+  <title>Manual Operacional CRV — Polícia Penal SC</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/brasao-pp-sc.png" />
+</head>
+<body>
+
+<div class="watermark" aria-hidden="true">
+  <img src="assets/brasao-pp-sc.png" alt="" />
+</div>
+
+<!-- ====================================================  HEADER  ==================================================== -->
+<header class="site-header">
+  <div class="header-topo">
+    <div class="header-topo-inner">
+      <span>🏛️ SEJURI / Departamento de Polícia Penal — DPP / Central de Regulação de Vagas — CRV</span>
+      <span>🔒 Uso exclusivo de servidores autorizados · Documento Interno</span>
+    </div>
+  </div>
+  <div class="header-principal">
+    <div class="logo-area">
+      <img src="assets/brasao-pp-sc.png" alt="Polícia Penal SC" class="logo-brasao-img" />
+      <div class="logo-separador"></div>
+      <div class="logo-textos">
+        <h1>Manual Operacional CRV</h1>
+        <span>Central de Regulação de Vagas · Polícia Penal SC</span>
+      </div>
+    </div>
+    <nav class="nav-principal" id="navPrincipal">
+      <a href="#" data-pagina="hipoteses"  onclick="navegarPara('hipoteses');return false;">Hipóteses</a>
+      <a href="#" data-pagina="fluxo"      onclick="navegarPara('fluxo');return false;">Fluxo Operacional</a>
+      <a href="#" data-pagina="documentos" onclick="navegarPara('documentos');return false;">Documentos</a>
+      <a href="#" data-pagina="modelos"    onclick="navegarPara('modelos');return false;">Modelos de Ofícios</a>
+      <a href="#" data-pagina="prazos"     onclick="navegarPara('prazos');return false;">Prazos</a>
+      <a href="#" data-pagina="vedacoes"   onclick="navegarPara('vedacoes');return false;">Vedações</a>
+      <a href="#" data-pagina="legislacao" onclick="navegarPara('legislacao');return false;">Legislação</a>
+      <a href="#" data-pagina="unidades"   onclick="navegarPara('unidades');return false;">Unidades</a>
+    </nav>
+    <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
+  </div>
+</header>
+
+<div class="breadcrumb-bar">
+  <div class="breadcrumb-inner">
+    <a href="#" onclick="navegarPara('inicio');return false;">🏠 Início</a>
+    <span class="sep">›</span>
+    <span id="breadcrumbAtual" class="atual">Início</span>
+    <span id="breadcrumbLink" style="display:none;"></span>
+  </div>
+</div>
+
+
+<!-- ====================================================  INÍCIO  ==================================================== -->
+<section id="inicio" class="page-section ativo">
+  <div class="hero">
+    <div class="hero-inner">
+      <img src="assets/brasao-pp-sc.png" alt="" class="hero-brasao-deco" aria-hidden="true" />
+      <div class="hero-texto">
+        <span class="hero-badge">🛡️ Res. Conjunta Interinstitucional nº 1/2026 · TJSC + SEJURI</span>
+        <h2>Central de Regulação<br><span>de Vagas — CRV</span></h2>
+        <p>Normativa operacional para Policiais Penais das unidades prisionais de Santa Catarina. Procedimentos, fluxos e modelos de ofícios conforme a Resolução Conjunta Interinstitucional nº 1/2026.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card"><span class="num">06</span><span class="label">Hipóteses</span></div>
+        <div class="stat-card"><span class="num">Res.<br>1/2026</span><span class="label">Base Legal</span></div>
+        <div class="stat-card"><span class="num">SC</span><span class="label">Estado</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="busca-manual-bar">
+    <div class="busca-manual-inner">
+      <span class="busca-icone">🔍</span>
+      <input type="text" id="buscaManual" placeholder="Buscar no manual... (ex: transferência, prazo, documentos, vedação)" onkeyup="buscarManual()" autocomplete="off" />
+      <button class="busca-limpar" id="buscaLimpar" onclick="limparBusca()" title="Limpar" style="display:none;">✕</button>
+    </div>
+    <div id="buscaResultado" class="busca-resultado" style="display:none;"></div>
+  </div>
+
+  <div class="main-wrapper">
+
+    <div class="alerta alerta-info fade-up fade-up-delay-1">
+      <span class="alerta-icone">📖</span>
+      <div>
+        <strong class="alerta-titulo">Sobre esta Normativa Operacional</strong>
+        A presente normativa aplica-se a todos os estabelecimentos penais do Estado de Santa Catarina, orientando os procedimentos operacionais necessários à solicitação, análise e efetivação de transferências de pessoas privadas de liberdade no âmbito da <strong>Central de Regulação de Vagas (CRV)</strong>, promovendo padronização, segurança e transparência na gestão das vagas prisionais, nos termos da <strong>Resolução Conjunta Interinstitucional nº 01/2026</strong>.
+      </div>
+    </div>
+
+    <h2 class="section-titulo fade-up fade-up-delay-2">⚡ Atalhos Rápidos</h2>
+    <p class="section-subtitulo">Acesse o procedimento necessário conforme a situação da unidade prisional.</p>
+
+    <div class="atalhos-grid">
+      <a class="atalho-btn atalho-emergencial fade-up fade-up-delay-1" href="#" onclick="navegarPara('emergencial');return false;">
+        <div class="icone">🚨</div>
+        <span class="titulo">Segurança / Emergência</span>
+        <span class="desc">Risco imediato à integridade física, ameaça à vida ou necessidade de isolamento urgente.</span>
+        <span class="atalho-arrow">→</span>
+      </a>
+      <a class="atalho-btn atalho-pedido fade-up fade-up-delay-2" href="#" onclick="navegarPara('pedido-preso');return false;">
+        <div class="icone">👤</div>
+        <span class="titulo">Pedido do Preso ou Família</span>
+        <span class="desc">Requerimento do custodiado ou familiar. Vinculado ao Programa de Permutas.</span>
+        <span class="atalho-arrow">→</span>
+      </a>
+      <a class="atalho-btn atalho-equalizacao fade-up fade-up-delay-3" href="#" onclick="navegarPara('equalizacao');return false;">
+        <div class="icone">⚖️</div>
+        <span class="titulo">Adequação da Capacidade de Ocupação</span>
+        <span class="desc">Redistribuição administrativa para adequação da capacidade das unidades (Art. 21, III).</span>
+        <span class="atalho-arrow">→</span>
+      </a>
+      <a class="atalho-btn atalho-mandado fade-up fade-up-delay-4" href="#" onclick="navegarPara('mandado-comarca');return false;">
+        <div class="icone">🏛️</div>
+        <span class="titulo">Mandado de Prisão de Comarca Diversa</span>
+        <span class="desc">Preso capturado em comarca diferente da que expediu a ordem de prisão.</span>
+        <span class="atalho-arrow">→</span>
+      </a>
+      <a class="atalho-btn atalho-pernoite fade-up fade-up-delay-4" href="#" onclick="navegarPara('pernoite');return false;">
+        <div class="icone">🌙</div>
+        <span class="titulo">Pernoite</span>
+        <span class="desc">Custodiado que necessita permanecer temporariamente em unidade diversa da sua.</span>
+        <span class="atalho-arrow">→</span>
+      </a>
+      <a class="atalho-btn atalho-segmax fade-up fade-up-delay-5" href="#" onclick="navegarPara('seguranca-maxima');return false;">
+        <div class="icone">🔒</div>
+        <span class="titulo">Unidade de Seg. Máxima / RDD</span>
+        <span class="desc">Inclusão via Comissão Deliberativa + DPP. Requer RDD deferido pelo Juízo competente.</span>
+        <span class="atalho-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="conteudo-grid mt-3">
+      <div>
+        <div class="alerta alerta-atencao mb-2">
+          <span class="alerta-icone">⚠️</span>
+          <div><strong class="alerta-titulo">Instrumento Normativo Vigente</strong>
+          Todos os procedimentos observam a <strong>Resolução Conjunta Interinstitucional nº 1, de 20 de janeiro de 2026</strong> (TJSC + SEJURI), publicada no DJ nº 4.661 de 04/02/2026, e a <strong>Portaria Normativa nº 2.189/2025 do DPP</strong>.</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span>📌</span><h3>Quadro Resumo — Hipóteses e Prazos</h3></div>
+          <div class="card-body">
+            <div class="tabela-wrapper">
+              <table>
+                <thead>
+                  <tr><th>Hipótese</th><th>Quem solicita</th><th>Prazo execução</th><th>Comunicação Juízo</th><th>Tipo</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Segurança / Emergência</strong></td><td>Direção da Unidade</td><td>Até <strong>24h</strong></td><td>Até <strong>24h</strong> após</td><td><span class="badge badge-vermelho">Urgente</span></td></tr>
+                  <tr><td><strong>Pedido do Preso / Família</strong></td><td>Preso ou familiar</td><td colspan="2">Ver Programa de Permutas</td><td><span class="badge badge-azul">Permuta</span></td></tr>
+                  <tr><td><strong>Adequação de Capacidade</strong></td><td>CRV / DPP / SR / Direção</td><td>Conf. cronograma</td><td>Até 24h após</td><td><span class="badge badge-verde">Administrativo</span></td></tr>
+                  <tr><td><strong>Mandado de Comarca Diversa</strong></td><td>Vara de Execuções</td><td>Prazo do mandado</td><td>Imediato</td><td><span class="badge badge-amarelo">Judicial</span></td></tr>
+                  <tr><td><strong>Pernoite</strong></td><td>Direção da Unidade</td><td>Conf. deliberação</td><td>—</td><td><span class="badge badge-cinza">Pontual</span></td></tr>
+                  <tr><td><strong>Seg. Máxima / RDD</strong></td><td>Direção + SR + DPP</td><td>Conf. Comissão</td><td>Até 24h após</td><td><span class="badge badge-roxo">Especial</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">📂 Seções do Manual</div>
+          <div class="sidebar-card-body">
+            <div class="link-lista">
+              <a href="#" onclick="navegarPara('hipoteses');return false;"><span class="bullet">●</span> Hipóteses de Transferência</a>
+              <a href="#" onclick="navegarPara('fluxo');return false;"><span class="bullet">●</span> Fluxo Operacional</a>
+              <a href="#" onclick="navegarPara('documentos');return false;"><span class="bullet">●</span> Documentos Necessários</a>
+              <a href="#" onclick="navegarPara('modelos');return false;"><span class="bullet">●</span> Modelos de Ofícios</a>
+              <a href="#" onclick="navegarPara('prazos');return false;"><span class="bullet">●</span> Prazos</a>
+              <a href="#" onclick="navegarPara('vedacoes');return false;"><span class="bullet">●</span> Vedações</a>
+              <a href="#" onclick="navegarPara('legislacao');return false;"><span class="bullet">●</span> Legislação</a>
+              <a href="#" onclick="navegarPara('unidades');return false;"><span class="bullet">●</span> Unidades Prisionais</a>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">🏛️ Estrutura Institucional</div>
+          <div class="sidebar-card-body">
+            <div class="hierarquia">
+              <div class="hierarquia-item nivel-1">SEJURI</div>
+              <div class="hierarquia-item nivel-2">DPP — Depto. de Polícia Penal</div>
+              <div class="hierarquia-item nivel-3 ativo">CRV — Central de Reg. de Vagas</div>
+            </div>
+            <p class="text-sm text-muted mt-2">Res. Conjunta nº 1/2026 · TJSC + SEJURI<br>Pub. DJ nº 4.661 · 04/02/2026</p>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">📞 Contato CRV</div>
+          <div class="sidebar-card-body">
+            <div class="text-sm" style="line-height:2;">
+              <strong>Plantão 24h</strong><br>
+              <a href="tel:+554836657330" style="color:var(--azul-4);font-weight:600;">(48) 3665-7330</a><br>
+              <strong>E-mail</strong><br>
+              <a href="mailto:crv@pp.sc.gov.br" style="color:var(--azul-4);">crv@pp.sc.gov.br</a>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">🗒️ Fiscalização — GMF/TJSC</div>
+          <div class="sidebar-card-body">
+            <p class="text-sm text-muted" style="line-height:1.7;">A CRV é fiscalizada, monitorada e avaliada continuamente pelo <strong>Grupo de Monitoramento e Fiscalização do TJSC (GMF)</strong>, sob responsabilidade do juiz coordenador.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  HIPÓTESES  ==================================================== -->
+<section id="hipoteses" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>📌 Hipóteses de Transferência</h2>
+      <p>Situações previstas na Res. Conjunta nº 1/2026 que autorizam o pedido de transferência. Todo pedido deve se enquadrar em uma dessas hipóteses.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-atencao mb-3">
+      <span class="alerta-icone">⚠️</span>
+      <div>O pedido que não se enquadre em nenhuma das hipóteses abaixo será indeferido de plano pela CRV. Verifique a hipótese correta antes de instruir o processo.</div>
+    </div>
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          🚨 &nbsp;I — Segurança / Emergência (Art. 21, I — Res. nº 1/2026)
+          <span class="accordion-seta">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p><strong>Proteção da integridade física:</strong> Risco imediato e concreto à integridade física ou à vida do custodiado, de outros presos ou de servidores, que torne inviável a permanência na unidade. Os direitos da pessoa presa não serão suprimidos (visita, pátio de sol, etc.).</p>
+          <br>
+          <p><strong>Gerenciamento de crise por mau comportamento (transferência preventiva):</strong> Instrumento diverso da sanção disciplinar. O pedido deve explicitar que se trata de transferência preventiva de <strong>até 10 dias</strong> (art. 60 da LEP) e que o <strong>PAD foi instaurado</strong>. A transferência não constitui a sanção disciplinar de 30 dias — esta somente é cabível após regular tramitação do PAD (art. 57 e 58 da LEP; art. 73 da LC 529/11).</p>
+          <br>
+          <p><strong>Situações que configuram emergência:</strong></p>
+          <ul style="margin:.75rem 0 0 1.25rem;list-style:disc;font-size:.87rem;line-height:2.1;">
+            <li>Conflito grave com facção rival dentro da unidade;</li>
+            <li>Ameaça de morte comprovada (interna ou externa);</li>
+            <li>Distúrbio interno — risco à integridade física imediata, motim, rebelião;</li>
+            <li>Necessidade de isolamento por determinação médica;</li>
+            <li>Risco institucional por comportamento do preso.</li>
+          </ul>
+          <br>
+          <p><strong>Atenção:</strong> O ofício deve ser subscrito pelo <strong>Diretor da unidade de origem, Diretor da unidade de destino e Superintendente(s) Regional(is)</strong>.</p>
+          <br>
+          <p><a href="#" onclick="navegarPara('emergencial');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver fluxo e modelo de ofício completo</a></p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          👤 &nbsp;II — Pedido do Preso ou Família
+          <span class="accordion-seta">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p><strong>Situação atual:</strong> Como não há vagas disponíveis em unidades do Estado, pedidos de transferência por proximidade familiar são atendidos prioritariamente pelo <strong>Programa de Permutas</strong>, coordenado pela equipe da CRV.</p>
+          <br>
+          <div class="alerta alerta-info" style="margin:0;">
+            <span class="alerta-icone">🔗</span>
+            <div><strong class="alerta-titulo">Programa de Permutas</strong>
+            Para solicitações de transferência por pedido do preso ou familiar, acesse o sistema de permutas da CRV. Envios de memorandos diretamente à CRV solicitando vaga serão indeferidos por inexistência de vaga disponível.</div>
+          </div>
+          <br>
+          <p><a href="#" onclick="navegarPara('pedido-preso');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver orientações sobre o Programa de Permutas</a></p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          ⚖️ &nbsp;III — Adequação da Capacidade de Ocupação (Art. 21, III — Res. nº 1/2026)
+          <span class="accordion-seta">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p><strong>Definição:</strong> Redistribuição administrativa destinada à adequação da capacidade de ocupação das unidades prisionais. Pode ser iniciada pelo <strong>DPP, pela CRV, pelos Superintendentes Regionais ou pelos próprios Diretores das Unidades Prisionais</strong>, visando sempre a equalização e o ajuste de vagas.</p>
+          <br>
+          <p><strong>Modalidades:</strong></p>
+          <ul style="margin:.75rem 0 0 1.25rem;list-style:disc;font-size:.87rem;line-height:2.1;">
+            <li><strong>Larga escala / complexo:</strong> Transferência rotineira dentro do mesmo Complexo (ex.: 20 internos do presídio para a penitenciária em único pedido);</li>
+            <li><strong>Pontual:</strong> Transferência individual por perfil específico (ex.: pessoa LGBT para unidade adequada).</li>
+          </ul>
+          <br>
+          <p><strong>Metas — Plano Pena Justa:</strong> 130% (1º ano) → 120% (2º ano) → 100% (3º ano).</p>
+          <br>
+          <p><a href="#" onclick="navegarPara('equalizacao');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver fluxo, modelos de ofício e tabela de metas</a></p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          🏛️ &nbsp;IV — Mandado de Prisão de Comarca Diversa (Art. 21, III — Res. nº 1/2026 / Art. 24 — PN 2189/2025)
+          <span class="accordion-seta">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p><strong>Definição:</strong> Preso capturado em comarca diversa daquela que expediu a ordem de prisão, devendo ser transferido para a unidade prisional responsável pela circunscrição da autoridade judiciária expedidora.</p>
+          <br>
+          <p><strong>Requisitos:</strong></p>
+          <ul style="margin:.75rem 0 0 1.25rem;list-style:disc;font-size:.87rem;line-height:2.1;">
+            <li>Mandado de prisão expedido pela Vara competente;</li>
+            <li>Unidade de destino deve ser a responsável pela circunscrição do juízo expedidor;</li>
+            <li>Diretor da unidade de destino e Superintendentes Regionais devem anuir ao expediente.</li>
+          </ul>
+          <br>
+          <p><a href="#" onclick="navegarPara('mandado-comarca');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver fluxo e modelo de ofício</a></p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          🌙 &nbsp;V — Pernoite
+          <span class="accordion-seta">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p><strong>Definição:</strong> Necessidade de permanência temporária do custodiado em unidade diversa da sua, por motivo fundamentado (audiência, questão médica, logística de escolta, etc.).</p>
+          <br>
+          <p><strong>Requisitos:</strong></p>
+          <ul style="margin:.75rem 0 0 1.25rem;list-style:disc;font-size:.87rem;line-height:2.1;">
+            <li>Ofício da Direção da unidade de origem com fundamentação;</li>
+            <li>Anuência da gestão da unidade de destino (co-assina o expediente);</li>
+            <li>Anuência dos Superintendentes Regionais.</li>
+          </ul>
+          <br>
+          <p><a href="#" onclick="navegarPara('pernoite');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver modelo de ofício</a></p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          🔒 &nbsp;VI — Unidade de Segurança Máxima / RDD
+          <span class="accordion-seta">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p><strong>Definição:</strong> Inclusão de preso de alta periculosidade na Unidade de Segurança Máxima do Estado, mediante decisão judicial de RDD e deliberação da Comissão Deliberativa do DPP.</p>
+          <br>
+          <p><strong>Atenção — fluxo obrigatório:</strong></p>
+          <ul style="margin:.75rem 0 0 1.25rem;list-style:disc;font-size:.87rem;line-height:2.1;">
+            <li>A gestão local somente pode solicitar o RDD ao Judiciário <strong>após autorização expressa do DPP</strong>, por meio da Comissão Deliberativa da USM;</li>
+            <li>A Comissão Deliberativa deve ser tratada entre o Superintendente Regional e a DGPP;</li>
+            <li>Com o RDD deferido, o processo é encaminhado à CRV para cadastro no sistema;</li>
+            <li>Após o cadastro na CRV, o processo segue para PPSC/CEPEN para acompanhamento.</li>
+          </ul>
+          <br>
+          <p><a href="#" onclick="navegarPara('seguranca-maxima');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver fluxo completo e modelo de ofício</a></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  FLUXO  ==================================================== -->
+<section id="fluxo" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>🔄 Fluxo Operacional</h2>
+      <p>Etapas do processo de transferência, da identificação da hipótese até a comunicação ao juízo de execução.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-info mb-3">
+      <span class="alerta-icone">ℹ️</span>
+      <div>Para o detalhamento do fluxo operacional no sistema i-PEN e nas ferramentas informatizadas, consulte a Policial Penal Jéssica (CRV), responsável pelo refinamento dos procedimentos de sistema.</div>
+    </div>
+    <div class="conteudo-grid">
+      <div>
+        <h2 class="section-titulo mb-2">Fluxo Padrão — Todas as Hipóteses</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="fluxo-lista">
+              <div class="fluxo-item"><div class="fluxo-num">01</div><div class="fluxo-conteudo"><h4>Identificar a hipótese e reunir documentação</h4><p>Diretor ou Policial Penal enquadra a situação na hipótese correta (I a VI) e reúne todos os documentos exigidos antes de protocolar.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">02</div><div class="fluxo-conteudo"><h4>Obter anuência do Diretor de destino e do(s) SR(s)</h4><p>Antes do envio à CRV, o ofício deve ser subscrito ou anunciado pelo Diretor da unidade de destino e pelos Superintendentes Regionais envolvidos.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">03</div><div class="fluxo-conteudo"><h4>Enviar ofício à CRV com todos os anexos</h4><p>Ofício conforme modelo correspondente à hipótese, com todos os documentos obrigatórios anexados.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">04</div><div class="fluxo-conteudo"><h4>CRV: autuação e análise de admissibilidade</h4><p>Verificação de documentação completa, enquadramento na hipótese e inexistência de vedações. Pedidos incompletos são devolvidos com prazo de regularização.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">05</div><div class="fluxo-conteudo"><h4>CRV: consulta de vagas e deferimento</h4><p>Verificação de disponibilidade no sistema i-PEN. Despacho deferindo ou indeferindo com fundamentação.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">06</div><div class="fluxo-conteudo"><h4>Expedição da Guia de Recolhimento/Transferência</h4><p>CRV expede a GR. Comunicação simultânea às unidades de origem, destino e ao juízo de execução.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">07</div><div class="fluxo-conteudo"><h4>Execução — escolta e transporte</h4><p>Unidade de origem organiza escolta. Unidade de destino confirma recebimento no sistema da CRV.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">08</div><div class="fluxo-conteudo"><h4>Comunicação ao Juízo de Execução — até 24h</h4><p>Ofício ao juízo competente informando data, hora, matrícula, unidade de destino e nº do despacho CRV.</p></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="alerta alerta-urgente mt-2">
+          <span class="alerta-icone">🚨</span>
+          <div><strong class="alerta-titulo">Emergenciais — Fluxo Abreviado</strong>
+          Acionar a CRV por telefone <strong>(48) 3665-7330</strong> imediatamente. Anotar o protocolo verbal. O ofício chega em até 2h. Execução em até 24h.</div>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">⚡ Fluxos por Hipótese</div>
+          <div class="sidebar-card-body">
+            <div class="link-lista">
+              <a href="#" onclick="navegarPara('emergencial');return false;"><span class="bullet">●</span> Segurança / Emergência</a>
+              <a href="#" onclick="navegarPara('pedido-preso');return false;"><span class="bullet">●</span> Pedido do Preso / Família</a>
+              <a href="#" onclick="navegarPara('equalizacao');return false;"><span class="bullet">●</span> Adequação de Capacidade</a>
+              <a href="#" onclick="navegarPara('mandado-comarca');return false;"><span class="bullet">●</span> Mandado de Comarca Diversa</a>
+              <a href="#" onclick="navegarPara('pernoite');return false;"><span class="bullet">●</span> Pernoite</a>
+              <a href="#" onclick="navegarPara('seguranca-maxima');return false;"><span class="bullet">●</span> Seg. Máxima / RDD</a>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">📞 CRV Plantão 24h</div>
+          <div class="sidebar-card-body"><a href="tel:+554836657330" style="font-size:1rem;font-weight:700;color:var(--azul-4);">(48) 3665-7330</a></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  DOCUMENTOS  ==================================================== -->
+<section id="documentos" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>📂 Documentos Necessários</h2>
+      <p>Checklist por hipótese. O BPI deve estar devidamente atualizado no sistema i-PEN. Pedidos incompletos serão devolvidos.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-info mb-3">
+      <span class="alerta-icone">ℹ️</span>
+      <div>O <strong>Boletim Penal Informativo (BPI)</strong> deve estar atualizado no sistema i-PEN antes do envio, assinado pelo Coordenador de Execução Penal ou pelo Diretor da Unidade Prisional. O <strong>Relatório de Saúde</strong> deve ser assinado pelo Responsável Técnico (Médico, Enfermeiro ou Técnico de Enfermagem), Coordenador de Saúde ou Diretor.</div>
+    </div>
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">🚨 Segurança / Emergência — Checklist<span class="accordion-seta">▼</span></div>
+        <div class="accordion-body">
+          <ul style="list-style:none;font-size:.875rem;line-height:2.3;">
+            <li>☐ <strong>Ofício da Direção</strong> — descreve data, hora, circunstâncias e fundamenta no Art. 21, I da Res. nº 1/2026</li>
+            <li>☐ <strong>Boletim de Ocorrência Interno (BOI)</strong></li>
+            <li>☐ <strong>Relatório da equipe de segurança</strong></li>
+            <li>☐ <strong>BPI atualizado no i-PEN</strong> — assinado pelo CEP ou Diretor</li>
+            <li>☐ <strong>Relatório de Saúde</strong> — assinado pelo responsável técnico</li>
+            <li>☐ <strong>PAD instaurado</strong> — se tratar de transferência preventiva por mau comportamento</li>
+            <li>☐ <strong>Assinaturas:</strong> Diretor origem + Diretor destino + Superintendente(s) Regional(is)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">⚖️ Adequação da Capacidade de Ocupação — Checklist<span class="accordion-seta">▼</span></div>
+        <div class="accordion-body">
+          <ul style="list-style:none;font-size:.875rem;line-height:2.3;">
+            <li>☐ <strong>Ofício da Direção / SR / DPP / CRV</strong> — fundamento no Art. 21, III da Res. nº 1/2026</li>
+            <li>☐ <strong>BPI atualizado no i-PEN</strong> — de cada preso indicado</li>
+            <li>☐ <strong>Relatório de Saúde</strong> — de cada preso indicado</li>
+            <li>☐ <strong>Lista dos presos indicados</strong> — nome, IPEN, regime, perfil</li>
+            <li>☐ <strong>Assinaturas:</strong> Diretor origem + Diretor destino + Superintendente(s) Regional(is)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">🏛️ Mandado de Prisão de Comarca Diversa — Checklist<span class="accordion-seta">▼</span></div>
+        <div class="accordion-body">
+          <ul style="list-style:none;font-size:.875rem;line-height:2.3;">
+            <li>☐ <strong>Ofício da Direção</strong> — fundamentado no Art. 21, III da Res. nº 1/2026 e Art. 24 da PN 2189/2025</li>
+            <li>☐ <strong>Cópia do Mandado de Prisão</strong> — expedido pela Vara competente</li>
+            <li>☐ <strong>BPI atualizado no i-PEN</strong></li>
+            <li>☐ <strong>Relatório de Saúde</strong></li>
+            <li>☐ <strong>Assinaturas:</strong> Diretor origem + Diretor destino + Superintendente(s) Regional(is)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">🌙 Pernoite — Checklist<span class="accordion-seta">▼</span></div>
+        <div class="accordion-body">
+          <ul style="list-style:none;font-size:.875rem;line-height:2.3;">
+            <li>☐ <strong>Ofício da Direção</strong> — com fundamentação do motivo do pernoite</li>
+            <li>☐ <strong>BPI atualizado no i-PEN</strong></li>
+            <li>☐ <strong>Assinaturas:</strong> Diretor origem + Diretor destino + Superintendente(s) Regional(is)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">🔒 Segurança Máxima / RDD — Checklist<span class="accordion-seta">▼</span></div>
+        <div class="accordion-body">
+          <ul style="list-style:none;font-size:.875rem;line-height:2.3;">
+            <li>☐ <strong>Autorização expressa do DPP</strong> — via Comissão Deliberativa da USM (antes de qualquer pedido ao Judiciário)</li>
+            <li>☐ <strong>Ofício de solicitação de RDD</strong> — encaminhado ao juízo competente</li>
+            <li>☐ <strong>Decisão judicial</strong> — que determina a inclusão em RDD</li>
+            <li>☐ <strong>Boletim de Ocorrência, PAD, Relatórios</strong> — e demais documentos pertinentes</li>
+            <li>☐ <strong>BPI atualizado no i-PEN</strong> — assinado pelo CEP ou Diretor</li>
+            <li>☐ <strong>Relatório de Saúde</strong> — assinado pelo responsável técnico</li>
+            <li>☐ <strong>Assinaturas:</strong> Diretor origem + Superintendente Regional origem</li>
+            <li>☐ <strong>Destinatários:</strong> Comissão Deliberativa USM/DPP <strong>e</strong> CRV</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  MODELOS DE OFÍCIOS  ==================================================== -->
+<section id="modelos" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>📝 Modelos de Ofícios</h2>
+      <p>Modelos padronizados conforme a Res. nº 1/2026 e a PN 2189/2025. Preencha todos os campos antes do envio.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-atencao mb-3">
+      <span class="alerta-icone">⚠️</span>
+      <div>Os campos em <span style="background:#fef9c3;border:1px dashed #ca8a04;border-radius:3px;padding:0 4px;font-weight:700;color:#92400e">LETRAS MAIÚSCULAS</span> devem ser preenchidos. Nunca envie ofício com campos em branco. O BPI deve estar atualizado no i-PEN antes do envio.</div>
+    </div>
+
+    <!-- MODELO 1 — EMERGENCIAL -->
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <h4>🚨 Modelo 005/2026 — Segurança / Emergência</h4>
+        <button class="btn-copiar" onclick="copiarModelo(this)">📋 Copiar</button>
+      </div>
+      <div class="modelo-card-body">
+        <div class="modelo-texto">UNIDADE PRISIONAL DE ORIGEM, [DIA] de [MÊS] de [ANO].
+
+Prezados(as),
+
+Encaminho para análise urgente dessa Central de Regulação de Vagas pedido de transferência excepcional do(a) reeducando(a) NOME COMPLETO, IPEN Nº [NÚMERO], atualmente custodiado(a) no(a) UNIDADE PRISIONAL DE ORIGEM, em razão de situação de crise/emergência identificada pelas equipes deste estabelecimento penal, conforme passo a detalhar.
+
+A solicitação fundamenta-se na existência de [DESCREVER DETALHADAMENTE A SITUAÇÃO: risco iminente à integridade física, ameaça de morte, envolvimento em crise interna, motim, rebelião ou outro fator de segurança], que torna inviável a manutenção do(a) reeducando(a) nesta unidade prisional sem prejuízo à sua integridade física ou à ordem e segurança do estabelecimento, nos termos do art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026.
+
+Diante da urgência da situação, solicita-se a transferência do(a) reeducando(a) para o(a) UNIDADE PRISIONAL DE DESTINO, onde há condições adequadas para sua custódia em segurança.
+
+Destaca-se que a transferência em análise não deve ser considerada como sanção disciplinar de 30 (trinta) dias, uma vez que não constitui efetivamente eventual sanção a ser aplicada, cabível somente após a regular tramitação do PAD, nos termos do art. 57 e 58 da Lei de Execução Penal e art. 73 da Lei Complementar 529/11.
+
+Deste modo, os direitos inerentes à pessoa presa deverão ser preservados, não se excluindo a possibilidade de isolamento preventivo, instituto diverso da sanção disciplinar, cuja disciplina encontra-se no art. 60 da Lei nº 7.210/1984 (LEP):
+
+    Art. 60. A autoridade administrativa poderá decretar o isolamento preventivo do faltoso pelo prazo de até dez dias. [...].
+
+Para subsidiar a análise, encaminho, anexos, o Boletim Penal Informativo da pessoa presa devidamente atualizado no sistema i-PEN, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor. Encaminho ainda: boletim de ocorrência interno, relatório da equipe de segurança e demais documentos que subsidiam a presente solicitação.
+
+Uma vez efetivada a remoção, caso aprovada, o r. Juízo competente será devidamente comunicado, no prazo legal estabelecido, qual seja em até 24 horas.
+
+Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, quais sejam, o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.
+
+Diante do exposto, solicita-se análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.
+
+Atenciosamente,
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE ORIGEM
+Diretor(a) do(a) UNIDADE DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE DESTINO
+Diretor(a) do(a) UNIDADE DE DESTINO
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — ORIGEM
+Superintendente do(a) SR DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — DESTINO (SE FOR O CASO)
+Superintendente do(a) SR DE DESTINO
+
+À
+Central de Regulação de Vagas
+Departamento de Polícia Penal — DPP
+Secretaria de Estado de Justiça e Reintegração Social
+Florianópolis/SC</div>
+      </div>
+    </div>
+
+    <!-- MODELO 2 — ADEQUAÇÃO DE CAPACIDADE -->
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <h4>⚖️ Modelo — Adequação da Capacidade de Ocupação (Art. 21, III)</h4>
+        <button class="btn-copiar" onclick="copiarModelo(this)">📋 Copiar</button>
+      </div>
+      <div class="modelo-card-body">
+        <div class="modelo-texto">UNIDADE PRISIONAL DE ORIGEM, [DIA] de [MÊS] de [ANO].
+
+Prezados(as),
+
+Considerando a necessidade de gestão e equalização da ocupação carcerária no âmbito do(a) UNIDADE PRISIONAL DE ORIGEM, bem como a adequada distribuição das pessoas privadas de liberdade entre as diferentes estruturas de estabelecimentos penais, encaminho para análise dessa Central de Regulação de Vagas pedido de transferência do(a) reeducando(a) NOME COMPLETO, IPEN Nº [NÚMERO], atualmente custodiado(a) nesta unidade prisional, para o(a) UNIDADE PRISIONAL DE DESTINO.
+
+A solicitação fundamenta-se na necessidade de adequação da capacidade de ocupação entre as unidades do sistema prisional catarinense, em conformidade com as diretrizes estabelecidas para a gestão de vagas e movimentações prisionais previstas na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.
+
+Para subsidiar a análise, informo a devida atualização no sistema i-PEN do Boletim Penal Informativo, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como anexo o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor.
+
+Uma vez efetivada a remoção, caso aprovada, o r. Juízo competente será devidamente comunicado no prazo legal de até 24 horas.
+
+Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, quais sejam, o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.
+
+Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.
+
+Atenciosamente,
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE ORIGEM
+Diretor(a) do(a) UNIDADE DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE DESTINO
+Diretor(a) do(a) UNIDADE DE DESTINO
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — ORIGEM
+Superintendente do(a) SR DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — DESTINO (SE FOR O CASO)
+Superintendente do(a) SR DE DESTINO
+
+À
+Central de Regulação de Vagas
+Departamento de Polícia Penal — DPP
+Secretaria de Estado de Justiça e Reintegração Social
+Florianópolis/SC</div>
+      </div>
+    </div>
+
+    <!-- MODELO 3 — MANDADO COMARCA DIVERSA -->
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <h4>🏛️ Modelo — Mandado de Prisão de Comarca Diversa</h4>
+        <button class="btn-copiar" onclick="copiarModelo(this)">📋 Copiar</button>
+      </div>
+      <div class="modelo-card-body">
+        <div class="modelo-texto">UNIDADE PRISIONAL DE ORIGEM, [DIA] de [MÊS] de [ANO].
+
+Prezados(as),
+
+Encaminho para análise pedido de transferência do(a) reeducando(a) NOME COMPLETO, IPEN Nº [NÚMERO], atualmente custodiado(a) no(a) UNIDADE PRISIONAL DE ORIGEM, para o(a) UNIDADE PRISIONAL DE DESTINO, em razão do cumprimento de Mandado de Prisão expedido pelo(a) JUÍZO EXPEDIDOR (ex.: Vara Regional de Execuções Penais da Comarca de XXXXX / 2ª Vara Criminal da Comarca de XXX).
+
+Considerando que o(a) referido(a) custodiado(a) foi preso(a) em comarca diversa daquela que expediu a ordem de prisão, bem como que o(a) UNIDADE PRISIONAL DE DESTINO é a unidade responsável pela circunscrição da autoridade judiciária expedidora, a transferência mostra-se adequada, em conformidade com as diretrizes estabelecidas para a gestão de vagas e movimentações prisionais previstas na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III, bem como em cumprimento ao Art. 24 da Portaria Normativa nº 2.189/2025 do Departamento de Polícia Penal.
+
+Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, quais sejam, o(a) Diretor(a) da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.
+
+Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.
+
+Respeitosamente,
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE ORIGEM
+Diretor(a) do(a) UNIDADE DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE DESTINO
+Diretor(a) do(a) UNIDADE DE DESTINO
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — ORIGEM
+Superintendente do(a) SR DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — DESTINO (SE FOR O CASO)
+Superintendente do(a) SR DE DESTINO
+
+À
+CENTRAL DE REGULAÇÃO DE VAGAS
+Departamento de Polícia Penal — DPP
+Secretaria de Estado de Justiça e Reintegração Social
+Florianópolis/SC</div>
+      </div>
+    </div>
+
+    <!-- MODELO 4 — PERNOITE -->
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <h4>🌙 Modelo — Pernoite</h4>
+        <button class="btn-copiar" onclick="copiarModelo(this)">📋 Copiar</button>
+      </div>
+      <div class="modelo-card-body">
+        <div class="modelo-texto">UNIDADE PRISIONAL DE ORIGEM, [DIA] de [MÊS] de [ANO].
+
+Prezados(as),
+
+Encaminho para análise pedido de PERNOITE do(a) reeducando(a) NOME COMPLETO, IPEN Nº [NÚMERO], atualmente custodiado(a) no(a) UNIDADE PRISIONAL DE ORIGEM, no estabelecimento penal UNIDADE PRISIONAL DE DESTINO, em razão de [FUNDAMENTAR A RAZÃO].
+
+Informo, por fim, que fora realizado contato prévio com a gestão da unidade de destino, que subscreve também o presente expediente, bem como com o(s) respectivo(s) Superintendente(s) Regional(is).
+
+Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade do pleito administrativo.
+
+Respeitosamente,
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE ORIGEM
+Diretor(a) do(a) UNIDADE DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE DESTINO
+Diretor(a) do(a) UNIDADE DE DESTINO
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — ORIGEM
+Superintendente do(a) SR DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — DESTINO (SE FOR O CASO)
+Superintendente do(a) SR DE DESTINO
+
+À
+CENTRAL DE REGULAÇÃO DE VAGAS
+Departamento de Polícia Penal — DPP
+Secretaria de Estado de Justiça e Reintegração Social
+Florianópolis/SC</div>
+      </div>
+    </div>
+
+    <!-- MODELO 5 — SEGURANÇA MÁXIMA / RDD -->
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <h4>🔒 Modelo — Inclusão na Unidade de Segurança Máxima (após RDD deferido)</h4>
+        <button class="btn-copiar" onclick="copiarModelo(this)">📋 Copiar</button>
+      </div>
+      <div class="modelo-card-body">
+        <div class="modelo-texto">UNIDADE PRISIONAL DE ORIGEM, [DIA] de [MÊS] de [ANO].
+
+Prezados(as),
+
+Encaminho para análise e deliberação dessa Comissão Deliberativa para inclusão de presos na Unidade de Segurança Máxima do Estado e Central de Regulação de Vagas quanto à inclusão do(a) reeducando(a) NOME COMPLETO, IPEN Nº [NÚMERO], atualmente custodiado(a) no(a) UNIDADE PRISIONAL DE ORIGEM.
+
+A presente solicitação fundamenta-se nos documentos e informações que seguem anexos, os quais demonstram a necessidade da medida, especialmente diante das circunstâncias que envolvem o referido custodiado e os riscos à ordem, à disciplina e à segurança do estabelecimento prisional.
+
+Para subsidiar a análise dessa Comissão e CRV, encaminham-se os seguintes documentos:
+
+    - Ofício de solicitação de inclusão em Regime Disciplinar Diferenciado (RDD) encaminhado ao r. Juízo competente;
+    - Decisão judicial que determina a inclusão do apenado em RDD;
+    - Boletim de Ocorrência, PAD, Relatórios e/ou demais informações pertinentes à avaliação da medida.
+
+Para subsidiar a análise, informo a devida atualização no sistema i-PEN do Boletim Penal Informativo, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como anexo o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor.
+
+Uma vez efetivada a remoção, caso aprovada, o r. Juízo competente será devidamente comunicado no prazo legal de até 24 horas.
+
+Diante do exposto, solicita-se a urgente apreciação do presente pedido, com vistas à deliberação acerca da inclusão do apenado na Unidade de Segurança Máxima do Estado.
+
+Respeitosamente,
+
+(documento assinado digitalmente)
+NOME DO DIRETOR DA UNIDADE PRISIONAL DE ORIGEM
+Diretor(a) do(a) UNIDADE DE ORIGEM
+
+(documento assinado digitalmente)
+NOME DO SUPERINTENDENTE REGIONAL — ORIGEM
+Superintendente do(a) SR DE ORIGEM
+
+À
+COMISSÃO DELIBERATIVA — UNIDADE DE SEGURANÇA MÁXIMA
+Departamento de Polícia Penal — DPP
+Secretaria de Estado de Justiça e Reintegração Social
+Florianópolis/SC
+
+À
+CENTRAL DE REGULAÇÃO DE VAGAS
+Departamento de Polícia Penal — DPP
+Secretaria de Estado de Justiça e Reintegração Social
+Florianópolis/SC</div>
+      </div>
+    </div>
+
+    <!-- MODELO 6 — COMUNICAÇÃO AO JUÍZO -->
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <h4>🏛️ Modelo — Comunicação de Transferência ao Juízo de Execução</h4>
+        <button class="btn-copiar" onclick="copiarModelo(this)">📋 Copiar</button>
+      </div>
+      <div class="modelo-card-body">
+        <div class="modelo-texto">UNIDADE PRISIONAL DE ORIGEM, [DIA] de [MÊS] de [ANO].
+
+Excelentíssimo(a) Senhor(a) Juiz(a) da
+[VARA DE EXECUÇÕES PENAIS — COMARCA DE [COMARCA]]
+
+ASSUNTO: Comunicação de Transferência de Custodiado(a)
+
+Excelência,
+
+Comunicamos que o(a) custodiado(a) NOME COMPLETO, IPEN nº [NÚMERO], foi transferido(a) para [NOME DA UNIDADE DE DESTINO] — [CIDADE]/SC, em [DATA], às [HORA]h, em razão de [MOTIVO: segurança/emergência / adequação de capacidade / mandado de comarca diversa].
+
+A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP/SEJURI, mediante despacho nº [Nº DO DESPACHO], de [DATA].
+
+Respeitosamente,
+
+(documento assinado digitalmente)
+NOME DO(A) DIRETOR(A)
+Diretor(a) do(a) UNIDADE DE ORIGEM</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================================================  PRAZOS  ==================================================== -->
+<section id="prazos" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>🕐 Prazos</h2>
+      <p>Prazos máximos para análise, execução e comunicação ao juízo. Descumprimento enseja responsabilização administrativa.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="card">
+      <div class="card-body">
+        <div class="tabela-wrapper">
+          <table>
+            <thead>
+              <tr><th>Hipótese</th><th>Análise CRV</th><th>Execução</th><th>Comunicação ao Juízo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Segurança / Emergência</strong></td><td><span class="badge badge-vermelho">Imediato / até 2h</span></td><td>Até <strong>24 horas</strong></td><td>Até <strong>24h</strong> após a transferência</td></tr>
+              <tr><td><strong>Adequação de Capacidade</strong></td><td>Conf. cronograma</td><td>Conf. cronograma CRV / SR / DPP</td><td>Até <strong>24h</strong> após execução</td></tr>
+              <tr><td><strong>Mandado de Comarca Diversa</strong></td><td>Até 3 dias úteis</td><td>Conforme prazo do mandado</td><td>Imediato ao cumprimento</td></tr>
+              <tr><td><strong>Pernoite</strong></td><td>Conf. deliberação CRV</td><td>Conf. deliberação</td><td>—</td></tr>
+              <tr><td><strong>Seg. Máxima / RDD</strong></td><td>Conf. Comissão / DPP</td><td>Conf. decisão judicial</td><td>Até <strong>24h</strong> após execução</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="alerta alerta-urgente mt-2">
+      <span class="alerta-icone">🚨</span>
+      <div><strong class="alerta-titulo">Descumprimento de prazo</strong>O descumprimento injustificado dos prazos pode ensejar responsabilização administrativa do servidor e gerar nulidades processuais na execução penal.</div>
+    </div>
+    <div class="alerta alerta-info mt-2">
+      <span class="alerta-icone">ℹ️</span>
+      <div>Os prazos são máximos. A CRV e as unidades devem agir com a maior brevidade possível. Em emergências: ligue primeiro — <strong>(48) 3665-7330</strong>.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  VEDAÇÕES  ==================================================== -->
+<section id="vedacoes" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>🚫 Vedações</h2>
+      <p>Situações em que a transferência não será autorizada. Pedidos enquadrados em vedação serão indeferidos de plano.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-urgente mb-3">
+      <span class="alerta-icone">🚫</span>
+      <div><strong class="alerta-titulo">Indeferimento automático</strong>A identificação de qualquer das situações abaixo impede o deferimento, salvo decisão judicial expressa em sentido contrário.</div>
+    </div>
+    <div class="accordion">
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">1. BPI desatualizado ou sem assinatura do responsável<span class="accordion-seta">▼</span></div><div class="accordion-body">O Boletim Penal Informativo deve estar atualizado no sistema i-PEN e assinado pelo Coordenador de Execução Penal ou pelo Diretor antes do envio. Processos com BPI desatualizado serão devolvidos para regularização.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">2. Ausência de anuência do Diretor de destino e/ou do SR<span class="accordion-seta">▼</span></div><div class="accordion-body">Todo expediente de transferência deve ser subscrito pelo Diretor da unidade de destino e pelo(s) Superintendente(s) Regional(is) envolvidos. A ausência dessas assinaturas resultará na devolução imediata do processo.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">3. Ausência de vaga compatível na unidade de destino<span class="accordion-seta">▼</span></div><div class="accordion-body">Nenhuma transferência será autorizada para unidade sem vaga disponível e compatível com o perfil do custodiado. A superlotação é vedada pelo Princípio da Taxatividade da Res. nº 1/2026.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">4. Incompatibilidade de regime, gênero ou perfil<span class="accordion-seta">▼</span></div><div class="accordion-body">Preso em regime fechado não pode ser enviado a unidade semiaberta ou aberta, e vice-versa. Presos de alta periculosidade não serão transferidos para unidades de perfil comum sem autorização específica da CRV e do DPP.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">5. Solicitação de inclusão em USM sem autorização prévia do DPP<span class="accordion-seta">▼</span></div><div class="accordion-body">A gestão local não pode solicitar RDD ao Judiciário sem autorização expressa prévia do DPP via Comissão Deliberativa. Pedidos enviados diretamente ao Judiciário sem essa autorização serão considerados indevidos e o processo será arquivado na CRV.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">6. Preso em RDD transferido para unidade comum<span class="accordion-seta">▼</span></div><div class="accordion-body">Durante o cumprimento de RDD, a transferência para unidade comum somente ocorrerá mediante autorização judicial expressa.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">7. Restrição judicial de permanência na unidade atual<span class="accordion-seta">▼</span></div><div class="accordion-body">Quando o juízo competente determinou expressamente a permanência do preso na unidade, nenhuma transferência será autorizada sem nova decisão judicial revogando a restrição.</div></div>
+      <div class="accordion-item"><div class="accordion-header" onclick="toggleAccordion(this)">8. Contraindicação médica ao transporte<span class="accordion-seta">▼</span></div><div class="accordion-body">Laudo médico que contraindique o transporte (risco de morte ou agravamento grave) suspende a transferência até nova autorização médica. A CRV é comunicada e o processo fica em espera.</div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  LEGISLAÇÃO  ==================================================== -->
+<section id="legislacao" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>📚 Legislação</h2>
+      <p>Base normativa aplicável aos procedimentos da CRV em Santa Catarina.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <h2 class="section-titulo mb-2">Normativa Estadual — Santa Catarina</h2>
+    <div class="lei-card">
+      <span class="lei-icon">⭐</span>
+      <div class="lei-info">
+        <h4>Resolução Conjunta Interinstitucional nº 1, de 20 de janeiro de 2026 — TJSC + SEJURI</h4>
+        <p>Cria e regulamenta a Central de Regulação de Vagas. Disciplina os procedimentos operacionais, administrativos e judiciais para ingresso, alocação e transferência de pessoas privadas de liberdade. Pub. DJ nº 4.661 de 04/02/2026. <strong>Norma primária de todo este manual.</strong></p>
+      </div>
+    </div>
+    <div class="lei-card">
+      <span class="lei-icon">📄</span>
+      <div class="lei-info">
+        <h4>Portaria Normativa nº 2.189/2025 — Departamento de Polícia Penal (DPP)</h4>
+        <p>Regulamenta internamente os procedimentos operacionais do DPP, incluindo o Art. 24 que disciplina as transferências por mandado de prisão de comarca diversa.</p>
+      </div>
+    </div>
+    <div class="lei-card">
+      <span class="lei-icon">📄</span>
+      <div class="lei-info">
+        <h4>Lei Complementar nº 529/2011 — SC</h4>
+        <p>Art. 73: sanções disciplinares na própria cela ou em cela especial de isolamento não ultrapassarão 30 dias para cada falta cometida. Aplicável nas transferências emergenciais por mau comportamento.</p>
+      </div>
+    </div>
+    <h2 class="section-titulo mt-3 mb-2">Legislação Federal</h2>
+    <div class="lei-card">
+      <span class="lei-icon">📜</span>
+      <div class="lei-info">
+        <h4>Lei nº 7.210/1984 — Lei de Execução Penal (LEP)</h4>
+        <p>Arts. 57, 58 (sanções disciplinares) e art. 60 (isolamento preventivo de até 10 dias) são especialmente relevantes para as transferências emergenciais. Art. 86 trata das transferências entre estabelecimentos.</p>
+      </div>
+    </div>
+    <div class="lei-card">
+      <span class="lei-icon">📜</span>
+      <div class="lei-info">
+        <h4>Lei nº 11.671/2008 — Transferência para o Sistema Federal</h4>
+        <p>Regula a inclusão e transferência de presos para estabelecimentos penais federais de segurança máxima. Define competências do DEPEN.</p>
+      </div>
+    </div>
+    <div class="lei-card">
+      <span class="lei-icon">📜</span>
+      <div class="lei-info">
+        <h4>Decreto nº 6.877/2009</h4>
+        <p>Regulamenta a Lei nº 11.671/2008. Detalha os procedimentos para transferência ao DEPEN, incluindo prazos, documentação e critérios de inclusão no sistema federal.</p>
+      </div>
+    </div>
+    <div class="lei-card">
+      <span class="lei-icon">📜</span>
+      <div class="lei-info">
+        <h4>Plano Pena Justa — CNJ</h4>
+        <p>Metas de redução progressiva da taxa de ocupação: 130% (1º ano) → 120% (2º ano) → 100% (3º ano). Fundamenta a hipótese de Adequação da Capacidade de Ocupação.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  UNIDADES  ==================================================== -->
+<section id="unidades" class="page-section">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h2>🏢 Unidades Prisionais</h2>
+      <p>Cadastro das unidades do sistema prisional catarinense. Use o filtro para localizar.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="filtro-bar">
+      <input type="text" id="buscaUnidade" placeholder="🔍 Buscar por nome, cidade ou sigla..." oninput="filtrarUnidades()" />
+      <select id="filtroTipo" onchange="filtrarUnidades()">
+        <option value="">Todos os regimes</option>
+        <option value="fechado">Regime Fechado</option>
+        <option value="semiaberto">Regime Semiaberto</option>
+        <option value="aberto">Regime Aberto</option>
+        <option value="maxima">Segurança Máxima</option>
+        <option value="feminino">Feminino</option>
+        <option value="provisorio">Provisório / CDP</option>
+      </select>
+    </div>
+    <div class="unidade-grid" id="unidadeGrid">
+      <div class="unidade-card" data-tipo="fechado"><div class="unidade-nome">Penitenciária de Florianópolis</div><div class="unidade-sigla">PEFLO</div><div class="unidade-info"><span>📍 Florianópolis</span><span>🔒 Regime Fechado Masculino</span></div><div class="unidade-tipo"><span class="badge badge-azul">Fechado</span></div></div>
+      <div class="unidade-card" data-tipo="fechado maxima"><div class="unidade-nome">Penitenciária de Segurança Máxima</div><div class="unidade-sigla">PSM-SC</div><div class="unidade-info"><span>📍 São Pedro de Alcântara</span><span>🔒 Segurança Máxima Masculino</span></div><div class="unidade-tipo"><span class="badge badge-roxo">Seg. Máxima</span></div></div>
+      <div class="unidade-card" data-tipo="fechado"><div class="unidade-nome">Presídio Regional de Joinville</div><div class="unidade-sigla">PRJ</div><div class="unidade-info"><span>📍 Joinville</span><span>🔒 Provisório / Fechado</span></div><div class="unidade-tipo"><span class="badge badge-azul">Fechado</span></div></div>
+      <div class="unidade-card" data-tipo="fechado"><div class="unidade-nome">Presídio Regional de Blumenau</div><div class="unidade-sigla">PRB</div><div class="unidade-info"><span>📍 Blumenau</span><span>🔒 Provisório / Fechado</span></div><div class="unidade-tipo"><span class="badge badge-azul">Fechado</span></div></div>
+      <div class="unidade-card" data-tipo="fechado"><div class="unidade-nome">Presídio Regional de Chapecó</div><div class="unidade-sigla">PRCHP</div><div class="unidade-info"><span>📍 Chapecó</span><span>🔒 Provisório / Fechado</span></div><div class="unidade-tipo"><span class="badge badge-azul">Fechado</span></div></div>
+      <div class="unidade-card" data-tipo="semiaberto"><div class="unidade-nome">Centro de Progressão Penitenciária — Norte</div><div class="unidade-sigla">CPP-NORTE</div><div class="unidade-info"><span>📍 Joinville</span><span>🔓 Semiaberto Masculino</span></div><div class="unidade-tipo"><span class="badge badge-amarelo">Semiaberto</span></div></div>
+      <div class="unidade-card" data-tipo="semiaberto"><div class="unidade-nome">Centro de Progressão Penitenciária — Sul</div><div class="unidade-sigla">CPP-SUL</div><div class="unidade-info"><span>📍 Criciúma</span><span>🔓 Semiaberto Masculino</span></div><div class="unidade-tipo"><span class="badge badge-amarelo">Semiaberto</span></div></div>
+      <div class="unidade-card" data-tipo="feminino fechado"><div class="unidade-nome">Presídio Feminino de Florianópolis</div><div class="unidade-sigla">PFF</div><div class="unidade-info"><span>📍 Florianópolis</span><span>🔒 Feminino Fechado / Provisório</span></div><div class="unidade-tipo"><span class="badge badge-verde">Feminino</span></div></div>
+      <div class="unidade-card" data-tipo="provisorio"><div class="unidade-nome">Centro de Triagem e Inclusão Penitenciária</div><div class="unidade-sigla">CTIP</div><div class="unidade-info"><span>📍 São José</span><span>🏠 Triagem e Inclusão</span></div><div class="unidade-tipo"><span class="badge badge-cinza">Provisório</span></div></div>
+      <div class="unidade-card" data-tipo="fechado"><div class="unidade-nome">Presídio Regional de Lages</div><div class="unidade-sigla">PRL</div><div class="unidade-info"><span>📍 Lages</span><span>🔒 Provisório / Fechado</span></div><div class="unidade-tipo"><span class="badge badge-azul">Fechado</span></div></div>
+      <div class="unidade-card" data-tipo="fechado"><div class="unidade-nome">Presídio Regional de Itajaí</div><div class="unidade-sigla">PRI</div><div class="unidade-info"><span>📍 Itajaí</span><span>🔒 Provisório / Fechado</span></div><div class="unidade-tipo"><span class="badge badge-azul">Fechado</span></div></div>
+      <div class="unidade-card" data-tipo="aberto"><div class="unidade-nome">Casa do Albergado de Florianópolis</div><div class="unidade-sigla">CAF</div><div class="unidade-info"><span>📍 Florianópolis</span><span>🏠 Aberto / Albergado</span></div><div class="unidade-tipo"><span class="badge badge-cinza">Aberto</span></div></div>
+    </div>
+    <div class="alerta alerta-info mt-3">
+      <span class="alerta-icone">ℹ️</span>
+      <div>O cadastro completo e as vagas disponíveis em tempo real são consultados no sistema i-PEN / CRV. Em caso de divergência, prevalece o sistema oficial (conf. Art. 28 da Res. nº 1/2026).</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  ATALHOS — PÁGINAS ESPECÍFICAS  ==================================================== -->
+
+<!-- EMERGENCIAL -->
+<section id="emergencial" class="page-section">
+  <div class="page-hero" style="background:linear-gradient(135deg,#450a0a,#991b1b);">
+    <div class="page-hero-inner">
+      <h2>🚨 Segurança / Emergência</h2>
+      <p>Acione a CRV por telefone <strong>(48) 3665-7330</strong> imediatamente. O ofício deve chegar em até 2h.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-urgente mb-3">
+      <span class="alerta-icone">📞</span>
+      <div><strong class="alerta-titulo">1º Passo — Ligue agora</strong>Plantão 24h: <a href="tel:+554836657330" style="color:var(--vermelho);font-weight:800;">(48) 3665-7330</a> — Anote o número do protocolo verbal. O ofício deve chegar em até 2h.</div>
+    </div>
+    <div class="conteudo-grid">
+      <div>
+        <div class="card mb-2">
+          <div class="card-header"><span>🔀</span><h3>Dois tipos de transferência emergencial</h3></div>
+          <div class="card-body">
+            <p class="text-sm mb-2"><strong>Tipo 1 — Proteção da integridade física:</strong> Risco à vida ou integridade do custodiado. Os direitos da pessoa presa são preservados (visita, pátio de sol, etc.).</p>
+            <p class="text-sm"><strong>Tipo 2 — Transferência preventiva por mau comportamento:</strong> Prazo de até 10 dias (art. 60 LEP). O PAD deve estar instaurado. Não constitui sanção disciplinar.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="fluxo-lista">
+              <div class="fluxo-item"><div class="fluxo-num">01</div><div class="fluxo-conteudo"><h4>Diretor identifica o risco imediato</h4><p>Conflito grave, ameaça de morte, lesão em curso, motim — qualquer situação que torne inviável a permanência na unidade.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">02</div><div class="fluxo-conteudo"><h4>Ligar para a CRV — (48) 3665-7330</h4><p>Informar nome do preso, IPEN, hipótese e breve descrição do risco. Anotar o protocolo verbal.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">03</div><div class="fluxo-conteudo"><h4>Contato com Diretor de destino e SR(s)</h4><p>Obter a anuência do Diretor da unidade de destino e do(s) Superintendente(s) Regional(is) para que assinem o expediente.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">04</div><div class="fluxo-conteudo"><h4>Enviar ofício modelo 005/2026 + documentos — até 2h</h4><p>Ofício subscrito por: Diretor origem + Diretor destino + SR(s). Anexar: BOI, relatório de segurança, BPI atualizado no i-PEN e Relatório de Saúde.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">05</div><div class="fluxo-conteudo"><h4>CRV defere e expede a GR — até 24h</h4><p>Transferência executada. Unidade de destino confirma no sistema i-PEN.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">06</div><div class="fluxo-conteudo"><h4>Comunicar o Juízo de Execução — até 24h</h4><p>Ofício ao juízo competente com data, hora, IPEN, unidade de destino e nº do despacho CRV.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="sidebar-card"><div class="sidebar-card-header">📂 Documentos</div><div class="sidebar-card-body"><ul style="font-size:.82rem;line-height:2.1;list-style:none;"><li>☐ Ofício (Modelo 005/2026)</li><li>☐ BOI</li><li>☐ Relatório de segurança</li><li>☐ BPI atualizado no i-PEN</li><li>☐ Relatório de Saúde</li><li>☐ PAD (se preventiva)</li></ul><a href="#" onclick="navegarPara('documentos');return false;" style="font-size:.8rem;color:var(--azul-4);margin-top:.5rem;display:block;">→ Checklist completo</a></div></div>
+        <div class="sidebar-card"><div class="sidebar-card-header">📝 Modelo de Ofício</div><div class="sidebar-card-body"><a href="#" onclick="navegarPara('modelos');return false;" style="font-size:.82rem;color:var(--azul-4);">→ Modelo 005/2026 — Emergencial</a></div></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- PEDIDO PRESO/FAMÍLIA -->
+<section id="pedido-preso" class="page-section">
+  <div class="page-hero" style="background:linear-gradient(135deg,#0c1e4a,#1d4ed8);">
+    <div class="page-hero-inner">
+      <h2>👤 Pedido do Preso ou Família</h2>
+      <p>Transferências por interesse do custodiado são atendidas pelo Programa de Permutas da CRV.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-info mb-3">
+      <span class="alerta-icone">ℹ️</span>
+      <div><strong class="alerta-titulo">Situação atual — sem vagas disponíveis</strong>
+      Como não há vagas disponíveis em unidades do Estado, transferências por pedido do preso ou familiar serão atendidas exclusivamente pelo <strong>Programa de Permutas</strong>, coordenado pela equipe da CRV. O envio de memorandos diretamente à CRV solicitando vaga será indeferido por inexistência de vaga.</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span>🔗</span><h3>Programa de Permutas — CRV</h3></div>
+      <div class="card-body">
+        <p class="text-sm mb-2">O Programa de Permutas permite que dois presos de unidades diferentes troquem de estabelecimento sem necessidade de vaga nova, desde que o perfil de ambos seja compatível com a troca.</p>
+        <p class="text-sm mb-2"><strong>Responsável:</strong> Equipe CRV (Policial Penal Jéssica).</p>
+        <p class="text-sm"><strong>Contato:</strong> <a href="mailto:crv@pp.sc.gov.br">crv@pp.sc.gov.br</a> | <a href="tel:+554836657330">(48) 3665-7330</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EQUALIZAÇÃO / ADEQUAÇÃO DE CAPACIDADE -->
+<section id="equalizacao" class="page-section">
+  <div class="page-hero" style="background:linear-gradient(135deg,#052e16,#15803d);">
+    <div class="page-hero-inner">
+      <h2>⚖️ Adequação da Capacidade de Ocupação</h2>
+      <p>Redistribuição administrativa promovida pelo DPP, CRV, Superintendentes Regionais ou Diretores das Unidades Prisionais.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-info mb-3">
+      <span class="alerta-icone">ℹ️</span>
+      <div>A adequação pode ser iniciada pelo <strong>DPP, pela CRV, pelos Superintendentes Regionais ou pelos próprios Diretores das Unidades Prisionais</strong>, visando sempre a equalização e o ajuste de vagas (Art. 21, III da Res. nº 1/2026).</div>
+    </div>
+    <div class="card mb-2">
+      <div class="card-header"><span>📊</span><h3>Metas — Plano Pena Justa</h3></div>
+      <div class="card-body">
+        <div class="tabela-wrapper">
+          <table>
+            <thead><tr><th>Período</th><th>Taxa máxima</th><th>Ação</th></tr></thead>
+            <tbody>
+              <tr><td>1º ano (2026)</td><td><strong>130%</strong></td><td>Monitoramento e equalização se necessário</td></tr>
+              <tr><td>2º ano (2027)</td><td><strong>120%</strong></td><td>Equalização obrigatória acima do limite</td></tr>
+              <tr><td>3º ano (2028+)</td><td><strong>100%</strong></td><td>Princípio da Taxatividade (1 vaga : 1 preso)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span>📋</span><h3>Modalidades de Transferência por Adequação</h3></div>
+      <div class="card-body">
+        <p class="text-sm mb-2"><strong>Modelo 1 — Larga escala / mesmo Complexo:</strong> Transferência rotineira de vários internos de uma só vez dentro do mesmo Complexo (ex.: 20 internos do presídio para a penitenciária). Todos no mesmo pedido.</p>
+        <p class="text-sm"><strong>Modelo 2 — Pontual:</strong> Transferência individual por perfil específico (ex.: pessoa LGBT para unidade adequada ao perfil).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANDADO COMARCA DIVERSA -->
+<section id="mandado-comarca" class="page-section">
+  <div class="page-hero" style="background:linear-gradient(135deg,#431407,#c2410c);">
+    <div class="page-hero-inner">
+      <h2>🏛️ Mandado de Prisão de Comarca Diversa</h2>
+      <p>Preso capturado em comarca diferente da que expediu a ordem. Art. 21, III — Res. nº 1/2026 · Art. 24 — PN 2189/2025.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-atencao mb-3">
+      <span class="alerta-icone">⚠️</span>
+      <div><strong class="alerta-titulo">Unidade de destino = circunscrição do juízo expedidor</strong>A unidade de destino deve ser aquela responsável pela circunscrição da autoridade judiciária que expediu o mandado.</div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="fluxo-lista">
+          <div class="fluxo-item"><div class="fluxo-num">01</div><div class="fluxo-conteudo"><h4>Receber o mandado e identificar a unidade de destino correta</h4><p>A unidade de destino é a responsável pela circunscrição da autoridade judiciária que expediu a ordem de prisão.</p></div></div>
+          <div class="fluxo-item"><div class="fluxo-num">02</div><div class="fluxo-conteudo"><h4>Obter anuência do Diretor de destino e do(s) SR(s)</h4><p>Contato prévio e assinatura digital no expediente.</p></div></div>
+          <div class="fluxo-item"><div class="fluxo-num">03</div><div class="fluxo-conteudo"><h4>Enviar ofício à CRV com cópia do mandado</h4><p>Fundamento: Art. 21, III da Res. nº 1/2026 e Art. 24 da PN 2189/2025.</p></div></div>
+          <div class="fluxo-item"><div class="fluxo-num">04</div><div class="fluxo-conteudo"><h4>CRV verifica disponibilidade e delibera</h4><p>Análise em até 3 dias úteis. Transferência executada conforme prazo do mandado.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERNOITE -->
+<section id="pernoite" class="page-section">
+  <div class="page-hero" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">
+    <div class="page-hero-inner">
+      <h2>🌙 Pernoite</h2>
+      <p>Permanência temporária do custodiado em unidade diversa da sua, por motivo fundamentado.</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-info mb-3">
+      <span class="alerta-icone">ℹ️</span>
+      <div>O pernoite não é uma transferência definitiva. É uma medida pontual e temporária, que deve ser devidamente fundamentada e autorizada pela CRV.</div>
+    </div>
+    <div class="conteudo-grid">
+      <div>
+        <div class="card">
+          <div class="card-body">
+            <div class="fluxo-lista">
+              <div class="fluxo-item"><div class="fluxo-num">01</div><div class="fluxo-conteudo"><h4>Identificar a necessidade e fundamentar</h4><p>Audiência em comarca distante, questão médica, logística de escolta — qualquer motivo que justifique a permanência temporária em outra unidade.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">02</div><div class="fluxo-conteudo"><h4>Contato prévio com a unidade de destino e SR(s)</h4><p>A gestão da unidade de destino deve anuir e subscrever o expediente.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">03</div><div class="fluxo-conteudo"><h4>Enviar ofício à CRV</h4><p>Ofício com fundamentação, BPI atualizado no i-PEN e assinaturas de todos os envolvidos.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">04</div><div class="fluxo-conteudo"><h4>CRV delibera e autoriza</h4><p>Com a autorização, executar o pernoite conforme planejado.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="sidebar-card"><div class="sidebar-card-header">📝 Modelo de Ofício</div><div class="sidebar-card-body"><a href="#" onclick="navegarPara('modelos');return false;" style="font-size:.82rem;color:var(--azul-4);">→ Modelo — Pernoite</a></div></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- SEGURANÇA MÁXIMA / RDD -->
+<section id="seguranca-maxima" class="page-section">
+  <div class="page-hero" style="background:linear-gradient(135deg,#1e1b4b,#4c1d95);">
+    <div class="page-hero-inner">
+      <h2>🔒 Unidade de Segurança Máxima / RDD</h2>
+      <p>Fluxo: DPP (Comissão Deliberativa) → Judiciário (RDD) → CRV (cadastro) → PPSC/CEPEN (acompanhamento).</p>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="alerta alerta-urgente mb-3">
+      <span class="alerta-icone">⛔</span>
+      <div><strong class="alerta-titulo">Atenção — Autorização prévia do DPP é obrigatória</strong>A gestão local somente pode solicitar o RDD ao Judiciário <strong>após autorização expressa do Departamento de Polícia Penal</strong>, por meio da Comissão Deliberativa da USM. A Comissão deve ser tratada entre o Superintendente Regional e a DGPP.</div>
+    </div>
+    <div class="conteudo-grid">
+      <div>
+        <h2 class="section-titulo mb-2">Fluxo Completo — Seg. Máxima</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="fluxo-lista">
+              <div class="fluxo-item"><div class="fluxo-num">01</div><div class="fluxo-conteudo"><h4>SR aciona a DGPP / Comissão Deliberativa da USM</h4><p>O Superintendente Regional identifica o caso e trata com a Diretoria-Geral de Polícia Penal (DGPP) a necessidade de inclusão na USM.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">02</div><div class="fluxo-conteudo"><h4>DPP autoriza via Comissão Deliberativa</h4><p>Somente após essa autorização expressa a Direção da unidade pode protocolar o pedido de RDD no Judiciário.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">03</div><div class="fluxo-conteudo"><h4>Direção protocola pedido de RDD no Juízo competente</h4><p>Ofício ao Juízo com toda a documentação: BO, PAD, relatórios, BPI atualizado no i-PEN e Relatório de Saúde.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">04</div><div class="fluxo-conteudo"><h4>Judiciário defere o RDD</h4><p>Com a decisão judicial deferindo o RDD, o processo está apto a ser encaminhado à Comissão Deliberativa e à CRV.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">05</div><div class="fluxo-conteudo"><h4>CRV recebe o processo e cadastra no sistema</h4><p>Somente a CRV tem acesso ao cadastro no sistema para inclusão na USM. A CRV solicita via despacho simples à PPSC/CEPEN a inclusão da ata e deliberação da Comissão.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">06</div><div class="fluxo-conteudo"><h4>PPSC/CEPEN inclui a ata e devolve o processo à CRV</h4><p>A CEPEN devolve o processo para a CRV fazer a manifestação final.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">07</div><div class="fluxo-conteudo"><h4>CRV manifesta-se e tramita para PPSC/CEPEN</h4><p>O processo é finalizado na CRV e tramitado para PPSC/CEPEN, que acompanha todos os presos na USM.</p></div></div>
+              <div class="fluxo-item"><div class="fluxo-num">08</div><div class="fluxo-conteudo"><h4>Execução e comunicação ao Juízo — até 24h</h4><p>Transferência executada após autorização. Juízo de execução comunicado em até 24h.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="sidebar-card"><div class="sidebar-card-header">📂 Documentos</div><div class="sidebar-card-body"><ul style="font-size:.82rem;line-height:2.1;list-style:none;"><li>☐ Autorização DPP (Comissão)</li><li>☐ Pedido de RDD ao Juízo</li><li>☐ Decisão judicial (RDD)</li><li>☐ BO / PAD / Relatórios</li><li>☐ BPI atualizado no i-PEN</li><li>☐ Relatório de Saúde</li></ul><a href="#" onclick="navegarPara('documentos');return false;" style="font-size:.8rem;color:var(--azul-4);margin-top:.5rem;display:block;">→ Checklist completo</a></div></div>
+        <div class="sidebar-card"><div class="sidebar-card-header">📝 Modelo</div><div class="sidebar-card-body"><a href="#" onclick="navegarPara('modelos');return false;" style="font-size:.82rem;color:var(--azul-4);">→ Modelo — Inclusão na USM (após RDD deferido)</a></div></div>
+        <div class="sidebar-card"><div class="sidebar-card-header">📚 Base Legal</div><div class="sidebar-card-body"><a href="#" onclick="navegarPara('legislacao');return false;" style="font-size:.82rem;color:var(--azul-4);">→ Lei nº 11.671/2008<br>→ Decreto nº 6.877/2009<br>→ Portaria 1465 (DPP)</a></div></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+
+<!-- ====================================================  FOOTER  ==================================================== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-bloco footer-bloco-principal">
+      <div class="footer-logo-area">
+        <img src="assets/brasao-pp-sc.png" alt="Polícia Penal SC" class="footer-brasao-img" />
+        <div>
+          <strong class="footer-titulo">Manual Operacional CRV</strong>
+          <span class="footer-subtitulo">Central de Regulação de Vagas</span>
+        </div>
+      </div>
+      <p class="footer-orgao">
+        Secretaria de Estado de Justiça e Reintegração Social — SEJURI<br>
+        Departamento de Polícia Penal — DPP<br>
+        Polícia Penal de Santa Catarina
+      </p>
+    </div>
+    <div class="footer-divisor"></div>
+    <div class="footer-bloco">
+      <span class="footer-label">Versão</span>
+      <span class="footer-valor footer-versao-num">2.1</span>
+      <span class="footer-label" style="margin-top:.5rem;">Atualização</span>
+      <span class="footer-valor">2026.2</span>
+    </div>
+    <div class="footer-divisor"></div>
+    <div class="footer-bloco">
+      <span class="footer-label" style="margin-bottom:.35rem;">Base Normativa</span>
+      <span class="footer-valor" style="font-size:.82rem;line-height:1.7;color:rgba(255,255,255,.5);">Res. Conjunta Interinst. nº 1/2026<br>TJSC + SEJURI · DJ nº 4.661 · 04/02/2026<br>PN nº 2.189/2025 · DPP</span>
+    </div>
+    <div class="footer-divisor"></div>
+    <div class="footer-bloco">
+      <span class="footer-aviso-badge">🔒 Uso Restrito</span>
+      <p class="footer-aviso-texto">Uso exclusivo de Policiais Penais autorizados.<br>Proibida reprodução ou divulgação não autorizada.</p>
+    </div>
+  </div>
+  <div class="footer-rodape-linha">
+    © 2026 SEJURI / DPP / CRV — Polícia Penal de Santa Catarina · Documento Interno
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+
+<!-- CSS extra: hierarquia institucional + atalho pernoite -->
+<style>
+.hierarquia { display:flex; flex-direction:column; gap:4px; }
+.hierarquia-item { padding:.4rem .75rem; border-radius:6px; font-size:.78rem; font-weight:600; border-left:3px solid transparent; }
+.nivel-1 { background:#f1f5f9; border-color:#94a3b8; color:#475569; }
+.nivel-2 { background:#e0f2fe; border-color:#38bdf8; color:#0369a1; margin-left:.75rem; }
+.nivel-3 { background:#dbeafe; border-color:#2563eb; color:#1d4ed8; margin-left:1.5rem; }
+.nivel-3.ativo { background:#1d4ed8; border-color:#1e40af; color:#fff; }
+.atalho-pernoite { --cor-destaque: #0f172a; --bg-icone: #e2e8f0; }
+</style>
+
+<script src="js/app.js" defer></script>
+
+</body>
+</html>
