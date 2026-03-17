@@ -2629,8 +2629,11 @@ body.dark-mode .oficio-sel-info   { color: #94a3b8; }
    ================================================ */
 
 .banner-fixo {
-  position: sticky;
+  position: fixed;
   top: 64px; /* altura do header principal */
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 85;
   background: linear-gradient(135deg, #0c1e4a 0%, #1a3a6e 60%, #0c1e4a 100%);
   border-bottom: 3px solid var(--ouro-3, #f0b429);
@@ -2687,7 +2690,7 @@ body.dark-mode .oficio-sel-info   { color: #94a3b8; }
 
 /* Empurra todo o conteúdo abaixo do banner fixo */
 .breadcrumb-bar {
-  /* Já existe - sem mudança necessária */
+  margin-top: 50px; /* space for fixed banner */
 }
 
 @media (max-width: 600px) {
