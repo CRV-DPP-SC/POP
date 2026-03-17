@@ -2623,20 +2623,76 @@ body.dark-mode .oficio-sel-info   { color: #94a3b8; }
 
 
 
+
 /* ================================================
-   HERO BANNER FIXO (STICKY) — PÁGINA INICIAL
+   BANNER FIXO — ABAIXO DO HEADER, SEMPRE VISÍVEL
    ================================================ */
 
-.page-hero-sticky {
+.banner-fixo {
   position: sticky;
-  top: 64px; /* altura do header */
-  z-index: 80;
-  box-shadow: 0 4px 20px rgba(0,0,0,.35);
+  top: 64px; /* altura do header principal */
+  z-index: 85;
+  background: linear-gradient(135deg, #0c1e4a 0%, #1a3a6e 60%, #0c1e4a 100%);
+  border-bottom: 3px solid var(--ouro-3, #f0b429);
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  width: 100%;
 }
 
-/* Garante que o conteúdo abaixo não fique atrás do hero sticky */
-#inicio .main-wrapper {
-  position: relative;
-  z-index: 1;
+.banner-fixo-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: .55rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.banner-fixo-badge {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ouro-3, #f0b429);
+  background: rgba(240,180,41,.1);
+  border: 1px solid rgba(240,180,41,.25);
+  border-radius: 100px;
+  padding: .2rem .65rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.banner-fixo-titulo {
+  font-family: var(--fonte-display, 'Barlow Condensed', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.banner-fixo-titulo span {
+  color: var(--ouro-3, #f0b429);
+}
+
+.banner-fixo-sub {
+  font-size: .7rem;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Empurra todo o conteúdo abaixo do banner fixo */
+.breadcrumb-bar {
+  /* Já existe - sem mudança necessária */
+}
+
+@media (max-width: 600px) {
+  .banner-fixo-inner { padding: .45rem 1rem; gap: .6rem; }
+  .banner-fixo-titulo { font-size: .88rem; }
+  .banner-fixo-sub { display: none; }
 }
 
