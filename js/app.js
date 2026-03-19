@@ -910,27 +910,120 @@ function copiarOficio() {
   });
 }
 
+// ── Helpers: dados da unidade e destinatário limpo ──────────────────────────
+function _dadosUnidade() {
+  const ori = unidadeOrigemSel;
+  const srOri = ori ? (SR_INFO[ori.sr] || {}) : {};
+  return {
+    nomeUnidade:  ori ? ori.nome       : '[UNIDADE PRISIONAL]',
+    cidade:       ori ? ori.cidade     : '[CIDADE]',
+    tel:          ori ? ori.tel        : '',
+    email:        ori ? ori.email      : '',
+    nomeSR:       srOri.nome           || '',
+    diretor:      ori ? ori.diretor    : '',
+  };
+}
+
+// Coleta destinatário como texto limpo (resolve campos de input)
+function _destTextoLimpo() {
+  const destEl = document.getElementById('ofc-destinatario');
+  if (!destEl) return [];
+  const juiz   = destEl.querySelector('#dest-juiz');
+  const vara   = destEl.querySelector('#dest-vara');
+  const cidade = destEl.querySelector('#dest-cidade');
+  if (juiz) {
+    return [
+      'À Senhor(a)',
+      'Dr(a). ' + (juiz.value.trim() || juiz.placeholder),
+      'Juiz(a) de Direito',
+      (vara.value.trim()   || vara.placeholder),
+      (cidade.value.trim() || cidade.placeholder),
+    ];
+  }
+  // Texto fixo: extrai linha a linha sem tags HTML
+  return destEl.innerText.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
 function gerarPDF() {
   const { cidade, data, saudacao, paras, despedida, asss } = coletarTextoOficio();
-  const destEl = document.getElementById('ofc-destinatario');
+  const u   = _dadosUnidade();
+  const dest = _destTextoLimpo();
+
+  // Rodapé: nome (negrito) | endereço (cidade/SC) | fone · e-mail
+  const rodapeLinha1 = u.nomeUnidade.toUpperCase();
+  const rodapeLinha2 = u.cidade ? u.cidade + '/SC' : '';
+  const rodapeLinha3 = [u.tel, u.email].filter(Boolean).join(' · ');
+
   const html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/><title>Ofício CRV</title>'
-    + '<style>@page{size:A4;margin:3cm 2.5cm 2.5cm 3cm;}body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;color:#000;}'
-    + '.data{text-align:right;margin-bottom:4em;}.saud{text-indent:1.5cm;margin-bottom:4em;}'
+    + '<style>'
+    + '@page{'
+    + '  size:A4;'
+    + '  margin:0;'
+    + '  @top-center{ content: element(cabecalho); }'
+    + '  @bottom-center{ content: element(rodape); }'
+    + '}'
+    + 'html,body{margin:0;padding:0;font-family:Arial,sans-serif;font-size:11pt;color:#000;line-height:1.5;}'
+    // Cabeçalho e rodapé fixos via posição running elements (Chromium suporta via @page)
+    // Fallback: usamos padding generoso no body para não sobrepor
+    + '.pagina{width:21cm;min-height:29.7cm;margin:0 auto;padding:4.5cm 2.5cm 3.5cm 3cm;box-sizing:border-box;}'
+    + '.cab{border-bottom:2px solid #1a3a6b;padding-bottom:.6em;margin-bottom:2em;}'
+    + '.cab-top{font-size:7.5pt;color:#666;margin:0;letter-spacing:.04em;}'
+    + '.cab-sejuri{font-size:7.5pt;color:#666;margin:.1em 0 0;}'
+    + '.cab-dpp{font-size:8pt;color:#444;margin:.1em 0 0;font-weight:bold;}'
+    + '.cab-unidade{font-size:11pt;font-weight:bold;color:#1a3a6b;margin:.25em 0 0;letter-spacing:.02em;}'
+    + '.data{text-align:right;margin-bottom:3.5em;}'
+    + '.saud{text-indent:1.5cm;margin-bottom:3.5em;}'
     + '.par{text-indent:1.5cm;text-align:justify;margin-bottom:1em;}'
-    + '.desp{margin-top:4em;margin-left:8cm;}.asss{margin-top:5em;margin-left:8cm;}'
-    + '.ab{margin-bottom:2em;}.dig{font-size:9pt;color:#555;font-style:italic;}.nom{font-weight:bold;}'
-    + '.dest{margin-top:4em;}strong{font-weight:bold;text-transform:uppercase;}</style></head><body>'
+    + '.desp{margin-top:3.5em;margin-left:8cm;}'
+    + '.asss{margin-top:4em;margin-left:8cm;}'
+    + '.ab{margin-bottom:2em;}'
+    + '.dig{font-size:9pt;color:#555;font-style:italic;}'
+    + '.nom{font-weight:bold;}'
+    + '.dest{margin-top:3.5em;line-height:1.5;}'
+    + '.dest-linha{display:block;margin:0;padding:0;}'
+    + '.dest-linha strong{font-weight:bold;text-transform:uppercase;}'
+    + '.rod{border-top:1px solid #bbb;padding-top:.5em;margin-top:2em;text-align:center;font-size:8pt;color:#666;line-height:1.4;}'
+    + '.rod-nome{font-weight:bold;font-size:8.5pt;display:block;}'
+    + '.rod-end{display:block;}'
+    + '.rod-cont{display:block;}'
+    + '</style></head><body>'
+    + '<div class="pagina">'
+    // Cabeçalho institucional
+    + '<div class="cab">'
+    + '<div class="cab-top">ESTADO DE SANTA CATARINA</div>'
+    + '<div class="cab-sejuri">SECRETARIA DE ESTADO DE JUSTIÇA E REINTEGRAÇÃO SOCIAL</div>'
+    + '<div class="cab-dpp">DEPARTAMENTO DE POLÍCIA PENAL</div>'
+    + '<div class="cab-unidade">' + u.nomeUnidade.toUpperCase() + '</div>'
+    + '</div>'
+    // Corpo
     + '<div class="data">' + cidade + ', ' + data + '.</div>'
     + '<div class="saud">' + saudacao + '</div>'
     + paras.map(p => '<div class="par">' + p + '</div>').join('')
     + '<div class="desp">' + despedida + '</div>'
-    + '<div class="asss">' + asss.map(a =>
-        '<div class="ab"><div class="dig">(documento assinado digitalmente)</div>'
+    + '<div class="asss">'
+    + asss.map(a =>
+        '<div class="ab">'
+        + '<div class="dig">(documento assinado digitalmente)</div>'
         + '<div class="nom">' + a.nome + '</div>'
         + a.cargo.split('\n').map(l => '<div>' + l + '</div>').join('')
-        + '</div>').join('') + '</div>'
-    + '<div class="dest">' + (destEl ? destEl.innerHTML : '') + '</div>'
+        + '</div>').join('')
+    + '</div>'
+    // Destinatário — sem tags extras, linha a linha
+    + '<div class="dest">'
+    + dest.map((l, i) => {
+        const bold = i === 1; // linha do nome do juízo/CRV em negrito
+        return '<span class="dest-linha">' + (bold ? '<strong>' + l + '</strong>' : l) + '</span>';
+      }).join('')
+    + '</div>'
+    // Rodapé institucional
+    + '<div class="rod">'
+    + '<span class="rod-nome">' + rodapeLinha1 + '</span>'
+    + (rodapeLinha2 ? '<span class="rod-end">' + rodapeLinha2 + '</span>' : '')
+    + (rodapeLinha3 ? '<span class="rod-cont">' + rodapeLinha3 + '</span>' : '')
+    + '</div>'
+    + '</div>'
     + '</body></html>';
+
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
@@ -939,15 +1032,44 @@ function gerarPDF() {
 
 function gerarWord() {
   const { cidade, data, saudacao, paras, despedida, asss } = coletarTextoOficio();
-  const destEl = document.getElementById('ofc-destinatario');
-  const mso = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
+  const u    = _dadosUnidade();
+  const dest = _destTextoLimpo();
+
+  // Cabeçalho MSO (div com mso-element:header)
+  const cab =
+    '<div style="mso-element:header;font-family:Arial;font-size:10pt;border-bottom:2pt solid #1a3a6b;padding-bottom:6pt;margin-bottom:12pt;">'
+    + '<p style="margin:0;font-size:8pt;color:#666;">ESTADO DE SANTA CATARINA</p>'
+    + '<p style="margin:0;font-size:8pt;color:#666;">SECRETARIA DE ESTADO DE JUSTIÇA E REINTEGRAÇÃO SOCIAL</p>'
+    + '<p style="margin:0;font-size:9pt;color:#444;font-weight:bold;">DEPARTAMENTO DE POLÍCIA PENAL</p>'
+    + '<p style="margin:0;font-size:11pt;font-weight:bold;color:#1a3a6b;">' + u.nomeUnidade.toUpperCase() + '</p>'
+    + '</div>';
+
+  // Rodapé MSO
+  const rod =
+    '<div style="mso-element:footer;font-family:Arial;font-size:8pt;color:#666;text-align:center;border-top:1pt solid #bbb;padding-top:4pt;margin-top:12pt;">'
+    + '<p style="margin:0;font-weight:bold;font-size:8.5pt;">' + u.nomeUnidade.toUpperCase() + '</p>'
+    + (u.cidade ? '<p style="margin:0;">' + u.cidade + '/SC</p>' : '')
+    + ([u.tel, u.email].filter(Boolean).length ? '<p style="margin:0;">' + [u.tel, u.email].filter(Boolean).join(' · ') + '</p>' : '')
+    + '</div>';
+
+  // Destinatário limpo
+  const destHtml = dest.map((l, i) =>
+    '<p style="margin:0;font-family:Arial;font-size:11pt;">'
+    + (i === 1 ? '<b>' + l + '</b>' : l)
+    + '</p>'
+  ).join('');
+
+  const mso =
+    '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
     + '<head><meta charset="UTF-8"/>'
-    + '<style>@page{mso-page-orientation:portrait;margin:3cm 2.5cm 2.5cm 3cm;}'
+    + '<style>'
+    + '@page{mso-page-orientation:portrait;margin:3cm 2.5cm 2.5cm 3cm;mso-header-margin:1.5cm;mso-footer-margin:1.2cm;mso-header:h1;mso-footer:f1;}'
     + 'body{font-family:Arial;font-size:11pt;line-height:1.5;}'
     + '.data{text-align:right;}.gap4{margin-bottom:4em;}.gap5{margin-bottom:5em;}.gap2{margin-bottom:2em;}'
     + '.i15{margin-left:1.5cm;text-align:justify;}.i8{margin-left:8cm;}'
     + 'b{font-weight:bold;}.dig{font-size:9pt;color:#555;font-style:italic;}'
     + '</style></head><body>'
+    + cab
     + '<p class="data">' + cidade + ', ' + data + '.</p>'
     + '<p class="gap4">&nbsp;</p>'
     + '<p class="i15 gap4">' + saudacao + '</p>'
@@ -960,8 +1082,10 @@ function gerarWord() {
         + a.cargo.split('\n').map(l => '<p class="i8">' + l + '</p>').join('')
         + '<p class="gap2">&nbsp;</p>').join('')
     + '<p class="gap4">&nbsp;</p>'
-    + (destEl ? destEl.innerHTML : '')
+    + destHtml
+    + rod
     + '</body></html>';
+
   const blob = new Blob(['\ufeff', mso], { type: 'application/msword' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -969,6 +1093,83 @@ function gerarWord() {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
   showToast('📘 Download Word iniciado!');
+}
+
+// ================================================
+// GERAR CARDS DE UNIDADES DINAMICAMENTE
+// (evita ofuscação de e-mail pelo Cloudflare)
+// ================================================
+function gerarCardsUnidades() {
+  const container = document.getElementById('srContainer');
+  if (!container) return;
+
+  const srLabel = {
+    SR01: 'Superintendência Regional da Grande Florianópolis',
+    SR02: 'Superintendência Regional Sul',
+    SR03: 'Superintendência Regional do Norte Catarinense',
+    SR04: 'Superintendência Regional do Vale do Itajaí',
+    SR05: 'Superintendência Regional Serrana',
+    SR06: 'Superintendência Regional Oeste',
+    SR07: 'Superintendência Regional do Médio Vale do Itajaí',
+    SR08: 'Superintendência Regional do Planalto Norte',
+  };
+
+  // Agrupa unidades por SR
+  const grupos = {};
+  UNIDADES.forEach(u => {
+    if (!grupos[u.sr]) grupos[u.sr] = [];
+    grupos[u.sr].push(u);
+  });
+
+  let html = '';
+  Object.keys(srLabel).forEach(srId => {
+    const unds = grupos[srId] || [];
+    const sr   = SR_INFO[srId] || {};
+    const telLink = sr.tel ? sr.tel.replace(/[\s‑\-]/g,'') : '';
+    const emailSR = sr.email || '';
+
+    html += `<div class="sr-bloco" data-sr="${srId.toLowerCase()}">
+      <div class="sr-header" onclick="toggleSR(this)">
+        <div class="sr-header-left">
+          <span class="sr-tag">${srId}</span>
+          <span class="sr-titulo">${srLabel[srId]}</span>
+        </div>
+        <div class="sr-header-right">
+          <span class="sr-count">${unds.length} unidade${unds.length !== 1 ? 's' : ''}</span>
+          <span class="sr-chevron-icon">▶</span>
+        </div>
+      </div>
+      <div class="sr-info-strip">
+        <span>👤 <strong>${sr.superintendente || ''}</strong></span>
+        <span>📞 <a href="tel:+55${telLink}">${sr.tel || ''}</a></span>
+        <span>📧 <a href="mailto:${emailSR}">${emailSR}</a></span>
+      </div>
+      <div class="sr-unidades" style="display:none;">`;
+
+    unds.forEach(u => {
+      const telU    = u.tel || '';
+      const telNum  = telU.replace(/[\s‑\-\(\)]/g,'');
+      const emailU  = u.email || '';
+      html += `<div class="up-card">
+        <div class="up-header" onclick="toggleUP(this)">
+          <div>
+            <div class="up-nome">${u.nome}</div>
+            <div class="up-diretor">Dir.: ${u.diretor}</div>
+          </div>
+          <span class="up-chevron">▶</span>
+        </div>
+        <div class="up-detalhe" style="display:none;">
+          <span>📍 ${u.cidade}/SC</span>
+          <span>📞 <a href="tel:+55${telNum}">${telU}</a></span>
+          <span>📧 <a href="mailto:${emailU}">${emailU}</a></span>
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
 }
 
 // ================================================
@@ -990,6 +1191,8 @@ function showToast(msg) {
 // INICIALIZAÇÃO
 // ================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Gera cards de unidades dinamicamente (evita ofuscação de e-mail)
+  gerarCardsUnidades();
   // Restaurar dark mode
   if (localStorage.getItem('darkMode') === '1') {
     document.body.classList.add('dark-mode');
