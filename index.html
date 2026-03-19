@@ -208,7 +208,7 @@
         <h2 class="section-titulo fade-up fade-up-delay-2">⚡ Atalhos Rápidos</h2>
     <p class="section-subtitulo">Acesse o procedimento necessário conforme a situação da unidade prisional.</p>
         <div class="atalhos-grid atalhos-grid-6">
-      <a class="atalho-btn atalho-emergencial fade-up fade-up-delay-1" href="#" onclick="abrirModeloDireto('emergencial');return false;">
+      <a class="atalho-btn atalho-emergencial fade-up fade-up-delay-1" href="#" onclick="abrirModeloDireto('emergencial_i');return false;">
         <div class="icone">🚨</div>
         <span class="titulo">Segurança / Emergência</span>
         <span class="desc">Ato de indisciplina (em tese) ou manutenção da ordem/integridade física. Enquadramento obrigatório antes do pedido.</span>
@@ -849,10 +849,17 @@
     <!-- Grade de cartões de modelos -->
     <div class="modelos-grade">
 
-      <div class="modelo-tile atalho-emergencial" onclick="abrirModalOficio('emergencial')">
-        <div class="modelo-tile-icone">🚨</div>
-        <div class="modelo-tile-titulo">Segurança / Emergência</div>
-        <div class="modelo-tile-sub">Art. 21, I — Modelo 005/2026</div>
+      <div class="modelo-tile atalho-emergencial" onclick="abrirModalOficio('emergencial_i')">
+        <div class="modelo-tile-icone">🔴</div>
+        <div class="modelo-tile-titulo">Emergencial — Hipótese I</div>
+        <div class="modelo-tile-sub">Ato de Indisciplina (em tese) · Art. 21, I — Modelo 005-A/2026</div>
+        <span class="modelo-tile-btn">Abrir modelo →</span>
+      </div>
+
+      <div class="modelo-tile atalho-emergencial" onclick="abrirModalOficio('emergencial_ii')" style="--cor-destaque:#1d4ed8;--bg-icone:#dbeafe;">
+        <div class="modelo-tile-icone">🔵</div>
+        <div class="modelo-tile-titulo">Emergencial — Hipótese II</div>
+        <div class="modelo-tile-sub">Manutenção da Ordem / Integridade Física · Art. 21, I — Modelo 005-B/2026</div>
         <span class="modelo-tile-btn">Abrir modelo →</span>
       </div>
 
@@ -1686,7 +1693,7 @@
             <p style="font-size:.78rem;color:var(--cinza-5);margin-top:.5rem;">PAD não se aplica nesta hipótese.</p>
           </div>
         </div>
-        <div class="sidebar-card"><div class="sidebar-card-header">📝 Modelo de Ofício</div><div class="sidebar-card-body"><a href="#" onclick="navegarPara('modelos');return false;" style="font-size:.82rem;color:var(--azul-4);">→ Modelo 005/2026 — Emergencial</a></div></div>
+        <div class="sidebar-card"><div class="sidebar-card-header">📝 Modelos de Ofício</div><div class="sidebar-card-body"><a href="#" onclick="abrirModeloDireto('emergencial_i');return false;" style="font-size:.82rem;color:var(--azul-4);display:block;margin-bottom:.4rem;">→ Modelo 005-A/2026 — Hipótese I (Indisciplina)</a><a href="#" onclick="abrirModeloDireto('emergencial_ii');return false;" style="font-size:.82rem;color:var(--azul-4);">→ Modelo 005-B/2026 — Hipótese II (Manutenção da Ordem)</a></div></div>
       </aside>
     </div>
   </div>
