@@ -41,7 +41,7 @@ const UNIDADES = [
   // SR05 — Serrana
   { nome: 'Penitenciária Industrial de São Cristóvão do Sul', cidade: 'São Cristóvão do Sul', sr: 'SR05', diretor: 'Giselle Cordeiro Demeneck Remor', email: 'pe09@pp.sc.gov.br', tel: '(49) 3412‑3190', end: 'Estrada Geral Paredão, s/n – São Cristóvão do Sul/SC – CEP 89533‑000' },
   { nome: 'Penitenciária Regional de Curitibanos',       cidade: 'São Cristóvão do Sul', sr: 'SR05', diretor: 'Fabio Marcelo Palhano',          email: 'pe08@pp.sc.gov.br', tel: '(49) 3412‑3300', end: 'Rua Juventino França de Moraes, s/n – São Cristóvão do Sul/SC – CEP 89533‑000' },
-  { nome: 'Presídio Masculino de Lages',                 cidade: 'Lages',                sr: 'SR05', diretor: 'Rodrigo Barroso',                      email: 'pr19@pp.sc.gov.br', tel: '(49) 3289‑8467', end: 'Rua Ricardo Marin, s/n – Bairro Santa Clara – Lages/SC – CEP 88513‑210' },
+  { nome: 'Presídio Masculino de Lages',                 cidade: 'Lages',                sr: 'SR05', diretor: '',                      email: 'pr19@pp.sc.gov.br', tel: '(49) 3289‑8467', end: 'Rua Ricardo Marin, s/n – Bairro Santa Clara – Lages/SC – CEP 88513‑210' },
   { nome: 'Presídio Regional de Lages',                  cidade: 'Lages',                sr: 'SR05', diretor: 'Ricardo Fernando Moreira Floriani',    email: 'pr20@pp.sc.gov.br', tel: '(49) 3289‑8403', end: 'Rua Mato Grosso, 247 – Bairro São Cristóvão – Lages/SC – CEP 88509‑220' },
   { nome: 'Presídio Regional de Caçador',                cidade: 'Caçador',              sr: 'SR05', diretor: 'André Luiz Pierdoná',                  email: 'pr21@pp.sc.gov.br', tel: '(49) 3561‑6945', end: 'Av. Albino Felipe Potrick, 50 – Bom Sucesso – Caçador/SC – CEP 89501‑335' },
   { nome: 'Presídio Regional de Campos Novos',           cidade: 'Campos Novos',         sr: 'SR05', diretor: 'Evalcir Morais dos Santos',            email: 'pr22@pp.sc.gov.br', tel: '(49) 3541‑3588', end: 'Estrada Geral Usina Velha, s/n – Interior – Campos Novos/SC – CEP 89620‑000' },
@@ -76,7 +76,7 @@ const UNIDADES = [
 // Nomes das Superintendências Regionais e seus Superintendentes
 const SR_INFO = {
   SR01: { nome: 'Superintendência Regional da Grande Florianópolis', superintendente: 'Kelvyn Diehl',                          email: 'sr01@pp.sc.gov.br', tel: '(48) 3665‑9131' },
-  SR02: { nome: 'Superintendência Regional Sul',                      superintendente: 'Hélio Damian Filho',                    email: 'sr02@pp.sc.gov.br', tel: '(48) 3403‑1501' },
+  SR02: { nome: 'Superintendência Regional Sul',                      superintendente: 'Marcos Aurélio Spinardi',                email: 'sr02@pp.sc.gov.br', tel: '(48) 3403‑1501' },
   SR03: { nome: 'Superintendência Regional do Norte Catarinense',     superintendente: 'Efraym Ben José Falcão',                email: 'sr03@pp.sc.gov.br', tel: '(47) 3481‑3993' },
   SR04: { nome: 'Superintendência Regional do Vale do Itajaí',        superintendente: 'Anderson Luiz Teodoro',                 email: 'sr04@pp.sc.gov.br', tel: '(47) 3398‑6704' },
   SR05: { nome: 'Superintendência Regional Serrana',                   superintendente: 'André Isidoro de Oliveira Martarello',  email: 'sr05@pp.sc.gov.br', tel: '(49) 3412‑3300' },
@@ -290,11 +290,24 @@ function _aplicarVarianteComunicacao(tipo) {
   const cont = document.getElementById('ofc-paragrafos');
   cont.innerHTML = variante.paragrafos.map((p, pIdx) => {
     const texto = typeof p === 'object' ? p.texto : p;
-    const htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
-      const inputId = `campo-${pIdx}-${fieldName.replace(/[^a-zA-Z0-9]/g,'_')}`;
-      const w = Math.max(120, Math.min(400, fieldName.length * 9 + 40));
-      return `<input type="text" class="campo-inline-editavel campo-inline-negrito" id="${inputId}" placeholder="${fieldName}" data-original="${fieldName}" style="width:${w}px;" />`;
-    });
+    const sf = typeof p === 'object' ? p.selectField : null;
+
+    // Se o parágrafo tem selectField, substitui o placeholder pelo <select>
+    let htmlTexto;
+    if (sf) {
+      htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
+        const selectId = `campo-sel-${pIdx}`;
+        const opts = sf.opcoes.map(o => `<option value="${o}">${o}</option>`).join('');
+        return `<select class="campo-inline-select" id="${selectId}" data-original="${fieldName}" style="font-weight:bold;color:#000;border:1.5px solid #f59e0b;border-radius:4px;padding:2px 6px;background:#fffbeb;font-size:inherit;">${opts}</select>`;
+      });
+    } else {
+      htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
+        const inputId = `campo-${pIdx}-${fieldName.replace(/[^a-zA-Z0-9]/g,'_')}`;
+        const w = Math.max(120, Math.min(400, fieldName.length * 9 + 40));
+        return `<input type="text" class="campo-inline-editavel campo-inline-negrito" id="${inputId}" placeholder="${fieldName}" data-original="${fieldName}" style="width:${w}px;" />`;
+      });
+    }
+
     return `<div class="oficio-paragrafo oficio-paragrafo-inline" data-texto-original="${texto.replace(/"/g,'&quot;')}">
       <p class="oficio-paragrafo-texto">${htmlTexto}</p>
     </div>`;
@@ -404,7 +417,7 @@ function atualizarInfoUnidade(tipo, u) {
   el.classList.add('preenchido');
 }
 
-// Atualiza cidade, parágrafos e assinaturas quando muda a seleção
+// Atualiza cidade, parágrafos, assinaturas, cabeçalho e rodapé quando muda a seleção
 function atualizarOficioComUnidades() {
   const ori = unidadeOrigemSel;
   const des = unidadeDestinoSel;
@@ -412,6 +425,22 @@ function atualizarOficioComUnidades() {
   // Cidade na linha de data
   const cidEl = document.getElementById('ofc-cidade-txt');
   if (cidEl) cidEl.textContent = ori ? ori.cidade : '[CIDADE]';
+
+  // Cabeçalho visual — nome da unidade
+  const cabUnEl = document.getElementById('ofc-cab-unidade');
+  if (cabUnEl) cabUnEl.textContent = ori ? ori.nome.toUpperCase() : '[UNIDADE PRISIONAL]';
+
+  // Brasão
+  const brasaoEl = document.getElementById('ofc-cab-brasao');
+  if (brasaoEl) brasaoEl.src = BRASAO_B64;
+
+  // Rodapé visual
+  const rodNomeEl = document.getElementById('ofc-rod-nome');
+  const rodEndEl  = document.getElementById('ofc-rod-end');
+  const rodContEl = document.getElementById('ofc-rod-cont');
+  if (rodNomeEl) rodNomeEl.textContent = ori ? ori.nome.toUpperCase() : '[UNIDADE PRISIONAL]';
+  if (rodEndEl)  rodEndEl.textContent  = ori && ori.end ? ori.end : (ori ? ori.cidade + '/SC' : '');
+  if (rodContEl) rodContEl.textContent = ori ? ['Fone: ' + ori.tel, 'e-mail: ' + ori.email].filter(Boolean).join(' / ') : '';
 
   // Substitui placeholders nos campos inline das unidades
   document.querySelectorAll('#ofc-paragrafos .campo-inline-editavel').forEach(input => {
@@ -459,6 +488,9 @@ ${ori.nome}` : 'Diretor(a) — [UNIDADE PRISIONAL]',
     return assinaturas;
   }
 
+  // Pernoite: apenas Diretor origem + Diretor destino (sem SR)
+  const semSuperintendente = modeloAtual === 'pernoite';
+
   // 1. Diretor origem
   assinaturas.push({
     nome:  ori ? ori.diretor             : '[NOME DO DIRETOR — ORIGEM]',
@@ -475,24 +507,25 @@ ${des.nome}` : 'Diretor(a) — [UNIDADE DE DESTINO]',
     });
   }
 
-  // 3. Superintendente da SR de Origem (sempre)
-  const srOriInfo = ori ? SR_INFO[ori.sr] : null;
-  assinaturas.push({
-    nome:  srOriInfo ? srOriInfo.superintendente : '[NOME DO SUPERINTENDENTE — ORIGEM]',
-    cargo: srOriInfo ? `Superintendente
+  // 3 e 4. Superintendentes — não aparecem no pernoite
+  if (!semSuperintendente) {
+    const srOriInfo = ori ? SR_INFO[ori.sr] : null;
+    assinaturas.push({
+      nome:  srOriInfo ? srOriInfo.superintendente : '[NOME DO SUPERINTENDENTE — ORIGEM]',
+      cargo: srOriInfo ? `Superintendente
 ${srOriInfo.nome}` : 'Superintendente — [SR DE ORIGEM]',
-  });
+    });
 
-  // 4. Superintendente da SR de Destino (só se SR diferente)
-  if (!isUSM && des) {
-    const srDesInfo = SR_INFO[des.sr];
-    const srOriId   = ori ? ori.sr : null;
-    if (des.sr !== srOriId) {
-      assinaturas.push({
-        nome:  srDesInfo ? srDesInfo.superintendente : '[NOME DO SUPERINTENDENTE — DESTINO]',
-        cargo: srDesInfo ? `Superintendente
+    if (!isUSM && des) {
+      const srDesInfo = SR_INFO[des.sr];
+      const srOriId   = ori ? ori.sr : null;
+      if (des.sr !== srOriId) {
+        assinaturas.push({
+          nome:  srDesInfo ? srDesInfo.superintendente : '[NOME DO SUPERINTENDENTE — DESTINO]',
+          cargo: srDesInfo ? `Superintendente
 ${srDesInfo.nome}` : 'Superintendente — [SR DE DESTINO]',
-      });
+        });
+      }
     }
   }
 
@@ -583,7 +616,7 @@ const modelosTexto = {
       { texto: 'A presente solicitação enquadra-se na Hipótese I — Gerenciamento de Crise, em razão de situação de instabilidade interna, conflito ou risco à ordem da unidade, que exige a retirada imediata do(a) reeducando(a). A medida possui natureza administrativa e não punitiva, nos termos do art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026.', editavel: false },
       { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A CONDUTA E SEUS REFLEXOS NA SEGURANÇA/ORDEM], demonstrando risco atual, concreto e relevante à segurança institucional, o que torna inviável a permanência do(a) reeducando(a) nesta unidade prisional.', editavel: true, label: 'Descrição da conduta e do risco' },
       { texto: 'Diante da urgência, solicita-se a transferência do(a) reeducando(a) para o(a) [UNIDADE PRISIONAL DE DESTINO], onde há condições adequadas para sua custódia.', editavel: false },
-      { texto: 'Informa-se que foi instaurado (ou será imediatamente instaurado) o competente Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente.', editavel: false },
+      { texto: 'Informa-se que [FOI INSTAURADO / SERÁ IMEDIATAMENTE INSTAURADO] o competente Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente.', editavel: false, selectField: { placeholder: 'FOI INSTAURADO / SERÁ IMEDIATAMENTE INSTAURADO', opcoes: ['foi instaurado', 'será imediatamente instaurado'] } },
       { texto: 'Esclarece-se que a presente medida não possui natureza de sanção disciplinar, tratando-se de providência administrativa de caráter cautelar, sem prejuízo da apuração regular dos fatos no âmbito do PAD.', editavel: false },
       { texto: 'Ressalta-se que eventual isolamento preventivo observará rigorosamente os limites legais, especialmente quanto ao prazo máximo (até 10 dias, prorrogável por mais 20 se o PAD for concluído com decisão procedente dentro desse período, nos termos do art. 60 da LEP) e à vedação de punição antecipada, com preservação integral dos direitos da pessoa privada de liberdade.', editavel: false },
       { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, a portaria de instauração do PAD e [OUTROS DOCUMENTOS: boletim de ocorrência interno, relatório da equipe de segurança, entre outros].', editavel: false },
@@ -856,6 +889,12 @@ function coletarTextoOficio() {
       const valor = input.value.trim() || input.placeholder;
       texto = texto.replace('[' + original + ']', valor);
     });
+    // Substitui selects inline
+    div.querySelectorAll('.campo-inline-select').forEach(sel => {
+      const original = sel.dataset.original || '';
+      const valor = sel.value || original;
+      texto = texto.replace('[' + original + ']', valor);
+    });
     return texto.trim();
   }).filter(Boolean);
   const asss     = [...document.querySelectorAll('#ofc-assinaturas .oficio-assinatura-bloco')].map(b => {
@@ -922,6 +961,7 @@ function _dadosUnidade() {
     cidade:       ori ? ori.cidade     : '[CIDADE]',
     tel:          ori ? ori.tel        : '',
     email:        ori ? ori.email      : '',
+    end:          ori ? ori.end        : '',
     nomeSR:       srOri.nome           || '',
     diretor:      ori ? ori.diretor    : '',
   };
