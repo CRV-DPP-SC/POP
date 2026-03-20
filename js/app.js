@@ -858,15 +858,48 @@ function selecionarModelo(id) {
   // Parágrafos — renderização inline com campos [EDITÁVEIS] como inputs amarelos
   const cont = document.getElementById('ofc-paragrafos');
   cont.innerHTML = m.paragrafos.map((p, pIdx) => {
-    const isObj = typeof p === 'object';
-    const texto = isObj ? p.texto : p;
+    const isObj  = typeof p === 'object';
+    const texto  = isObj ? p.texto : p;
+    const sf     = isObj ? p.selectField      : null;
+    const lista  = isObj ? p.listaReeducandos : false;
 
-    // Substitui [CAMPO] por <input> amarelo inline
-    const htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
-      const inputId = `campo-${pIdx}-${fieldName.replace(/[^a-zA-Z0-9]/g,'_')}`;
-      const w = Math.max(120, Math.min(400, fieldName.length * 9 + 40));
-      return `<input type="text" class="campo-inline-editavel campo-inline-negrito" id="${inputId}" placeholder="${fieldName}" data-original="${fieldName}" style="width:${w}px;" />`;
-    });
+    // Lista dinâmica de reeducandos (modelo coletivo)
+    if (lista) {
+      return `<div class="oficio-paragrafo oficio-paragrafo-inline lista-reeducandos-wrap" data-texto-original="[LISTA_REEDUCANDOS]">
+        <div id="lista-reeducandos" style="margin:4px 0 6px 0;">
+          <div class="lista-reeducando-item" data-idx="1" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span style="font-weight:700;min-width:18px;">1.</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Nome completo do reeducando" data-field="nome" style="flex:1;min-width:220px;" />
+            <span style="white-space:nowrap;">— IPEN Nº</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Número IPEN" data-field="ipen" style="width:130px;" />
+          </div>
+          <div class="lista-reeducando-item" data-idx="2" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span style="font-weight:700;min-width:18px;">2.</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Nome completo do reeducando" data-field="nome" style="flex:1;min-width:220px;" />
+            <span style="white-space:nowrap;">— IPEN Nº</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Número IPEN" data-field="ipen" style="width:130px;" />
+          </div>
+        </div>
+        <button onclick="adicionarReeducando()" type="button" style="margin-top:2px;padding:4px 14px;font-size:.82rem;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:6px;cursor:pointer;color:#0369a1;">+ Adicionar reeducando</button>
+      </div>`;
+    }
+
+    // Parágrafo com select inline
+    let htmlTexto;
+    if (sf) {
+      htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
+        const selectId = `campo-sel-${pIdx}`;
+        const opts = sf.opcoes.map(o => `<option value="${o}">${o}</option>`).join('');
+        return `<select class="campo-inline-select" id="${selectId}" data-original="${fieldName}" style="font-weight:bold;color:#000;border:1.5px solid #f59e0b;border-radius:4px;padding:2px 6px;background:#fffbeb;font-size:inherit;">${opts}</select>`;
+      });
+    } else {
+      // Substitui [CAMPO] por <input> amarelo inline
+      htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
+        const inputId = `campo-${pIdx}-${fieldName.replace(/[^a-zA-Z0-9]/g,'_')}`;
+        const w = Math.max(120, Math.min(400, fieldName.length * 9 + 40));
+        return `<input type="text" class="campo-inline-editavel campo-inline-negrito" id="${inputId}" placeholder="${fieldName}" data-original="${fieldName}" style="width:${w}px;" />`;
+      });
+    }
 
     return `<div class="oficio-paragrafo oficio-paragrafo-inline" data-texto-original="${texto.replace(/"/g,'&quot;')}">
       <p class="oficio-paragrafo-texto">${htmlTexto}</p>
