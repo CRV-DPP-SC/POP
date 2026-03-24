@@ -1386,8 +1386,76 @@ function selecionarHipoteseEmergencial(hip) {
   const variante = m.variantes[hip];
   if (!variante) return;
 
+  // Atualiza título
   document.getElementById('oficioTitulo').textContent = variante.titulo;
 
+  // Atualiza estado visual dos botões do seletor
+  document.querySelectorAll('#ofc-hipotese-seletor .tipo-btn').forEach(btn => {
+    btn.classList.remove('ativo');
+  });
+  const btnAtivo = hip === 'hipotese_i'
+    ? document.querySelector('#ofc-hipotese-seletor .tipo-btn:first-child')
+    : document.querySelector('#ofc-hipotese-seletor .tipo-btn:last-child');
+  if (btnAtivo) btnAtivo.classList.add('ativo');
+
+  // Renderiza parágrafos com o pipeline completo (campos amarelos, selects, etc.)
   const cont = document.getElementById('ofc-paragrafos');
-  cont.innerHTML = variante.paragrafos.map(p => `<p>${p.texto}</p>`).join('');
+  cont.innerHTML = variante.paragrafos.map((p, pIdx) => {
+    const isObj = typeof p === 'object';
+    const texto = isObj ? p.texto : p;
+    const sf    = isObj ? p.selectField      : null;
+    const lista = isObj ? p.listaReeducandos : false;
+
+    if (lista) {
+      return `<div class="oficio-paragrafo oficio-paragrafo-inline lista-reeducandos-wrap" data-texto-original="[LISTA_REEDUCANDOS]">
+        <div id="lista-reeducandos" style="margin:4px 0 6px 0;">
+          <div class="lista-reeducando-item" data-idx="1" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span style="font-weight:700;min-width:18px;">1.</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Nome completo do reeducando" data-field="nome" style="flex:1;min-width:220px;" />
+            <span style="white-space:nowrap;">— IPEN Nº</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Número IPEN" data-field="ipen" style="width:130px;" />
+          </div>
+          <div class="lista-reeducando-item" data-idx="2" style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span style="font-weight:700;min-width:18px;">2.</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Nome completo do reeducando" data-field="nome" style="flex:1;min-width:220px;" />
+            <span style="white-space:nowrap;">— IPEN Nº</span>
+            <input type="text" class="campo-inline-editavel" placeholder="Número IPEN" data-field="ipen" style="width:130px;" />
+          </div>
+        </div>
+        <button onclick="adicionarReeducando()" type="button" style="margin-top:2px;padding:4px 14px;font-size:.82rem;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:6px;cursor:pointer;color:#0369a1;">+ Adicionar reeducando</button>
+      </div>`;
+    }
+
+    let htmlTexto;
+    if (sf) {
+      htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
+        const selectId = `campo-sel-${pIdx}`;
+        const opts = sf.opcoes.map(o => `<option value="${o}">${o}</option>`).join('');
+        return `<select class="campo-inline-select" id="${selectId}" data-original="${fieldName}" style="font-weight:bold;color:#000;border:1.5px solid #f59e0b;border-radius:4px;padding:2px 6px;background:#fffbeb;font-size:inherit;">${opts}</select>`;
+      });
+    } else {
+      htmlTexto = texto.replace(/\[([^\]]+)\]/g, (match, fieldName) => {
+        const inputId = `campo-${pIdx}-${fieldName.replace(/[^a-zA-Z0-9]/g,'_')}`;
+        const w = Math.max(120, Math.min(400, fieldName.length * 9 + 40));
+        return `<input type="text" class="campo-inline-editavel campo-inline-negrito" id="${inputId}" placeholder="${fieldName}" data-original="${fieldName}" style="width:${w}px;" />`;
+      });
+    }
+
+    return `<div class="oficio-paragrafo oficio-paragrafo-inline" data-texto-original="${texto.replace(/"/g,'&quot;')}">
+      <p class="oficio-paragrafo-texto">${htmlTexto}</p>
+    </div>`;
+  }).join('');
+
+  // Re-aplica substituição de unidades caso já estejam selecionadas
+  const ori = unidadeOrigemSel;
+  const des = unidadeDestinoSel;
+  if (ori || des) {
+    document.querySelectorAll('#ofc-paragrafos .oficio-paragrafo').forEach(div => {
+      let txt = div.dataset.textoOriginal || '';
+      if (ori) txt = txt.replace(/\[UNIDADE PRISIONAL DE ORIGEM\]/g, ori.nome);
+      if (des) txt = txt.replace(/\[UNIDADE PRISIONAL DE DESTINO\]/g, des.nome);
+      div.dataset.textoOriginal = txt;
+    });
+    renderizarAssinaturas(ori, des);
+  }
 }
