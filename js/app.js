@@ -655,48 +655,76 @@ const modelosTexto = {
     hipotese_i: {
       titulo: '🔴 Emergencial — Hipótese I — Gerenciamento de Crise',
       paragrafos: [
-        { texto: 'Encaminho para análise urgente dessa Central pedido de transferência do(a) reeducando(a) [NOME COMPLETO]...', editavel: true },
-        { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE]...', editavel: true },
-        { texto: 'A mera alegação genérica de urgência não será suficiente para concessão/autorização...', editavel: false }
+      { texto: 'Encaminho para análise urgente dessa Central de Regulação de Vagas pedido de transferência excepcional do(a) reeducando(a) [NOME COMPLETO], IPEN nº [NÚMERO], atualmente custodiado(a) no(a) [UNIDADE PRISIONAL DE ORIGEM], em razão de situação emergencial identificada pelas equipes deste estabelecimento penal, conforme segue.', editavel: false },
+      { texto: 'A presente solicitação enquadra-se na Hipótese I — Gerenciamento de Crise, em razão de situação de instabilidade interna, conflito ou risco à ordem da unidade, que exige a retirada imediata do(a) reeducando(a). A medida possui natureza administrativa e não punitiva, nos termos do art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026.', editavel: false },
+      { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A CONDUTA E SEUS REFLEXOS NA SEGURANÇA/ORDEM], demonstrando risco atual, concreto e relevante à segurança institucional, o que torna inviável a permanência do(a) reeducando(a) nesta unidade prisional.', editavel: true, label: 'Descrição da conduta e do risco' },
+      { texto: 'Diante da urgência, solicita-se a transferência do(a) reeducando(a) para o(a) [UNIDADE PRISIONAL DE DESTINO], onde há condições adequadas para sua custódia.', editavel: false },
+      { texto: 'Informa-se que [SELECIONE] o competente Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente.', editavel: false, selectField: { placeholder: 'SELECIONE', opcoes: ['FOI INSTAURADO', 'SERÁ INSTAURADO'] } },
+      { texto: 'Esclarece-se que a presente medida não possui natureza de sanção disciplinar, tratando-se de providência administrativa de caráter cautelar, sem prejuízo da apuração regular dos fatos no âmbito do PAD.', editavel: false },
+      { texto: 'Ressalta-se que eventual isolamento preventivo observará rigorosamente os limites legais, especialmente quanto ao prazo máximo (até 10 dias, prorrogável por mais 20 se o PAD for concluído com decisão procedente dentro desse período, nos termos do art. 60 da LEP) e à vedação de punição antecipada, com preservação integral dos direitos da pessoa privada de liberdade.', editavel: false },
+      { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, a portaria de instauração do PAD e [OUTROS DOCUMENTOS: boletim de ocorrência interno, relatório da equipe de segurança, entre outros].', editavel: false },
+      { texto: 'Uma vez efetivada a remoção, caso aprovada, o Juízo competente será devidamente comunicado no prazo legal de até 24 horas.', editavel: false },
+      { texto: 'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, incluindo o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.', editavel: false },
+      { texto: 'Diante do exposto, solicita-se análise e célere deliberação quanto à viabilidade da transferência.', editavel: false },
       ]
     },
     hipotese_ii: {
       titulo: '🔵 Emergencial — Hipótese II — Manutenção da Ordem/Integridade Física',
       paragrafos: [
-        { texto: 'Encaminho para análise urgente dessa Central pedido de transferência do(a) reeducando(a) [NOME COMPLETO]...', editavel: true },
-        { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE]...', editavel: true },
-        { texto: 'A mera alegação genérica de urgência não será suficiente para concessão/autorização...', editavel: false }
-      ]
-    }
+      { texto: 'Encaminho para análise urgente da Central de Regulação de Vagas (CRV) pedido de transferência excepcional do(a) reeducando(a) [NOME COMPLETO], IPEN nº [NÚMERO], atualmente custodiado(a) no(a) [UNIDADE PRISIONAL DE ORIGEM], em razão de situação emergencial identificada pelas equipes deste estabelecimento penal, conforme segue.', editavel: false },
+      { texto: 'A presente solicitação enquadra-se na Hipótese II — Medida de Segurança, diante de situação de risco à integridade física do(a) reeducando(a), de terceiros, ou à estabilidade da unidade prisional — envolvendo ameaças, conflitos ou risco coletivo — nos termos do art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026. A medida possui natureza administrativa e não punitiva.', editavel: false },
+      { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A SITUAÇÃO: ameaças, conflitos interpessoais ou coletivos, risco à integridade física, tensões internas, entre outros], circunstância que inviabiliza a permanência do(a) reeducando(a) nesta unidade sem comprometimento da segurança institucional.', editavel: true, label: 'Descrição da situação de risco' },
+      { texto: 'Diante da urgência, solicita-se a transferência do(a) reeducando(a) para o(a) [UNIDADE PRISIONAL DE DESTINO], onde há condições adequadas para sua custódia em segurança.', editavel: false },
+      { texto: 'Esclarece-se que a presente medida não possui natureza disciplinar, tratando-se exclusivamente de providência administrativa destinada à preservação da segurança do reeducando e de terceiros.', editavel: false },
+      { texto: 'Ressalta-se que o(a) reeducando(a) permanecerá em cela de convívio, com a integral preservação de seus direitos, sendo vedada sua submissão a isolamento, por não se tratar de hipótese disciplinar.', editavel: false },
+      { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, e [OUTROS DOCUMENTOS: boletim de ocorrência interno, relatório da equipe de segurança, entre outros].', editavel: false },
+      { texto: 'Uma vez efetivada a remoção, caso aprovada, o Juízo competente será devidamente comunicado no prazo legal de até 24 horas.', editavel: false },
+      { texto: 'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, incluindo o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.', editavel: false },
+      { texto: 'Diante do exposto, solicita-se análise e célere deliberação quanto à viabilidade da transferência.', editavel: false },
+      ],
   },
   paragrafos: []
 },
 
-  /* ── PEDIDO DO PRESO ─────────────────────────────── */
-  pedidos_voluntarios: {
-  titulo: '👤 Pedidos Voluntários',
-  saudacaoInicial: 'Senhor(a) Coordenador(a),',
-  paragrafos: [
-    { texto: 'Os pedidos de transferência devem ser realizados diretamente pelo Portal da Polícia Penal de Santa Catarina.', editavel: false },
-    { texto: 'Preso, familiar, advogado ou defensor público podem solicitar transferência diretamente pelo Portal, sem necessidade de comparecimento presencial à unidade.', editavel: false },
-    { texto: 'As Unidades Prisionais devem orientar o solicitante a utilizar o Portal Online.', editavel: false },
-    { texto: 'Todas as solicitações de transferência, inclusive permutas, devem ser realizadas pelo Portal Online.', editavel: false },
-    { texto: 'Acesse: https://ppsc.com.br/', editavel: false }
-  ]
-},
-
-  /* ── EQUALIZAÇÃO DE VAGAS ───────────────────────── */
-  /* ── ADEQUAÇÃO — INDIVIDUAL ─────────────────────── */
-  equalizacao: {
-    titulo: '⚖️ Adequação da Capacidade de Ocupação — Individual (Art. 21, III)',
+ /* ── PEDIDO DO PRESO ─────────────────────────────── */
+  pedido_preso: {
+    titulo: '👤 Modelo 1 — Pedido do Preso',
     saudacaoInicial: 'Senhor(a) Coordenador(a),',
     paragrafos: [
-      { texto: 'Considerando a necessidade de gestão e equalização da ocupação carcerária no âmbito do(a) [UNIDADE PRISIONAL DE ORIGEM], bem como a adequada distribuição das pessoas privadas de liberdade entre as diferentes estruturas de estabelecimentos penais, encaminho para análise dessa Central de Regulação de Vagas pedido de transferência do(a) reeducando(a) [NOME COMPLETO], IPEN Nº [NÚMERO], atualmente custodiado(a) nesta unidade prisional, para o(a) [UNIDADE PRISIONAL DE DESTINO].', editavel: false },
-      { texto: 'A solicitação fundamenta-se na necessidade de equalização da lotação entre as unidades do sistema prisional catarinense, em conformidade com as diretrizes estabelecidas para a gestão de vagas e movimentações prisionais previstas na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.', editavel: false },
-      { texto: 'Para subsidiar a análise, informo a devida atualização no sistema i-PEN do Boletim Penal Informativo, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como anexo o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor.', editavel: false },
-      { texto: 'Uma vez efetivada a remoção, caso aprovada, o r. Juízo competente será devidamente comunicado, no prazo legal estabelecido, qual seja em até 24 horas.', editavel: false },
-      { texto: 'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, quais sejam, o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.', editavel: false },
-      { texto: 'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.', editavel: false },
+      'Encaminho para análise dessa Central pedido de transferência do reeducando [NOME COMPLETO], IPEN [Nº], atualmente custodiado no(a) [UNIDADE PRISIONAL DE ORIGEM], para o(a) [UNIDADE PRISIONAL DE DESTINO], formulado pelo próprio reeducando por meio de memorando datado de [DATA DO MEMORANDO].',
+      'A solicitação tem por fundamento [MOTIVO ALEGADO PELO REEDUCANDO: mudança de domicílio familiar, necessidade de aproximação da família, outro motivo relevante], nos termos do art. 21, inciso II, da Resolução Conjunta Interinstitucional n. 01/2026.',
+      'Para subsidiar a análise, encaminho em anexo Boletim Penal Informativo devidamente atualizado, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor, e memorando original do reeducando.',
+      'Uma vez efetivada a remoção — caso aprovada —, o r. Juízo competente será devidamente comunicado, no prazo legal estabelecido, qual seja, em até 24 horas.',
+      'Informo, por fim, que foram realizados contatos prévios com os entes envolvidos, quais sejam, o Diretor da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
+      'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa do referido reeducando.',
+    ],
+  },
+
+  /* ── PEDIDO POR FAMILIAR ─────────────────────────── */
+  pedido_familiar: {
+    titulo: '👨‍👩‍👧 Modelo 2 — Pedido por Familiar',
+    saudacaoInicial: 'Senhor(a) Coordenador(a),',
+    paragrafos: [
+      'Encaminho para análise dessa Central pedido de transferência do reeducando [NOME COMPLETO], IPEN [Nº], atualmente custodiado no(a) [UNIDADE PRISIONAL DE ORIGEM], para o(a) [UNIDADE PRISIONAL DE DESTINO], formulado por seu(ua) familiar [NOME DO FAMILIAR], [GRAU DE PARENTESCO], por meio de [carta / e-mail / petição física / petição judicial] datado(a) de [DATA].',
+      'A solicitação tem por fundamento [MOTIVO ALEGADO PELO FAMILIAR: mudança de domicílio, necessidade de aproximação do núcleo familiar, dificuldade de deslocamento para visitas, outro motivo relevante], nos termos do art. 21, inciso II, da Resolução Conjunta Interinstitucional n. 01/2026.',
+      'Para subsidiar a análise, encaminho em anexo Boletim Penal Informativo devidamente atualizado, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor, e [carta / e-mail / petição física] original do familiar.',
+      'Uma vez efetivada a remoção — caso aprovada —, o r. Juízo competente será devidamente comunicado, no prazo legal estabelecido, qual seja, em até 24 horas.',
+      'Informo, por fim, que foram realizados contatos prévios com os entes envolvidos, quais sejam, o Diretor da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
+      'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa do referido reeducando.',
+    ],
+  },
+
+  /* ── PEDIDO POR ADVOGADO ─────────────────────────── */
+  pedido_advogado: {
+    titulo: '⚖️ Modelo 3 — Pedido por Advogado',
+    saudacaoInicial: 'Senhor(a) Coordenador(a),',
+    paragrafos: [
+      'Encaminho para análise dessa Central pedido de transferência do reeducando [NOME COMPLETO], IPEN [Nº], atualmente custodiado no(a) [UNIDADE PRISIONAL DE ORIGEM], para o(a) [UNIDADE PRISIONAL DE DESTINO], formulado pelo advogado constituído [NOME DO ADVOGADO], OAB/[UF] n.º [NÚMERO], por meio de petição datada de [DATA].',
+      'A solicitação tem por fundamento [MOTIVO ALEGADO PELO ADVOGADO: mudança de domicílio, aproximação familiar, outro motivo relevante devidamente fundamentado], nos termos do art. 21, inciso II, da Resolução Conjunta Interinstitucional n. 01/2026.',
+      'Para subsidiar a análise, encaminho em anexo Boletim Penal Informativo devidamente atualizado, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde, ou pelo Diretor, e petição original do advogado, com comprovação de mandato.',
+      'Uma vez efetivada a remoção — caso aprovada —, o r. Juízo competente será devidamente comunicado, no prazo legal estabelecido, qual seja, em até 24 horas.',
+      'Informo, por fim, que foram realizados contatos prévios com os entes envolvidos, quais sejam, o Diretor da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
+      'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa do referido reeducando.',
     ],
   },
 
@@ -788,7 +816,7 @@ const modelosTexto = {
 
 };
 
-let modeloAtual = 'emergencial_i';
+let modeloAtual = 'emergencial';
 
 function selecionarModelo(id) {
   modeloAtual = id;
