@@ -826,7 +826,14 @@ function selecionarModelo(id) {
 
   // Parágrafos — renderização inline com campos [EDITÁVEIS] como inputs amarelos
   const cont = document.getElementById('ofc-paragrafos');
-  cont.innerHTML = m.paragrafos.map((p, pIdx) => {
+  let paragrafosBase = m.paragrafos;
+
+  // 👉 Se for emergencial, usa hipótese I por padrão
+  if (id === 'emergencial' && m.variantes) {
+    paragrafosBase = m.variantes['hipotese_i'].paragrafos;
+  }
+
+    cont.innerHTML = paragrafosBase.map((p, pIdx) => {
     const isObj  = typeof p === 'object';
     const texto  = isObj ? p.texto : p;
     const sf     = isObj ? p.selectField      : null;
