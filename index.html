@@ -209,11 +209,11 @@
         <span class="desc">Gerenciamento de Crise ou Medida de Segurança. Enquadramento obrigatório antes do pedido.</span>
         <span class="atalho-arrow">→ ver procedimento</span>
       </a>
-      <a class="atalho-btn atalho-pedido fade-up fade-up-delay-2" href="#" onclick="navegarPara('pedido-preso');return false;">
-        <div class="icone">👤</div>
-        <span class="titulo">Vagas SC</span>
-        <span class="desc">Requerimento do custodiado, familiar, advogado ou defensor. Vinculado ao sistema Vagas SC.</span>
-        <span class="atalho-arrow">→</span>
+      <a class="atalho-btn atalho-pedido fade-up fade-up-delay-2" href="https://ppsc.com.br" target="_blank" rel="noopener">
+        <div class="icone">🌐</div>
+        <span class="titulo">Portal Online — PPSC</span>
+        <span class="desc">Pedidos voluntários do custodiado, familiar, advogado ou defensor. Acesse ppsc.com.br.</span>
+        <span class="atalho-arrow">→ acessar portal ↗</span>
       </a>
       <a class="atalho-btn atalho-equalizacao fade-up fade-up-delay-3" href="#" onclick="abrirModeloDireto('equalizacao');return false;">
         <div class="icone">⚖️</div>
@@ -377,12 +377,11 @@
           </div>
           <p><strong>Assinaturas obrigatórias:</strong> Diretor da unidade de origem + Diretor da unidade de destino + Superintendente(s) Regional(is).</p>
           <br>
+          <div style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px;margin-top:4px;margin-bottom:6px;border-radius:6px;">
+            <strong>Obs.:</strong> A mera alegação genérica de urgência não será suficiente para concessão/autorização da transferência, devendo a Unidade Prisional solicitante fundamentar o pedido de forma consistente e robusta. Pedidos genéricos serão indeferidos de plano.
+          </div>
           <p><a href="#" onclick="navegarPara('emergencial');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver fluxo e modelo de ofício completo</a></p>
         </div>
-      </div>
-
-          <div style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px;margin-top:10px;border-radius:6px;">
-             <strong>Obs.:</strong> A mera alegação genérica de urgência não será suficiente para concessão/autorização da transferência, devendo a Unidade Prisional solicitante fundamentar o pedido de forma consistente e robusta. Pedidos genéricos serão indeferidos de plano.
       </div>
 
       <div class="accordion-item">
@@ -391,15 +390,13 @@
           <span class="accordion-seta">▼</span>
         </div>
         <div class="accordion-body">
-          <p><strong>Situação atual:</strong> Como não há vagas disponíveis em unidades do Estado, pedidos de transferência por proximidade familiar são atendidos prioritariamente pelo <strong>Vagas SC</strong>, coordenado pela equipe da CRV.</p>
-          <br>
           <div class="alerta alerta-info" style="margin:0;">
-            <span class="alerta-icone">🔗</span>
-            <div><strong class="alerta-titulo">Vagas SC</strong>
-            Para solicitações de transferência por pedido do preso ou familiar, acesse o sistema de Vagas SC. Envios de memorandos diretamente à CRV solicitando vaga serão indeferidos por inexistência de vaga disponível.</div>
+            <span class="alerta-icone">🌐</span>
+            <div><strong class="alerta-titulo">Portal Online — PPSC</strong>
+            Para solicitações de transferência por pedido do preso, familiar ou advogado, acesse o <strong>Portal da Polícia Penal de Santa Catarina</strong>: <a href="https://ppsc.com.br" target="_blank" rel="noopener" style="color:var(--azul-4);font-weight:700;">ppsc.com.br</a>. Envios de memorandos diretamente à CRV serão indeferidos.</div>
           </div>
           <br>
-          <p><a href="#" onclick="navegarPara('pedido-preso');return false;" style="color:var(--azul-4);font-weight:700;">→ Ver orientações sobre o Vagas SC</a></p>
+          <p><a href="https://ppsc.com.br" target="_blank" rel="noopener" style="color:var(--azul-4);font-weight:700;">→ Ver orientações sobre o Portal Online (ppsc.com.br)</a></p>
         </div>
       </div>
 
@@ -859,16 +856,19 @@
      <div class="modelo-tile atalho-emergencial" onclick="abrirModalOficio('emergencial')">
         <div class="modelo-tile-icone">🔴</div>
         <div class="modelo-tile-titulo">Transferência Emergencial</div>
-        <div class="modelo-tile-sub">Hipótese I · Hipótese II</div>
+        <div class="modelo-tile-sub" style="text-align:left;line-height:1.5;">
+          <span style="display:block;">🔴 <strong>Hipótese I</strong> — Gerenciamento de Crise (Ato de Indisciplina, em tese)</span>
+          <span style="display:block;margin-top:4px;">🔵 <strong>Hipótese II</strong> — Manutenção da Ordem/Integridade Física (Emergências como: riscos à integridade física — sua ou de outrem —, inclusive de morte, motins, rebeliões, etc.)</span>
+        </div>
         <span class="modelo-tile-btn">Abrir modelo →</span>
       </div>
 
-      <div class="modelo-tile atalho-pedido" onclick="abrirModalOficio('pedidos_voluntarios')">
-        <div class="modelo-tile-icone">👤</div>
+      <a class="modelo-tile atalho-pedido" href="https://ppsc.com.br" target="_blank" rel="noopener">
+        <div class="modelo-tile-icone">🌐</div>
         <div class="modelo-tile-titulo">Pedidos Voluntários</div>
-        <div class="modelo-tile-sub">Preso · Familiar · Advogado</div>
-        <span class="modelo-tile-btn">Abrir modelo →</span>
-      </div>
+        <div class="modelo-tile-sub">Preso · Familiar · Advogado · Defensor</div>
+        <span class="modelo-tile-btn">Acessar Portal Online ↗</span>
+      </a>
 
       <div class="modelo-tile atalho-equalizacao" onclick="abrirModalOficio('equalizacao')">
         <div class="modelo-tile-icone">⚖️</div>
@@ -995,9 +995,9 @@
           <button class="tipo-btn ativo" data-tipo="saida" onclick="selecionarTipoComunicacao('saida')">📤 Saída</button>
           <button class="tipo-btn" data-tipo="entrada" onclick="selecionarTipoComunicacao('entrada')">📥 Entrada</button>
         </div>
-        <div id="ofc-hipotese-seletor" style="display:none;gap:8px;margin-bottom:10px;">
-          <button onclick="selecionarHipoteseEmergencial('hipotese_i')">Hipótese I</button>
-          <button onclick="selecionarHipoteseEmergencial('hipotese_ii')">Hipótese II</button>
+        <div id="ofc-hipotese-seletor" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:12px;padding:8px 0;">
+          <button class="tipo-btn ativo" onclick="selecionarHipoteseEmergencial('hipotese_i')">🔴 Hipótese I — Gerenciamento de Crise</button>
+          <button class="tipo-btn" onclick="selecionarHipoteseEmergencial('hipotese_ii')">🔵 Hipótese II — Manutenção da Ordem / Integridade Física</button>
         </div>
         <div class="oficio-campos-hint">
           ✏️ <strong>Campos em amarelo</strong> são editáveis — clique para preencher. O restante do texto é fixo.
@@ -1768,16 +1768,6 @@
     <div class="conteudo-grid">
       <div>
 
-        <!-- Vagas SC -->
-        <div class="card mb-2">
-          <div class="card-header"><span>🔗</span><h3>Vagas SC — CRV</h3></div>
-          <div class="card-body">
-            <p class="text-sm mb-2">O Vagas SC permite que dois custodiados de unidades diferentes troquem de estabelecimento <strong>sem necessidade de vaga nova</strong>, desde que o perfil de ambos seja compatível com a troca e haja interesse recíproco devidamente manifestado.</p>
-            <p class="text-sm mb-2">O pedido deve ser formulado pela Direção da unidade prisional junto à CRV, instruído com a documentação de ambos os custodiados envolvidos.</p>
-            <p class="text-sm"><strong>Contato CRV:</strong> <a href="/cdn-cgi/l/email-protection#305342467040401e43531e575f461e5242"><span class="__cf_email__" data-cfemail="107362665060603e63733e777f663e7262">[email&#160;protected]</span></a> &nbsp;|&nbsp; <a href="tel:+554836657330">(48) 3665-7330</a></p>
-          </div>
-        </div>
-
         <!-- Portal do Advogado -->
         <div class="card">
           <div class="card-header"><span>⚖️</span><h3>Portal Online</h3></div>
@@ -1811,16 +1801,6 @@
               <div style="margin-bottom:.5rem;">✅ <strong>Familiar de 1º grau</strong> — mediante requerimento à Direção da unidade</div>
               <div style="margin-bottom:.5rem;">✅ <strong>Defensor público</strong> — via portal online ou petição física</div>
               <div>✅ <strong>Próprio custodiado</strong> — mediante requerimento escrito à Direção</div>
-            </div>
-          </div>
-        </div>
-        <div class="sidebar-card">
-          <div class="sidebar-card-header">🔗 Links úteis</div>
-          <div class="sidebar-card-body">
-            <div class="link-lista">
-              <a href="https://ppsc.com.br" target="_blank" rel="noopener"><span class="bullet">●</span> Portal PPSC — ppsc.com.br ↗</a>
-              <a href="https://crv.ppsc.com.br" target="_blank" rel="noopener"><span class="bullet">●</span> Sistema CRV ↗</a>
-              <a href="/cdn-cgi/l/email-protection#debdaca89eaeaef0adbdf0b9b1a8f0bcac"><span class="bullet">●</span> <span class="__cf_email__" data-cfemail="4a29383c0a3a3a643929642d253c642838">[email&#160;protected]</span></a>
             </div>
           </div>
         </div>
