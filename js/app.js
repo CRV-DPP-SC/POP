@@ -794,7 +794,7 @@ const modelosTexto = {
         paragrafos: [
           { texto: 'Comunicamos a Vossa Excelência que o(a) custodiado(a) [NOME COMPLETO], IPEN nº [NÚMERO], foi transferido(a) desta Unidade Prisional para a [UNIDADE PRISIONAL DE DESTINO], localizada em [CIDADE DE DESTINO]/SC, no dia [DATA].', editavel: false },
           { texto: 'A transferência foi devidamente autorizada pela Central de Regulação de Vagas — CRV/DPP, uma vez que a Unidade Prisional de Destino é competente para a manutenção da prisão do custodiado por estar vinculada à Unidade Judiciária que determinou a prisão da referida pessoa.', editavel: false },
-          { texto: 'Nada mais havendo a comunicar, ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos que se façam necessários.', editavel: false },
+          { texto: 'Nada mais havendo a comunicar, ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos que se façam necessários.', editavel: false }
         ],
       },
       entrada: {
@@ -802,7 +802,7 @@ const modelosTexto = {
         paragrafos: [
           { texto: 'Comunicamos a Vossa Excelência que o(a) custodiado(a) [NOME COMPLETO], IPEN nº [NÚMERO], ingressou nesta Unidade Prisional, oriundo(a) da [UNIDADE PRISIONAL DE ORIGEM], localizada em [CIDADE DE ORIGEM]/SC, no dia [DATA].', editavel: false },
           { texto: 'A transferência foi devidamente autorizada pela Central de Regulação de Vagas — CRV/DPP, uma vez que a Unidade Prisional de Destino é competente para a manutenção da prisão do custodiado por estar vinculada à Unidade Judiciária que determinou a prisão da referida pessoa.', editavel: false },
-          { texto: 'Nada mais havendo a comunicar, ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos que se façam necessários.', editavel: false },
+          { texto: 'Nada mais havendo a comunicar, ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos que se façam necessários.', editavel: false }
         ],
       },
     },
