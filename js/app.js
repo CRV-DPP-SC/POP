@@ -646,38 +646,38 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModalO
 // ================================================
 const modelosTexto = {
 
-  /* ── EMERGENCIAL — HIPÓTESE I (GERENCIAMENTO DE CRISE) ─── */
+  /* ── EMERGENCIAL — TRANSFERÊNCIA EMERGENCIAL (Art. 21, I) ─── */
   emergencial: {
-  titulo: '🔴 Transferência Emergencial',
+  titulo: '🚨 Transferência Emergencial',
   saudacaoInicial: 'Senhor(a) Coordenador(a),',
   tipoSeletor: 'hipotese_emergencial',
   variantes: {
     hipotese_i: {
-      titulo: '🔴 Emergencial — Hipótese I — Gerenciamento de Crise',
+      titulo: '📋 Modelo A — Com PAD',
       paragrafos: [
       { texto: 'Encaminho para análise urgente dessa Central de Regulação de Vagas pedido de transferência excepcional do(a) reeducando(a) [NOME COMPLETO], IPEN nº [NÚMERO], atualmente custodiado(a) no(a) [UNIDADE PRISIONAL DE ORIGEM], em razão de situação emergencial identificada pelas equipes deste estabelecimento penal, conforme segue.', editavel: false },
-      { texto: 'A presente solicitação enquadra-se na Hipótese I — Gerenciamento de Crise, em razão de situação de instabilidade interna, conflito ou risco à ordem da unidade, que exige a retirada imediata do(a) reeducando(a). A medida possui natureza administrativa e não punitiva, nos termos do art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026.', editavel: false },
-      { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A CONDUTA E SEUS REFLEXOS NA SEGURANÇA/ORDEM], demonstrando risco atual, concreto e relevante à segurança institucional, o que torna inviável a permanência do(a) reeducando(a) nesta unidade prisional.', editavel: true, label: 'Descrição da conduta e do risco' },
+      { texto: 'A presente solicitação fundamenta-se no art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026, em razão de situação de risco atual, concreto e relevante que exige a retirada imediata do(a) reeducando(a). A medida possui natureza administrativa e não punitiva.', editavel: false },
+      { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A CONDUTA E SEUS REFLEXOS NA SEGURANÇA/ORDEM DA UNIDADE], demonstrando risco atual, concreto e relevante à segurança institucional, o que torna inviável a permanência do(a) reeducando(a) nesta unidade prisional.', editavel: true, label: 'Descrição detalhada da situação e do risco' },
       { texto: 'Diante da urgência, solicita-se a transferência do(a) reeducando(a) para o(a) [UNIDADE PRISIONAL DE DESTINO], onde há condições adequadas para sua custódia.', editavel: false },
-      { texto: 'Informa-se que [SELECIONE] o competente Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente.', editavel: false, selectField: { placeholder: 'SELECIONE', opcoes: ['FOI INSTAURADO', 'SERÁ INSTAURADO'] } },
+      { texto: 'Informa-se que [SELECIONE] o competente Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente, em razão de conduta enquadrada no rol taxativo do art. 50 / art. 52 da Lei de Execução Penal.', editavel: false, selectField: { placeholder: 'SELECIONE', opcoes: ['FOI INSTAURADO', 'SERÁ INSTAURADO'] } },
       { texto: 'Esclarece-se que a presente medida não possui natureza de sanção disciplinar, tratando-se de providência administrativa de caráter cautelar, sem prejuízo da apuração regular dos fatos no âmbito do PAD.', editavel: false },
       { texto: 'Ressalta-se que eventual isolamento preventivo observará rigorosamente os limites legais, especialmente quanto ao prazo máximo (até 10 dias, prorrogável por mais 20 se o PAD for concluído com decisão procedente dentro desse período, nos termos do art. 60 da LEP) e à vedação de punição antecipada, com preservação integral dos direitos da pessoa privada de liberdade.', editavel: false },
-      { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, a portaria de instauração do PAD e [OUTROS DOCUMENTOS: boletim de ocorrência interno, relatório da equipe de segurança, entre outros].', editavel: false },
+      { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, e [OUTROS DOCUMENTOS: ofício do Chefe de Segurança e/ou Setor de Inteligência, boletim de ocorrência interno, entre outros].', editavel: false },
       { texto: 'Uma vez efetivada a remoção, caso aprovada, o Juízo competente será devidamente comunicado no prazo legal de até 24 horas.', editavel: false },
       { texto: 'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, incluindo o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.', editavel: false },
       { texto: 'Diante do exposto, solicita-se análise e célere deliberação quanto à viabilidade da transferência.', editavel: false },
       ]
     },
     hipotese_ii: {
-      titulo: '🔵 Emergencial — Hipótese II — Manutenção da Ordem/Integridade Física',
+      titulo: '📋 Modelo B — Sem PAD',
       paragrafos: [
       { texto: 'Encaminho para análise urgente da Central de Regulação de Vagas (CRV) pedido de transferência excepcional do(a) reeducando(a) [NOME COMPLETO], IPEN nº [NÚMERO], atualmente custodiado(a) no(a) [UNIDADE PRISIONAL DE ORIGEM], em razão de situação emergencial identificada pelas equipes deste estabelecimento penal, conforme segue.', editavel: false },
-      { texto: 'A presente solicitação enquadra-se na Hipótese II — Medida de Segurança, diante de situação de risco à integridade física do(a) reeducando(a), de terceiros, ou à estabilidade da unidade prisional — envolvendo ameaças, conflitos ou risco coletivo — nos termos do art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026. A medida possui natureza administrativa e não punitiva.', editavel: false },
-      { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A SITUAÇÃO: ameaças, conflitos interpessoais ou coletivos, risco à integridade física, tensões internas, entre outros], circunstância que inviabiliza a permanência do(a) reeducando(a) nesta unidade sem comprometimento da segurança institucional.', editavel: true, label: 'Descrição da situação de risco' },
+      { texto: 'A presente solicitação fundamenta-se no art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026, em razão de situação de risco atual, concreto e relevante à integridade física do(a) reeducando(a), de terceiros, ou à estabilidade e segurança da unidade prisional. A medida possui natureza administrativa e não punitiva, não estando vinculada à prática de falta grave.', editavel: false },
+      { texto: 'A situação concreta consiste em [DESCREVER DETALHADAMENTE A SITUAÇÃO: ameaças, conflitos interpessoais ou coletivos, risco à integridade física, tensões internas, motins, rebeliões, entre outros], circunstância que inviabiliza a permanência do(a) reeducando(a) nesta unidade sem comprometimento da segurança institucional.', editavel: true, label: 'Descrição detalhada da situação de risco' },
       { texto: 'Diante da urgência, solicita-se a transferência do(a) reeducando(a) para o(a) [UNIDADE PRISIONAL DE DESTINO], onde há condições adequadas para sua custódia em segurança.', editavel: false },
-      { texto: 'Esclarece-se que a presente medida não possui natureza disciplinar, tratando-se exclusivamente de providência administrativa destinada à preservação da segurança do reeducando e de terceiros.', editavel: false },
-      { texto: 'Ressalta-se que o(a) reeducando(a) permanecerá em cela de convívio, com a integral preservação de seus direitos, sendo vedada sua submissão a isolamento, por não se tratar de hipótese disciplinar.', editavel: false },
-      { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, e [OUTROS DOCUMENTOS: boletim de ocorrência interno, relatório da equipe de segurança, entre outros].', editavel: false },
+      { texto: 'Esclarece-se que a presente medida não possui natureza disciplinar, tratando-se exclusivamente de providência administrativa destinada à preservação da segurança do(a) reeducando(a) e de terceiros. Não há instauração de PAD, por não se verificar, no caso concreto, a prática de falta grave tipificada nos arts. 50 ou 52 da Lei de Execução Penal.', editavel: false },
+      { texto: 'Ressalta-se que o(a) reeducando(a) permanecerá em cela de convívio, com a integral preservação de seus direitos, sendo vedada qualquer forma de isolamento.', editavel: false },
+      { texto: 'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico (Médico, Enfermeiro, Técnico de Enfermagem, etc.), pelo Coordenador de Saúde ou pelo Diretor, e [OUTROS DOCUMENTOS: ofício do Chefe de Segurança e/ou Setor de Inteligência, boletim de ocorrência interno, entre outros].', editavel: false },
       { texto: 'Uma vez efetivada a remoção, caso aprovada, o Juízo competente será devidamente comunicado no prazo legal de até 24 horas.', editavel: false },
       { texto: 'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, incluindo o Diretor do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.', editavel: false },
       { texto: 'Diante do exposto, solicita-se análise e célere deliberação quanto à viabilidade da transferência.', editavel: false },
