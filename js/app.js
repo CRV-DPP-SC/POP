@@ -135,6 +135,7 @@ const nomesPagina = {
   'faq':             'Perguntas Frequentes',
   'erros-comuns':    'Erros Mais Comuns',
   'comece-por-aqui': 'Comece por Aqui',
+  'restrito':        'Área Restrita',
 };
 
 function atualizarBreadcrumb(paginaId) {
