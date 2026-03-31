@@ -983,15 +983,19 @@ function coletarTextoOficio() {
       const itens = [...div.querySelectorAll('.lista-reeducando-item')].map((item, i) => {
         const nome = item.querySelector('[data-field="nome"]')?.value.trim() || '(nome não informado)';
         const ipen = item.querySelector('[data-field="ipen"]')?.value.trim() || '(IPEN não informado)';
-        return `${i + 1}. <strong>${nome}</strong> — IPEN Nº <strong>${ipen}</strong>`;
+        return `<strong>${nome}</strong> — IPEN Nº <strong>${ipen}</strong>`;
       });
+      // Para HTML (PDF/Word): cada item em div próprio com recuo
+      const itensHtml = itens.map((linha, i) =>
+        `<div style="margin-left:1.5cm;text-indent:0;margin-bottom:2px;">${i + 1}. ${linha}</div>`
+      ).join('');
       // Para texto puro (cópia): sem tags, separado por \n
       const itensPuro = [...div.querySelectorAll('.lista-reeducando-item')].map((item, i) => {
         const nome = item.querySelector('[data-field="nome"]')?.value.trim() || '(nome não informado)';
         const ipen = item.querySelector('[data-field="ipen"]')?.value.trim() || '(IPEN não informado)';
         return `${i + 1}. ${nome} — IPEN Nº ${ipen}`;
       });
-      return { puro: itensPuro.join('\n'), html: itens.join('<br>') };
+      return { puro: itensPuro.join('\n'), html: itensHtml };
     }
 
     div.querySelectorAll('.campo-inline-editavel').forEach(input => {
@@ -1126,7 +1130,8 @@ function gerarPDF() {
     + '.cab-unidade{font-size:11pt;font-weight:bold;color:#000;margin:.25em 0 0;}'
     + '.data{text-align:right;margin-bottom:3.5em;}'
     + '.saud{text-indent:1.5cm;margin-bottom:3.5em;}'
-    + '.par{text-indent:1.5cm;text-align:justify;margin-bottom:1em;}'
+    + '.par{text-indent:1.5cm;text-align:justify;margin-bottom:1em;}'\
+    + '.par-lista{text-indent:0;text-align:left;margin-bottom:1em;}'
     + '.desp{margin-top:3.5em;margin-left:8cm;}'
     + '.asss{margin-top:4em;margin-left:8cm;}'
     + '.ab{margin-bottom:2em;}'
@@ -1154,7 +1159,11 @@ function gerarPDF() {
     // Corpo
     + '<div class="data">' + cidade + ', ' + data + '.</div>'
     + '<div class="saud">' + saudacao + '</div>'
-    + paras.map((p, i) => '<div class="par">' + (parasHtml[i] || p) + '</div>').join('')
+    + paras.map((p, i) => {
+        const h = parasHtml[i] || p;
+        const isLista = h.includes('margin-left:1.5cm');
+        return '<div class="' + (isLista ? 'par-lista' : 'par') + '">' + h + '</div>';
+      }).join('')
     + '<div class="desp">' + despedida + '</div>'
     + '<div class="asss">'
     + asss.map(a =>
@@ -1236,7 +1245,12 @@ function gerarWord() {
     + '<p class="data">' + cidade + ', ' + data + '.</p>'
     + '<p class="gap4">&nbsp;</p>'
     + '<p class="i15 gap4">' + saudacao + '</p>'
-    + paras.map((p, i) => '<p class="i15">' + (parasHtml[i] || p) + '</p><p>&nbsp;</p>').join('')
+    + paras.map((p, i) => {
+        const h = parasHtml[i] || p;
+        const isLista = h.includes('margin-left:1.5cm');
+        if (isLista) return h; // já tem margin em cada div
+        return '<p class="i15">' + h + '</p><p>&nbsp;</p>';
+      }).join('')
     + '<p class="i8 gap4">' + despedida + '</p>'
     + '<p class="gap5">&nbsp;</p>'
     + asss.map(a =>
