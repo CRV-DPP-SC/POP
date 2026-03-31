@@ -1131,7 +1131,7 @@ function gerarPDF() {
     + '.cab-unidade{font-size:11pt;font-weight:bold;color:#000;margin:.25em 0 0;}'
     + '.data{text-align:right;margin-bottom:3.5em;}'
     + '.saud{text-indent:1.5cm;margin-bottom:3.5em;}'
-    + '.par{text-indent:1.5cm;text-align:justify;margin-bottom:1em;}'\
+    + '.par{text-indent:1.5cm;text-align:justify;margin-bottom:1em;}'
     + '.par-lista{text-indent:0;text-align:left;margin-bottom:1em;}'
     + '.desp{margin-top:3.5em;margin-left:8cm;}'
     + '.asss{margin-top:4em;margin-left:8cm;}'
