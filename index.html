@@ -42,6 +42,7 @@
       <a href="#" data-pagina="erros-comuns" onclick="navegarPara('erros-comuns');return false;">Erros Comuns</a>
       <a href="#" data-pagina="legislacao"  onclick="navegarPara('legislacao');return false;">Legislação</a>
       <a href="#" data-pagina="unidades"    onclick="navegarPara('unidades');return false;">Unidades</a>
+      <a href="#" id="nav-restrito" data-pagina="restrito" onclick="abrirAreaRestrita();return false;" style="background:var(--dourado,#b8860b);color:#fff!important;border-radius:6px;padding:4px 12px;font-weight:700;">🔒 Área Restrita</a>
     </nav>
     <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
   </div>
@@ -774,6 +775,7 @@
             <li>☐ <strong>Relatório de Saúde</strong> — de cada preso indicado</li>
             <li>☐ <strong>Lista dos presos indicados</strong> — nome, IPEN, regime, perfil</li>
             <li>☐ <strong>Assinaturas:</strong> Diretor de Origem + Diretor de Destino. Não é necessário tramitar o SGPe para manifestação das autoridades envolvidas, servindo apenas as respectivas assinaturas (anuência) no ofício inicial.</li>
+            <li style="color:var(--azul-2);font-size:.82rem;border-top:1px dashed #d1d5db;padding-top:.4rem;margin-top:.2rem;">📋 <strong>Mesmo Complexo Prisional:</strong> não é necessário ofício via SGPe — basta o cadastro no i-PEN com menção, no campo "observações", ao contato prévio com o Diretor ou Chefe de Segurança da unidade de destino e à sua anuência.</li>
           </ul>
         </div>
       </div>
@@ -800,6 +802,7 @@
             <li>☐ <strong>BPI atualizado no i-PEN</strong></li>
             <li>☐ <strong>Assinaturas:</strong> Diretor de Origem + Diretor de Destino. Não é necessário tramitar o SGPe para manifestação das autoridades envolvidas, servindo apenas as respectivas assinaturas (anuência) no ofício inicial.</li>
             <li style="color:var(--cinza-5);font-size:.8rem;">ℹ️ Não é exigida anuência dos Superintendentes Regionais nem do SGPe.</li>
+            <li style="color:var(--azul-2);font-size:.82rem;border-top:1px dashed #d1d5db;padding-top:.4rem;margin-top:.2rem;">📋 <strong>Pernoite — Dispensa de ofício via SGPe:</strong> não é necessário o envio de ofício via SGPe, sendo suficiente o cadastro no i-PEN com menção, no campo "observações", ao contato prévio com o Diretor ou Chefe de Segurança da unidade de destino e à sua anuência.</li>
           </ul>
         </div>
       </div>
@@ -1896,6 +1899,10 @@
       <span class="alerta-icone">ℹ️</span>
       <div>A adequação pode ser iniciada pelo <strong>DPP, pela CRV, pelos Superintendentes Regionais ou pelos próprios Diretores das Unidades Prisionais</strong>, visando sempre a equalização e o ajuste de vagas (Art. 21, III da Res. nº 1/2026).</div>
     </div>
+    <div class="alerta alerta-atencao mb-3">
+      <span class="alerta-icone">📋</span>
+      <div><strong class="alerta-titulo">Transferências dentro do mesmo Complexo Prisional</strong>Quando se tratar de transferência entre unidades prisionais pertencentes ao <strong>mesmo complexo prisional</strong>, não será necessário o envio de ofício via SGPe, sendo suficiente o cadastro no i-PEN. Ressalta-se ser indispensável consignar, no campo <strong>"observações"</strong>, que foi mantido contato prévio com o Diretor ou Chefe de Segurança da unidade de destino, o qual anuiu ao pedido.</div>
+    </div>
     <div class="card mb-2">
       <div class="card-header"><span>📊</span><h3>Metas — Plano Pena Justa</h3></div>
       <div class="card-body">
@@ -1959,6 +1966,10 @@
     <div class="alerta alerta-info mb-3">
       <span class="alerta-icone">ℹ️</span>
       <div>O pernoite não é uma transferência definitiva. É uma medida pontual e temporária, que deve ser devidamente fundamentada e autorizada pela CRV.</div>
+    </div>
+    <div class="alerta alerta-atencao mb-3">
+      <span class="alerta-icone">📋</span>
+      <div><strong class="alerta-titulo">Pernoite — Dispensa de ofício via SGPe</strong>Quando se tratar de pernoite, não será necessário o envio de ofício via SGPe, sendo suficiente o cadastro no i-PEN. Ressalta-se ser indispensável consignar, no campo <strong>"observações"</strong>, que foi mantido contato prévio com o Diretor ou Chefe de Segurança da unidade de destino, o qual anuiu ao pedido.</div>
     </div>
     <div class="conteudo-grid">
       <div>
@@ -2347,8 +2358,396 @@
 </footer>
 
 <!-- Botão voltar ao topo -->
+
+<!-- ========== MODAL DE LOGIN ========== -->
+<div id="modal-login" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:2rem;width:100%;max-width:420px;margin:1rem;box-shadow:0 20px 60px rgba(0,0,0,.35);position:relative;">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:2rem;margin-bottom:.5rem;">🔒</div>
+      <h2 style="font-size:1.2rem;font-weight:700;color:#1a2a4a;margin:0;">Área Restrita — CRV</h2>
+      <p style="font-size:.8rem;color:#6b7280;margin:.4rem 0 0;">Acesso exclusivo para Policiais Penais da CRV</p>
+    </div>
+
+    <!-- TELA: LOGIN -->
+    <div id="tela-login">
+      <div style="margin-bottom:1rem;">
+        <label style="font-size:.82rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">E-mail institucional</label>
+        <input id="login-email" type="email" placeholder="seu@email.com"
+          style="width:100%;height:42px;border:1.5px solid #d1d5db;border-radius:8px;padding:0 12px;font-size:.95rem;box-sizing:border-box;outline:none;"
+          onfocus="this.style.borderColor='#1a2a4a'" onblur="this.style.borderColor='#d1d5db'">
+      </div>
+      <div style="margin-bottom:1.2rem;position:relative;">
+        <label style="font-size:.82rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Senha</label>
+        <input id="login-senha" type="password" placeholder="••••••••"
+          style="width:100%;height:42px;border:1.5px solid #d1d5db;border-radius:8px;padding:0 40px 0 12px;font-size:.95rem;box-sizing:border-box;outline:none;"
+          onfocus="this.style.borderColor='#1a2a4a'" onblur="this.style.borderColor='#d1d5db'"
+          onkeydown="if(event.key==='Enter')fazerLogin()">
+        <span onclick="toggleSenhaVis('login-senha')" style="position:absolute;right:10px;bottom:10px;cursor:pointer;font-size:1rem;">👁</span>
+      </div>
+      <div id="login-erro" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:.6rem .8rem;font-size:.8rem;color:#b91c1c;margin-bottom:1rem;"></div>
+      <button onclick="fazerLogin()" id="btn-entrar"
+        style="width:100%;height:44px;background:#1a2a4a;color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;">
+        Entrar
+      </button>
+      <p style="text-align:center;margin-top:1rem;font-size:.78rem;color:#6b7280;">
+        Primeiro acesso? Use a senha temporária <strong>CRV@2026temp</strong><br>e você será redirecionado para criar a sua senha.
+      </p>
+    </div>
+
+    <!-- TELA: TROCAR SENHA (1º acesso) -->
+    <div id="tela-trocar-senha" style="display:none;">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.8rem;margin-bottom:1.2rem;font-size:.82rem;color:#1e40af;">
+        🔑 <strong>Primeiro acesso detectado!</strong><br>Por segurança, crie uma senha pessoal agora.
+      </div>
+      <div style="margin-bottom:1rem;position:relative;">
+        <label style="font-size:.82rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Nova senha</label>
+        <input id="nova-senha" type="password" placeholder="Mínimo 8 caracteres"
+          style="width:100%;height:42px;border:1.5px solid #d1d5db;border-radius:8px;padding:0 40px 0 12px;font-size:.95rem;box-sizing:border-box;outline:none;"
+          onfocus="this.style.borderColor='#1a2a4a'" onblur="this.style.borderColor='#d1d5db'">
+        <span onclick="toggleSenhaVis('nova-senha')" style="position:absolute;right:10px;bottom:10px;cursor:pointer;font-size:1rem;">👁</span>
+      </div>
+      <div style="margin-bottom:1.2rem;position:relative;">
+        <label style="font-size:.82rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Confirmar nova senha</label>
+        <input id="confirmar-senha" type="password" placeholder="Repita a senha"
+          style="width:100%;height:42px;border:1.5px solid #d1d5db;border-radius:8px;padding:0 40px 0 12px;font-size:.95rem;box-sizing:border-box;outline:none;"
+          onfocus="this.style.borderColor='#1a2a4a'" onblur="this.style.borderColor='#d1d5db'">
+        <span onclick="toggleSenhaVis('confirmar-senha')" style="position:absolute;right:10px;bottom:10px;cursor:pointer;font-size:1rem;">👁</span>
+      </div>
+      <div id="trocar-erro" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:.6rem .8rem;font-size:.8rem;color:#b91c1c;margin-bottom:1rem;"></div>
+      <button onclick="trocarSenha()"
+        style="width:100%;height:44px;background:#1a2a4a;color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;">
+        Salvar nova senha e entrar
+      </button>
+    </div>
+
+    <button onclick="fecharModalLogin()"
+      style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#9ca3af;line-height:1;">×</button>
+  </div>
+</div>
+
+<!-- ========== MODAL DE NOVIDADES ========== -->
+<div id="modal-novidades" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:1.8rem;width:100%;max-width:480px;margin:1rem;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1.2rem;">
+      <span style="font-size:1.5rem;">🆕</span>
+      <h3 style="font-size:1rem;font-weight:700;color:#1a2a4a;margin:0;">Novidades desde seu último acesso</h3>
+    </div>
+    <div id="novidades-conteudo" style="font-size:.88rem;color:#374151;line-height:1.7;max-height:300px;overflow-y:auto;background:#f9fafb;border-radius:8px;padding:1rem;border:1px solid #e5e7eb;"></div>
+    <button onclick="fecharNovidades()"
+      style="margin-top:1.2rem;width:100%;height:42px;background:#1a2a4a;color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;">
+      Entendido, continuar
+    </button>
+  </div>
+</div>
+
+<!-- ========== SEÇÃO ÁREA RESTRITA ========== -->
+<section id="restrito" class="page-section" style="display:none;">
+  <div class="main-wrapper">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+      <div>
+        <h2 style="font-size:1.4rem;font-weight:700;color:#1a2a4a;margin:0;">🔒 Área Restrita — CRV</h2>
+        <p id="restrito-usuario-info" style="font-size:.82rem;color:#6b7280;margin:.3rem 0 0;"></p>
+      </div>
+      <button onclick="fazerLogout()"
+        style="height:38px;padding:0 18px;background:#fff;border:1.5px solid #dc2626;color:#dc2626;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;">
+        Sair 🚪
+      </button>
+    </div>
+
+    <!-- FERRAMENTAS DA ÁREA RESTRITA -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;">
+      <div onclick="abrirCalculadora()"
+        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
+        <div style="font-size:2rem;margin-bottom:.6rem;">📊</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Calculadora de Gestão de Vagas</div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Déficit, excedente e taxa de ocupação</div>
+      </div>
+      <!-- Espaço para futuras ferramentas -->
+      <div style="background:#f9fafb;border:2px dashed #d1d5db;border-radius:12px;padding:1.5rem;text-align:center;opacity:.5;">
+        <div style="font-size:2rem;margin-bottom:.6rem;">➕</div>
+        <div style="font-weight:600;color:#9ca3af;font-size:.9rem;">Em breve</div>
+        <div style="font-size:.75rem;color:#9ca3af;margin-top:.3rem;">Novas ferramentas serão adicionadas aqui</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MODAL CALCULADORA ========== -->
+<div id="modal-calculadora" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9990;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:760px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;">
+    <div style="background:#1a2a4a;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0;">📊 Calculadora de Gestão de Vagas</h3>
+      <button onclick="fecharCalculadora()" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div id="calculadora-conteudo" style="padding:0;"></div>
+  </div>
+</div>
+
 <button id="btnTopo" class="btn-topo" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Voltar ao topo">↑</button>
 
+<!-- ========== FIREBASE SDK ========== -->
 <script src="js/app.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAtfo2cXia1N7EW14bBO9LMF2Ez3zz8Lo4",
+    authDomain: "crv-dpp-sc.firebaseapp.com",
+    projectId: "crv-dpp-sc",
+    storageBucket: "crv-dpp-sc.firebasestorage.app",
+    messagingSenderId: "707080008192",
+    appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // E-mails autorizados
+  const EMAILS_AUTORIZADOS = [
+    'rodrigo.l.pastore@gmail.com',
+    'ivana.schafer@gmail.com',
+    'brunawlongen@gmail.com',
+    'ricardobritomarques12@gmail.com',
+    'abeljuliana2012@gmail.com',
+    'jessicaveiga9@gmail.com',
+    'day.sestren88@gmail.com'
+  ];
+
+  const SENHA_TEMPORARIA = 'CRV@2026temp';
+
+  let usuarioAtual = null;
+
+  // ── Expõe funções para o escopo global ──
+  window.abrirAreaRestrita = function() {
+    if (usuarioAtual) {
+      mostrarAreaRestrita(usuarioAtual);
+    } else {
+      document.getElementById('modal-login').style.display = 'flex';
+      document.getElementById('login-email').focus();
+    }
+  };
+
+  window.fecharModalLogin = function() {
+    document.getElementById('modal-login').style.display = 'none';
+    document.getElementById('login-erro').style.display = 'none';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
+  };
+
+  window.fazerLogin = async function() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const senha = document.getElementById('login-senha').value;
+    const erroEl = document.getElementById('login-erro');
+    const btn = document.getElementById('btn-entrar');
+
+    erroEl.style.display = 'none';
+
+    if (!email || !senha) {
+      erroEl.textContent = 'Preencha o e-mail e a senha.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    if (!EMAILS_AUTORIZADOS.includes(email)) {
+      erroEl.textContent = 'Este e-mail não tem autorização de acesso.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, senha);
+      usuarioAtual = cred.user;
+
+      // Verifica se é senha temporária → redireciona para troca
+      if (senha === SENHA_TEMPORARIA) {
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-trocar-senha').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('modal-login').style.display = 'none';
+      await entrarNaAreaRestrita(cred.user);
+
+    } catch (e) {
+      let msg = 'E-mail ou senha incorretos.';
+      if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
+      if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
+      erroEl.textContent = msg;
+      erroEl.style.display = 'block';
+    } finally {
+      btn.textContent = 'Entrar';
+      btn.disabled = false;
+    }
+  };
+
+  window.trocarSenha = async function() {
+    const nova = document.getElementById('nova-senha').value;
+    const conf = document.getElementById('confirmar-senha').value;
+    const erroEl = document.getElementById('trocar-erro');
+
+    erroEl.style.display = 'none';
+
+    if (nova.length < 8) {
+      erroEl.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova !== conf) {
+      erroEl.textContent = 'As senhas não coincidem.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova === SENHA_TEMPORARIA) {
+      erroEl.textContent = 'Escolha uma senha diferente da temporária.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      await updatePassword(usuarioAtual, nova);
+      document.getElementById('modal-login').style.display = 'none';
+      document.getElementById('tela-login').style.display = 'block';
+      document.getElementById('tela-trocar-senha').style.display = 'none';
+      document.getElementById('nova-senha').value = '';
+      document.getElementById('confirmar-senha').value = '';
+      await entrarNaAreaRestrita(usuarioAtual);
+      mostrarToastCRV('✅ Senha criada com sucesso! Bem-vindo(a)!');
+    } catch (e) {
+      erroEl.textContent = 'Erro ao salvar senha. Tente novamente.';
+      erroEl.style.display = 'block';
+    }
+  };
+
+  window.fazerLogout = async function() {
+    await signOut(auth);
+    usuarioAtual = null;
+    document.getElementById('restrito').style.display = 'none';
+    if (typeof navegarPara === 'function') navegarPara('inicio');
+  };
+
+  window.toggleSenhaVis = function(id) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+  };
+
+  window.abrirCalculadora = function() {
+    const modal = document.getElementById('modal-calculadora');
+    const cont  = document.getElementById('calculadora-conteudo');
+    if (!cont.innerHTML.trim()) {
+      // Carrega o conteúdo da calculadora via fetch do arquivo
+      fetch('calculadora-prisional.html')
+        .then(r => r.text())
+        .then(html => {
+          // Extrai apenas o <body> da calculadora
+          const parser = new DOMParser();
+          const doc2 = parser.parseFromString(html, 'text/html');
+          // Remove o header da calculadora (já temos o header do site)
+          const siteHeader = doc2.querySelector('.site-header');
+          if (siteHeader) siteHeader.remove();
+          cont.innerHTML = '<div style="padding:1.5rem;">' + doc2.body.innerHTML + '</div>';
+          // Re-executa os scripts da calculadora
+          cont.querySelectorAll('script').forEach(s => {
+            const ns = document.createElement('script');
+            ns.textContent = s.textContent;
+            document.body.appendChild(ns);
+          });
+        })
+        .catch(() => {
+          cont.innerHTML = '<p style="padding:2rem;text-align:center;color:#6b7280;">Erro ao carregar a calculadora.</p>';
+        });
+    }
+    modal.style.display = 'flex';
+  };
+
+  window.fecharCalculadora = function() {
+    document.getElementById('modal-calculadora').style.display = 'none';
+  };
+
+  window.fecharNovidades = function() {
+    document.getElementById('modal-novidades').style.display = 'none';
+  };
+
+  // ── Funções internas ──
+  async function entrarNaAreaRestrita(user) {
+    const uid = user.uid;
+    const email = user.email;
+    const agora = new Date();
+    const agoraISO = agora.toISOString();
+
+    // Busca último acesso e novidades
+    let ultimoAcesso = null;
+    try {
+      const docRef = doc(db, 'usuarios', uid);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) ultimoAcesso = snap.data().ultimoAcesso || null;
+      // Atualiza último acesso
+      await setDoc(docRef, { ultimoAcesso: agoraISO, email }, { merge: true });
+    } catch (e) { /* silencioso */ }
+
+    // Verifica novidades
+    if (ultimoAcesso) {
+      try {
+        const novSnap = await getDocs(collection(db, 'novidades'));
+        const novas = [];
+        novSnap.forEach(d => {
+          const n = d.data();
+          if (n.data && n.data > ultimoAcesso) {
+            novas.push({ titulo: n.titulo || '', descricao: n.descricao || '', data: n.data });
+          }
+        });
+        if (novas.length > 0) {
+          novas.sort((a,b) => b.data.localeCompare(a.data));
+          const html = novas.map(n =>
+            `<div style="margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid #e5e7eb;">
+              <div style="font-weight:600;color:#1a2a4a;">${n.titulo}</div>
+              <div style="color:#4b5563;font-size:.84rem;margin-top:.2rem;">${n.descricao}</div>
+            </div>`
+          ).join('');
+          document.getElementById('novidades-conteudo').innerHTML = html;
+          document.getElementById('modal-novidades').style.display = 'flex';
+        }
+      } catch (e) { /* silencioso */ }
+    }
+
+    mostrarAreaRestrita(user);
+  }
+
+  function mostrarAreaRestrita(user) {
+    // Oculta todas as seções e mostra a restrita
+    document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
+    const sec = document.getElementById('restrito');
+    sec.style.display = 'block';
+
+    // Info do usuário
+    document.getElementById('restrito-usuario-info').textContent =
+      '👮 Conectado como: ' + (user.email || '');
+
+    // Atualiza breadcrumb
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Área Restrita';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function mostrarToastCRV(msg) {
+    if (typeof showToast === 'function') showToast(msg);
+  }
+
+  // Monitora estado de autenticação (para persistir sessão)
+  onAuthStateChanged(auth, user => {
+    if (user && EMAILS_AUTORIZADOS.includes(user.email)) {
+      usuarioAtual = user;
+    } else {
+      usuarioAtual = null;
+    }
+  });
+</script>
 </body>
 </html>
