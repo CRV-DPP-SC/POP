@@ -464,7 +464,7 @@
           <ul style="margin:.75rem 0 0 1.25rem;list-style:disc;font-size:.87rem;line-height:2.1;">
             <li><strong>Larga escala / complexo:</strong> Transferência rotineira dentro do mesmo Complexo (ex.: 20 internos do presídio para a penitenciária em único pedido);</li>
             <li><strong>Pontual:</strong> Transferência individual por perfil específico (ex.: pessoa LGBT para unidade adequada ao perfil).
-              <button onclick="document.getElementById('modal-lgbtqia').style.display='flex'"
+              <button onclick="window.abrirModal('modal-lgbtqia')"
                 style="margin-left:.5rem;background:#1a2a4a;color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:.75rem;cursor:pointer;vertical-align:middle;">
                 🏳️‍🌈 Ver Relação de Unidades LGBTQIA+
               </button>
@@ -2000,7 +2000,7 @@
       <div class="card-body">
         <p class="text-sm mb-2"><strong>Modelo 1 — Larga escala / mesmo Complexo:</strong> Transferência rotineira de vários internos de uma só vez dentro do mesmo Complexo (ex.: 20 internos do presídio para a penitenciária). Todos no mesmo pedido.</p>
         <p class="text-sm"><strong>Modelo 2 — Pontual:</strong> Transferência individual por perfil específico (ex.: pessoa LGBT para unidade adequada ao perfil).
-          <button onclick="document.getElementById('modal-lgbtqia').style.display='flex'"
+          <button onclick="window.abrirModal('modal-lgbtqia')"
             style="margin-left:.5rem;background:#1a2a4a;color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:.75rem;cursor:pointer;vertical-align:middle;">
             🏳️‍🌈 Ver Relação de Unidades LGBTQIA+
           </button>
@@ -3011,6 +3011,35 @@ function generateDOC(){
 
 <!-- ========== FIREBASE SDK ========== -->
 <script src="js/app.js"></script>
+<script>
+// ── Modal manager (plain script — runs before module) ─────────────────────────
+window.fecharModal = function(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+};
+
+window.abrirModal = function(id) {
+  document.querySelectorAll('[id^="modal-"]').forEach(function(m) {
+    if (m.id !== id && m.style.display === 'flex') {
+      m.style.display = 'none';
+    }
+  });
+  var el = document.getElementById(id);
+  if (el) el.style.display = 'flex';
+  // Gerador init hooks (set by Script 5 IIFE)
+  if (id === 'modal-gerador-oficio') {
+    var dataEl = document.getElementById('ofc-data-auto');
+    if (dataEl && window.getDataOficioFn) dataEl.textContent = window.getDataOficioFn();
+    setTimeout(function() {
+      if (window.desenharReguaFn) window.desenharReguaFn();
+      if (window.initEditorFn) window.initEditorFn();
+    }, 60);
+  }
+};
+
+window.abrirCalculadora = function() { window.abrirModal('modal-calculadora'); };
+window.fecharCalculadora = function() { window.fecharModal('modal-calculadora'); };
+</script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
@@ -3186,24 +3215,6 @@ function generateDOC(){
   };
 
   
-  // ── Universal modal manager ─────────────────────────────────────
-  window.abrirModal = function(id) {
-    document.querySelectorAll('[id^="modal-"]').forEach(function(m) {
-      if (m.id !== id && m.style.display === 'flex') {
-        m.style.display = 'none';
-      }
-    });
-    var el = document.getElementById(id);
-    if (el) el.style.display = 'flex';
-  };
-  window.fecharModal = function(id) {
-    var el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  };
-  window.abrirCalculadora = function() { window.abrirModal('modal-calculadora'); };
-
-  window.fecharCalculadora = function() {
-    document.getElementById('modal-calculadora').style.display = 'none';
   };
 
   window.fecharNovidades = function() {
@@ -3876,12 +3887,12 @@ window.abrirEscalaPlantao = function() {
   var MESES = ['janeiro','fevereiro','março','abril','maio','junho',
                'julho','agosto','setembro','outubro','novembro','dezembro'];
 
-  function getDataOficio() {
+  window.getDataOficioFn = function getDataOficio() {
     var d = new Date();
     return 'Florianópolis/SC, ' + d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear() + '.';
   }
 
-  function initEditor() {
+  window.initEditorFn = function initEditor() {
     var editor = document.getElementById('oficio-texto-livre');
     if (!editor || editor.dataset.init) return;
     editor.dataset.init = '1';
@@ -3906,7 +3917,7 @@ window.abrirEscalaPlantao = function() {
     });
   }
 
-  function desenharRegua() {
+  window.desenharReguaFn = function desenharRegua() {
     var canvas = document.getElementById('ofc-regua-canvas');
     if (!canvas) return;
     var width = canvas.offsetWidth || 480;
@@ -3929,16 +3940,7 @@ window.abrirEscalaPlantao = function() {
     canvas.innerHTML = svg;
   }
 
-  // Override abrirModal to init editor when gerador opens
-  var _origAbrirModal = window.abrirModal;
-  window.abrirModal = function(id) {
-    _origAbrirModal(id);
-    if (id === 'modal-gerador-oficio') {
-      var dataEl = document.getElementById('ofc-data-auto');
-      if (dataEl) dataEl.textContent = getDataOficio();
-      setTimeout(function() { desenharRegua(); initEditor(); }, 50);
-    }
-  };
+  // (gerador init handled by abrirModal in Script 4)
 
   function getLogo() {
     var img = document.querySelector('#oficio-folha img');
