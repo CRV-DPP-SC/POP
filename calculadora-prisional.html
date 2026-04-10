@@ -332,31 +332,47 @@ function getSel(){
   return{masc:val==='masc'||val==='ambos', fem:val==='fem'||val==='ambos'};
 }
 
-/* ── BUILD TEXTO ── */
+/* ── BUILD TEXTO — Boletim CRV (Copiar Texto) ── */
 function buildTexto(sel,intro){
   var L=[];
   if(intro){L.push(intro,'');}
-  L.push('RELATÓRIO DO SISTEMA PRISIONAL');
-  L.push('Estado de Santa Catarina');
-  L.push('Florianópolis/SC, '+getDate()+'.','');
+
+  L.push('BOLETIM PLANTÃO CRV - '+getDate(),'');
 
   // Vagas existentes
-  L.push('VAGAS EXISTENTES');
-  if(sel.masc) L.push('  Masculino: '+fmt(TV.m));
-  if(sel.fem)  L.push('  Feminino:  '+fmt(TV.f));
+  L.push('VAGAS EXISTENTES (Com base no Relatório 1.4 do iPEN)');
+  var tvM = sel.masc ? TV.m : 0;
+  var tvF = sel.fem  ? TV.f : 0;
+  var tvT = tvM + tvF;
+  if(sel.masc) L.push('  Masculino: '+fmt(tvM));
+  if(sel.fem)  L.push('  Feminino:  '+fmt(tvF));
+  if(sel.masc&&sel.fem) L.push('  TOTAL:     '+fmt(tvT));
   L.push('');
 
-  // Pessoas recolhidas
-  function blocoRec(s,label){
-    L.push('PESSOAS RECOLHIDAS — '+label.toUpperCase());
-    REG.forEach(function(r){L.push('  '+REG_NOME[r]+': '+fmt(P[s][r]))});
-    L.push('  TOTAL: '+fmt(P[s].tt));
-    L.push('');
-  }
-  if(sel.masc) blocoRec('m','Masculino');
-  if(sel.fem)  blocoRec('f','Feminino');
+  // Pessoas recolhidas — masc+fem somados, pr agrega ab+ni
+  var recM_pr = sel.masc ? P.m.pr + P.m.ab + P.m.ni : 0;
+  var recM_fe = sel.masc ? P.m.fe : 0;
+  var recM_se = sel.masc ? P.m.se : 0;
+  var recM_ms = sel.masc ? P.m.ms : 0;
+  var recF_pr = sel.fem  ? P.f.pr + P.f.ab + P.f.ni : 0;
+  var recF_fe = sel.fem  ? P.f.fe : 0;
+  var recF_se = sel.fem  ? P.f.se : 0;
+  var recF_ms = sel.fem  ? P.f.ms : 0;
+  var pr_tot = recM_pr + recF_pr;
+  var fe_tot = recM_fe + recF_fe;
+  var se_tot = recM_se + recF_se;
+  var ms_tot = recM_ms + recF_ms;
+  var rec_tt  = (sel.masc?P.m.tt:0) + (sel.fem?P.f.tt:0);
 
-  // Déficit — apenas total por sexo + total geral
+  L.push('PESSOAS RECOLHIDAS');
+  L.push('  Provisório:         '+fmt(pr_tot));
+  L.push('  Fechado:            '+fmt(fe_tot));
+  L.push('  Semiaberto:         '+fmt(se_tot));
+  L.push('  Medida de Segurança:'+fmt(ms_tot));
+  L.push('  TOTAL:              '+fmt(rec_tt));
+  L.push('');
+
+  // Déficit — Masculino, Feminino e Total
   L.push('DÉFICIT DE VAGAS');
   if(sel.masc){
     var neg=D.m<0;
@@ -368,12 +384,8 @@ function buildTexto(sel,intro){
   }
   if(sel.masc&&sel.fem){
     var neg=D.t<0;
-    L.push('  TOTAL GERAL: '+fmt(D.t)+(D.t!==0?' ('+fmtp(PCT.t,neg)+')':''));
+    L.push('  TOTAL:     '+fmt(D.t)+(D.t!==0?' ('+fmtp(PCT.t,neg)+')':''));
   }
-  L.push('');
-
-  // Observação condicional
-  if(temObs()) L.push(OBS_TEXTO);
 
   return L.join('\n');
 }
@@ -430,61 +442,59 @@ function gerarPDF(sel){
   doc.text('CENTRAL DE REGULAÇÃO DE VAGAS - CRV',L,y+15);
   y+=22;
   doc.setDrawColor(0,0,0);doc.setLineWidth(0.3);doc.line(L,y,190,y);y+=7;
-  doc.setFont('helvetica','normal');doc.setFontSize(10);
-  doc.text('Florianópolis/SC, '+getDate()+'.',190,y,{align:'right'});y+=9;
+
+  // Título
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);
+  doc.text('BOLETIM PLANTÃO CRV - '+getDate(),L,y);y+=lh+2;
 
   // Vagas existentes
-  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(0,0,0);
-  doc.text('VAGAS EXISTENTES',L,y);y+=lh;
+  doc.setFont('helvetica','bold');doc.setFontSize(10);
+  doc.text('VAGAS EXISTENTES (Com base no Relatório 1.4 do iPEN)',L,y);y+=lh;
   doc.setFont('helvetica','normal');
-  if(sel.masc){doc.text('Masculino:',L+5,y);doc.text(fmt(TV.m),RE,y,{align:'right'});y+=lh;}
-  if(sel.fem) {doc.text('Feminino:',L+5,y); doc.text(fmt(TV.f),RE,y,{align:'right'});y+=lh;}
+  var tvM=sel.masc?TV.m:0, tvF=sel.fem?TV.f:0, tvT=tvM+tvF;
+  if(sel.masc){doc.text('Masculino:',L+5,y);doc.text(fmt(tvM),RE,y,{align:'right'});y+=lh;}
+  if(sel.fem) {doc.text('Feminino:',L+5,y); doc.text(fmt(tvF),RE,y,{align:'right'});y+=lh;}
+  if(sel.masc&&sel.fem){
+    doc.setFont('helvetica','bold');
+    doc.text('TOTAL:',L+5,y);doc.text(fmt(tvT),RE,y,{align:'right'});
+    doc.setFont('helvetica','normal');y+=lh;
+  }
   y+=3;
 
-  // Pessoas recolhidas
-  function blocoRec(s,label){
-    doc.setFont('helvetica','bold');doc.setTextColor(59,91,219);
-    doc.text('PESSOAS RECOLHIDAS — '+label.toUpperCase(),L,y);y+=lh;
-    doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);
-    REG.forEach(function(r){
-      doc.text(REG_NOME[r]+':',L+5,y);doc.text(fmt(P[s][r]),RE,y,{align:'right'});y+=lh;
-    });
-    doc.setFont('helvetica','bold');
-    doc.text('TOTAL:',L+5,y);doc.text(fmt(P[s].tt),RE,y,{align:'right'});
-    doc.setFont('helvetica','normal');y+=lh;y+=3;
-  }
-  if(sel.masc) blocoRec('m','Masculino');
-  if(sel.fem)  blocoRec('f','Feminino');
+  // Pessoas recolhidas — masc+fem somados, pr agrega ab+ni
+  var pr_tot=(sel.masc?P.m.pr+P.m.ab+P.m.ni:0)+(sel.fem?P.f.pr+P.f.ab+P.f.ni:0);
+  var fe_tot=(sel.masc?P.m.fe:0)+(sel.fem?P.f.fe:0);
+  var se_tot=(sel.masc?P.m.se:0)+(sel.fem?P.f.se:0);
+  var ms_tot=(sel.masc?P.m.ms:0)+(sel.fem?P.f.ms:0);
+  var rec_tt=(sel.masc?P.m.tt:0)+(sel.fem?P.f.tt:0);
+  doc.setFont('helvetica','bold');doc.setTextColor(59,91,219);
+  doc.text('PESSOAS RECOLHIDAS',L,y);y+=lh;
+  doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);
+  var linhasRec=[['Provisório',pr_tot],['Fechado',fe_tot],['Semiaberto',se_tot],['Medida de Segurança',ms_tot]];
+  linhasRec.forEach(function(row){doc.text(row[0]+':',L+5,y);doc.text(fmt(row[1]),RE,y,{align:'right'});y+=lh;});
+  doc.setFont('helvetica','bold');
+  doc.text('TOTAL:',L+5,y);doc.text(fmt(rec_tt),RE,y,{align:'right'});
+  doc.setFont('helvetica','normal');y+=lh;y+=3;
 
-  // Déficit — apenas total
+  // Déficit — Masculino, Feminino, Total
   doc.setFont('helvetica','bold');doc.setTextColor(0,0,0);
   doc.text('DÉFICIT DE VAGAS',L,y);y+=lh;
   doc.setFont('helvetica','normal');
-  function linhaDeficit(s,label){
+  function linhaDefPDF(val,pct,label){
     doc.setTextColor(0,0,0);doc.text(label+':',L+5,y);
-    var c=pdfCor(D[s]);doc.setTextColor(c[0],c[1],c[2]);
-    doc.text(fmt(D[s]),RE-28,y,{align:'right'});
-    if(D[s]!==0)doc.text('('+fmtp(PCT[s],D[s]<0)+')',RE,y,{align:'right'});
+    var c=pdfCor(val);doc.setTextColor(c[0],c[1],c[2]);
+    doc.text(fmt(val),RE-28,y,{align:'right'});
+    if(val!==0)doc.text('('+fmtp(pct,val<0)+')',RE,y,{align:'right'});
     y+=lh;
   }
-  if(sel.masc) linhaDeficit('m','Masculino');
-  if(sel.fem)  linhaDeficit('f','Feminino');
+  if(sel.masc) linhaDefPDF(D.m,PCT.m,'Masculino');
+  if(sel.fem)  linhaDefPDF(D.f,PCT.f,'Feminino');
   if(sel.masc&&sel.fem){
-    doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.text('TOTAL GERAL:',L+5,y);
-    var c=pdfCor(D.t);doc.setTextColor(c[0],c[1],c[2]);
-    doc.text(fmt(D.t),RE-28,y,{align:'right'});
-    if(D.t!==0)doc.text('('+fmtp(PCT.t,D.t<0)+')',RE,y,{align:'right'});
-    doc.setFont('helvetica','normal');y+=lh;
+    doc.setFont('helvetica','bold');
+    linhaDefPDF(D.t,PCT.t,'TOTAL');
+    doc.setFont('helvetica','normal');
   }
   doc.setTextColor(0,0,0);y+=3;
-
-  // Observação
-  if(temObs()){
-    doc.setFontSize(8.5);doc.setTextColor(120,80,0);
-    var obsLines=doc.splitTextToSize(OBS_TEXTO,160);
-    doc.text(obsLines,L,y);y+=obsLines.length*5+3;
-    doc.setFontSize(10);doc.setTextColor(0,0,0);
-  }
 
   doc.setLineWidth(0.3);doc.setDrawColor(0,0,0);doc.line(L,265,190,265);
   doc.setFontSize(8);doc.setTextColor(80,80,80);
@@ -505,40 +515,43 @@ function corSpan(val,texto){
 function gerarDOC(sel){
   var css='@page{margin:2cm 3cm 2.5cm 3cm;}body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.15;color:#000;}.sep{border:none;border-top:1px solid #000;margin:6pt 0;}.date{text-align:right;margin-bottom:10pt;}h2{font-size:11pt;font-weight:bold;margin:10pt 0 2pt 0;}h3{font-size:10pt;font-weight:bold;margin:8pt 0 2pt 0;color:#3b5bdb;border-left:3px solid #3b5bdb;padding-left:6pt;}table.d{width:100%;border-collapse:collapse;margin-bottom:4pt;}table.d td{font-size:10pt;padding:2pt 4pt;}table.d td:last-child{text-align:right;}.tr td{font-weight:bold;}.obs{font-size:9pt;color:#92400e;background:#fffbeb;border:1pt solid #fbbf24;padding:6pt 8pt;margin-top:8pt;}.fs{border:none;border-top:1px solid #000;margin-top:140pt;margin-bottom:3pt;}.ft{text-align:center;font-size:8pt;color:#555;margin:1pt 0;}';
 
-  var body='<p>ESTADO DE SANTA CATARINA</p><p>SECRETARIA DE ESTADO DE JUSTIÇA E REINTEGRAÇÃO SOCIAL</p><p>DEPARTAMENTO DE POLÍCIA PENAL</p><p><b>CENTRAL DE REGULAÇÃO DE VAGAS - CRV</b></p><hr class="sep"><p class="date">Florianópolis/SC, '+getDate()+'.</p>';
+  var body='<hr class="sep">';
+
+  // Título
+  body+='<h2>BOLETIM PLANTÃO CRV - '+getDate()+'</h2>';
 
   // Vagas existentes
-  body+='<h2>VAGAS EXISTENTES</h2><table class="d">';
-  if(sel.masc) body+='<tr><td>Masculino</td><td>'+fmt(TV.m)+'</td></tr>';
-  if(sel.fem)  body+='<tr><td>Feminino</td><td>'+fmt(TV.f)+'</td></tr>';
+  var tvM=sel.masc?TV.m:0, tvF=sel.fem?TV.f:0, tvT=tvM+tvF;
+  body+='<h2>VAGAS EXISTENTES <span style="font-weight:normal;font-size:9pt">(Com base no Relatório 1.4 do iPEN)</span></h2><table class="d">';
+  if(sel.masc) body+='<tr><td>Masculino</td><td>'+fmt(tvM)+'</td></tr>';
+  if(sel.fem)  body+='<tr><td>Feminino</td><td>'+fmt(tvF)+'</td></tr>';
+  if(sel.masc&&sel.fem) body+='<tr class="tr"><td>TOTAL</td><td>'+fmt(tvT)+'</td></tr>';
   body+='</table>';
 
-  // Recolhidos
-  function blocoRecDoc(s,label){
-    var out='<h3>PESSOAS RECOLHIDAS — '+label.toUpperCase()+'</h3><table class="d">';
-    REG.forEach(function(r){out+='<tr><td>'+REG_NOME[r]+'</td><td>'+fmt(P[s][r])+'</td></tr>'});
-    out+='<tr class="tr"><td>TOTAL</td><td>'+fmt(P[s].tt)+'</td></tr></table>';
-    return out;
-  }
-  if(sel.masc) body+=blocoRecDoc('m','Masculino');
-  if(sel.fem)  body+=blocoRecDoc('f','Feminino');
+  // Pessoas recolhidas — masc+fem somados, pr agrega ab+ni
+  var pr_tot=(sel.masc?P.m.pr+P.m.ab+P.m.ni:0)+(sel.fem?P.f.pr+P.f.ab+P.f.ni:0);
+  var fe_tot=(sel.masc?P.m.fe:0)+(sel.fem?P.f.fe:0);
+  var se_tot=(sel.masc?P.m.se:0)+(sel.fem?P.f.se:0);
+  var ms_tot=(sel.masc?P.m.ms:0)+(sel.fem?P.f.ms:0);
+  var rec_tt=(sel.masc?P.m.tt:0)+(sel.fem?P.f.tt:0);
+  body+='<h2>PESSOAS RECOLHIDAS</h2><table class="d">';
+  body+='<tr><td>Provisório</td><td>'+fmt(pr_tot)+'</td></tr>';
+  body+='<tr><td>Fechado</td><td>'+fmt(fe_tot)+'</td></tr>';
+  body+='<tr><td>Semiaberto</td><td>'+fmt(se_tot)+'</td></tr>';
+  body+='<tr><td>Medida de Segurança</td><td>'+fmt(ms_tot)+'</td></tr>';
+  body+='<tr class="tr"><td>TOTAL</td><td>'+fmt(rec_tt)+'</td></tr></table>';
 
-  // Déficit — apenas total
+  // Déficit — Masculino, Feminino, Total
   body+='<h2>DÉFICIT DE VAGAS</h2><table class="d">';
-  function linhaDefDoc(s,label){
-    var pct=D[s]!==0?' '+corSpan(D[s],'('+fmtp(PCT[s],D[s]<0)+')'):'';
-    return'<tr class="tr"><td>'+label+'</td><td>'+corSpan(D[s],fmt(D[s]))+pct+'</td></tr>';
+  function linhaDefDoc(val,pct,label,bold){
+    var pctSpan=val!==0?' '+corSpan(val,'('+fmtp(pct,val<0)+')'):'';
+    var tr=bold?'class="tr"':'';
+    return'<tr '+tr+'><td>'+label+'</td><td>'+corSpan(val,fmt(val))+pctSpan+'</td></tr>';
   }
-  if(sel.masc) body+=linhaDefDoc('m','Masculino');
-  if(sel.fem)  body+=linhaDefDoc('f','Feminino');
-  if(sel.masc&&sel.fem){
-    var pct=D.t!==0?' '+corSpan(D.t,'('+fmtp(PCT.t,D.t<0)+')'):'';
-    body+='<tr class="tr"><td>TOTAL GERAL</td><td>'+corSpan(D.t,fmt(D.t))+pct+'</td></tr>';
-  }
+  if(sel.masc) body+=linhaDefDoc(D.m,PCT.m,'Masculino',false);
+  if(sel.fem)  body+=linhaDefDoc(D.f,PCT.f,'Feminino',false);
+  if(sel.masc&&sel.fem) body+=linhaDefDoc(D.t,PCT.t,'TOTAL',true);
   body+='</table>';
-
-  // Observação
-  if(temObs()) body+='<p class="obs"><b>Obs.:</b> As Pessoas Privadas de Liberdade que constam como "Não Informado" e/ou "Aberto" ingressaram recentemente e aguardam análise e atualização do BPI pelo setor penal.</p>';
 
   body+='<hr class="fs"><p class="ft"><b>POLÍCIA PENAL DE SANTA CATARINA</b></p><p class="ft">Rua Fúlvio Aducci, nº 1214 – Bairro Estreito – CEP 88075-000 – Florianópolis/SC</p><p class="ft">Fone: (48) 3665-7310 / e-mail: policiapenal@pp.sc.gov.br</p>';
 
