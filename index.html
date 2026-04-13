@@ -2484,112 +2484,82 @@
 
     <!-- FERRAMENTAS DA ÁREA RESTRITA -->
 
-    <!-- ── LINHA 1: Acesso rápido aos sistemas ── -->
-    <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.6rem;">Acesso Rápido</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.85rem;margin-bottom:1.5rem;">
+    <!-- LINHA 1 -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1rem;">
 
-      <!-- 1.1 Escala de Plantão -->
-      <div onclick="abrirIframeRestrito('https://sparkle-spark-spark.lovable.app/','📅','ESCALA DE PLANTÃO')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">📅</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Escala de Plantão</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Acesso à escala da equipe</div>
+      <div onclick="abrirCalculadora()" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
+        <div style="font-size:2rem;margin-bottom:.5rem;">📊</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.92rem;">Calculadora de Gestão de Vagas</div>
+        <div style="font-size:.75rem;color:#6b7280;margin-top:.3rem;">Déficit, excedente e taxa de ocupação</div>
       </div>
 
-      <!-- 1.2 iPEN -->
-      <div onclick="window.open('https://www.sc.gov.br/sap/ipen/signin','_blank')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">🔑</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">iPEN</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Sistema iPEN SC</div>
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;">↗ abre em nova aba</div>
-      </div>
-
-      <!-- 1.3 SGPe -->
-      <div onclick="window.open('https://sgpe.sea.sc.gov.br/sgpe/#/container','_blank')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">📂</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">SGPe</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Gestão de Processos Eletrônicos</div>
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;">↗ abre em nova aba</div>
-      </div>
-
-      <!-- 1.4 Gerador de Despachos -->
-      <div onclick="abrirIframeRestrito('https://crv-dpp-sc.github.io/manual/gerador_despachos_crv.html','⚖️','Gerador de Despachos')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">⚖️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Gerador de Despachos</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Deferir, Indeferir e Devolver — CRV</div>
+      <div onclick="abrirIframeRestrito('https://regulation-flow-pro.lovable.app/board/1966025a-82e4-4cc4-bfd9-fd88671ba682','📋','Trello — Gestão de Tarefas')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
+        <div style="font-size:2rem;margin-bottom:.5rem;">📋</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.92rem;">Trello Fake by Jessica</div>
+        <div style="font-size:.75rem;color:#6b7280;margin-top:.3rem;">Gestão de tarefas da equipe</div>
       </div>
     </div>
 
-    <!-- ── LINHA 2: Ferramentas internas ── -->
-    <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.6rem;">Ferramentas CRV</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.85rem;margin-bottom:1.5rem;">
+    <!-- LINHA 2 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem;">
 
-      <!-- 2.1 Calculadora -->
-      <div onclick="abrirCalculadora()" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">📊</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Calculadora de Gestão de Vagas</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Déficit, excedente e taxa de ocupação</div>
+      <div onclick="pe3Abrir()" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">🏛️</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">Informações das Unidades Prisionais e SR's</div>
+        <div style="font-size:.69rem;color:#6b7280;margin-top:.25rem;">Porta de Entrada · VR · VRG · Municípios · outros</div>
       </div>
 
-      <!-- 2.2 Informações das Unidades / Porta de Entrada -->
-      <div onclick="pe3Abrir()" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">🏛️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Informações das Unidades Prisionais e SR's</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Porta de Entrada · VR · VRG · Municípios por Unidade · outros</div>
+      <div onclick="abrirPainelRespostas()" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">📋</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">Fluxo — Ingresso de Presos / Exame de Corpo de Delito</div>
+        <div style="font-size:.69rem;color:#6b7280;margin-top:.25rem;">Respostas, compilados e filtros</div>
       </div>
 
-      <!-- 2.3 Fluxo Ingresso -->
-      <div onclick="abrirPainelRespostas()" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">📋</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Fluxo — Ingresso de Presos / Exame de Corpo de Delito</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Respostas, compilados e filtros</div>
+      <div onclick="abrirIframeRestrito('https://sparkle-spark-spark.lovable.app/','📅','Escala de Plantão')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">📅</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">Escala de Plantão</div>
+        <div style="font-size:.69rem;color:#6b7280;margin-top:.25rem;">Acesso à escala da equipe</div>
       </div>
 
-      <!-- 2.4 Trello -->
-      <div onclick="abrirIframeRestrito('https://regulation-flow-pro.lovable.app/board/1966025a-82e4-4cc4-bfd9-fd88671ba682','📋','Trello — Gestão de Tarefas')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">📋</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Trello Fake by Jessica</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Gestão de tarefas da equipe</div>
+      <div onclick="abrirIframeRestrito('https://crv-dpp-sc.github.io/manual/gerador_despachos_crv.html','⚖️','Gerador de Despachos')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">⚖️</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">Gerador de Despachos</div>
+        <div style="font-size:.69rem;color:#6b7280;margin-top:.25rem;">Deferir, Indeferir e Devolver — CRV</div>
       </div>
     </div>
 
-    <!-- ── LINHA 3: Sistemas judiciais (nova aba) ── -->
-    <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.6rem;">Sistemas Judiciais</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.85rem;margin-bottom:2rem;">
+    <!-- LINHA 3 (sistemas externos) -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;">
 
-      <!-- 3.1 SEEU -->
-      <div onclick="window.open('https://seeu.pje.jus.br/seeu/','_blank')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">⚖️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">SEEU</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Execução Unificada</div>
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;">↗ abre em nova aba</div>
+      <div onclick="window.open('https://seeu.pje.jus.br/seeu/','_blank')" style="background:#f8f9fd;border:1.5px solid #dde1ee;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#f8f9fd';this.style.borderColor='#dde1ee'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">⚖️</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">SEEU</div>
+        <div style="font-size:.67rem;color:#9ca3af;margin-top:.25rem;">↗ nova aba</div>
       </div>
 
-      <!-- 3.2 EPROC 1 -->
-      <div onclick="window.open('https://eproc1g.tjsc.jus.br/eproc/','_blank')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">🏛️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">EPROC 1º Grau</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Processo eletrônico 1ª instância</div>
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;">↗ abre em nova aba</div>
+      <div onclick="window.open('https://eproc1g.tjsc.jus.br/eproc/','_blank')" style="background:#f8f9fd;border:1.5px solid #dde1ee;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#f8f9fd';this.style.borderColor='#dde1ee'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">🏛️</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">EPROC 1º Grau</div>
+        <div style="font-size:.67rem;color:#9ca3af;margin-top:.25rem;">↗ nova aba</div>
       </div>
 
-      <!-- 3.3 EPROC 2 -->
-      <div onclick="window.open('https://eproc2g.tjsc.jus.br/eproc/externo_controlador.php?acao=principal','_blank')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">🏛️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">EPROC 2º Grau</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Processo eletrônico 2ª instância</div>
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;">↗ abre em nova aba</div>
+      <div onclick="window.open('https://eproc2g.tjsc.jus.br/eproc/externo_controlador.php?acao=principal','_blank')" style="background:#f8f9fd;border:1.5px solid #dde1ee;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#f8f9fd';this.style.borderColor='#dde1ee'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">🏛️</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">EPROC 2º Grau</div>
+        <div style="font-size:.67rem;color:#9ca3af;margin-top:.25rem;">↗ nova aba</div>
       </div>
 
-      <!-- 3.4 SIGRHPORTAL -->
-      <div onclick="window.open('https://sigrhportal.sea.sc.gov.br/SIGRHNovoPortal/#/auth','_blank')" style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.25rem 1rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#fff';this.style.borderColor='#1a2a4a'">
-        <div style="font-size:1.8rem;margin-bottom:.5rem;">👤</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">SIGRHPORTAL</div>
-        <div style="font-size:.72rem;color:#6b7280;margin-top:.25rem;">Recursos Humanos SC</div>
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;">↗ abre em nova aba</div>
+      <div onclick="window.open('https://sigrhportal.sea.sc.gov.br/SIGRHNovoPortal/#/auth','_blank')" style="background:#f8f9fd;border:1.5px solid #dde1ee;border-radius:12px;padding:1.25rem .75rem;cursor:pointer;transition:.2s;text-align:center;" onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#f8f9fd';this.style.borderColor='#dde1ee'">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">👤</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.82rem;">SIGRHPORTAL</div>
+        <div style="font-size:.67rem;color:#9ca3af;margin-top:.25rem;">↗ nova aba</div>
       </div>
     </div>
+
   </div>
-</section>=================================================  FOOTER  ==================================================== -->
+</section>
+
+<!-- ====================================================  FOOTER  ==================================================== -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-bloco footer-bloco-principal">
