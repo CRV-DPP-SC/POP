@@ -2492,7 +2492,7 @@
         <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Déficit, excedente e taxa de ocupação</div>
       </div>
       <!-- Porta de Entrada -->
-      <div onclick="window.abrirModal('modal-porta-entrada')"
+      <div onclick="window.abrirModal('modal-porta-entrada'); if(window.peRender) window.peRender();"
         style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
         onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
         <div style="font-size:2rem;margin-bottom:.6rem;">🚪</div>
@@ -4028,15 +4028,17 @@ window.abrirAreaRestrita = function() {
     if(card) card.style.borderColor = open?'#e5e7eb':'#2563eb';
   };
 
-  // Inicializar quando o modal abrir
-  var _origAbrirModal = window.abrirModal;
-  window.abrirModal = function(id){
-    if(id==='modal-porta-entrada'){
-      var modal = document.getElementById('modal-porta-entrada');
-      modal.style.display='flex';
-      if(!modal._peInit){ modal._peInit=true; peRender(); }
-    } else if(_origAbrirModal){ _origAbrirModal(id); }
-  };
+  // Inicializar ao abrir o modal (hook via MutationObserver)
+  var _peInited = false;
+  var _peTarget = document.getElementById('modal-porta-entrada');
+  if(_peTarget){
+    var _peObs = new MutationObserver(function(){
+      if(_peTarget.style.display==='flex'){
+        if(!_peInited){ _peInited=true; peRender(); }
+      }
+    });
+    _peObs.observe(_peTarget, {attributes:true, attributeFilter:['style']});
+  }
 })();
 </script>
 
