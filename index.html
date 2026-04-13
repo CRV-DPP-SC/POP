@@ -2492,7 +2492,7 @@
         <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Déficit, excedente e taxa de ocupação</div>
       </div>
       <!-- Porta de Entrada -->
-      <div onclick="window.abrirModal('modal-porta-entrada'); setTimeout(function(){ if(window.pe2Render) window.pe2Render(); }, 30);"
+      <div onclick="pe2Abrir()"
         style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
         onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
         <div style="font-size:2rem;margin-bottom:.6rem;">🚪</div>
@@ -3736,10 +3736,29 @@ window.abrirAreaRestrita = function() {
 </div>
 
 <!-- ========== MODAL PORTA DE ENTRADA ========== -->
-<div id="modal-porta-entrada" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9990;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1rem;" onclick="if(event.target===this)this.style.display='none'">
+<style>
+.pe2chip-prov{background:#ede9fe;color:#5b21b6}
+.pe2chip-fech{background:#fee2e2;color:#991b1b}
+.pe2chip-semi{background:#d1fae5;color:#065f46}
+.pe2chip-aber{background:#fef3c7;color:#92400e}
+.pe2chip-civ{background:#e0f2fe;color:#075985}
+.pe2card{background:#fff;border:1.5px solid #dde1ee;border-radius:13px;overflow:hidden;box-shadow:0 1px 3px rgba(30,40,90,.07);transition:border-color .18s,box-shadow .18s}
+.pe2card:hover{border-color:#2563eb;box-shadow:0 2px 8px rgba(30,40,90,.1),0 8px 24px rgba(30,40,90,.07)}
+.pe2hd{padding:.85rem 1rem;cursor:pointer;user-select:none;display:flex;align-items:flex-start;gap:.7rem;transition:background .15s}
+.pe2hd:hover{background:#f4f6fb}
+.pe2bd{display:none;border-top:1.5px solid #dde1ee;padding:.85rem 1rem;background:#f8f9fd}
+.pe2bd.aberto{display:block}
+.pe2hd.aberto .pe2chev{transform:rotate(180deg)}
+.pe2chev{color:#9ca3af;transition:transform .22s;flex-shrink:0;margin-top:3px}
+.pe2tag{display:inline-flex;align-items:center;border-radius:6px;padding:.16rem .45rem;font-size:.66rem;font-weight:600;white-space:nowrap}
+.pe2chip{display:inline-block;border-radius:20px;padding:.16rem .5rem;font-size:.67rem;font-weight:600}
+.pe2obs{background:#fef3c7;border:1px solid rgba(217,119,6,.25);border-radius:8px;padding:.45rem .65rem;font-size:.73rem;color:#78350f;margin-top:.6rem;line-height:1.5}
+#pe2-modal mark{background:rgba(37,99,235,.15);color:#2563eb;border-radius:3px;padding:0 2px;font-style:normal}
+</style>
+
+<div id="pe2-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9990;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1rem;" onclick="if(event.target===this)pe2Fechar()">
   <div style="background:#f4f6fb;border-radius:16px;width:100%;max-width:1200px;margin:1.5rem auto;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;font-family:'Inter',system-ui,sans-serif;">
 
-    <!-- Header -->
     <div style="background:#1a2a4a;padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;">
       <div style="display:flex;align-items:center;gap:.75rem;">
         <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🚪</div>
@@ -3748,77 +3767,57 @@ window.abrirAreaRestrita = function() {
           <div style="color:rgba(255,255,255,.55);font-size:.7rem;margin-top:1px;">Varas de Garantia · Unidades Prisionais · SC — 295 municípios</div>
         </div>
       </div>
-      <button onclick="document.getElementById('modal-porta-entrada').style.display='none'" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">×</button>
+      <button onclick="pe2Fechar()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:7px;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">×</button>
     </div>
 
-    <!-- Stats bar -->
     <div style="background:#e8ecf5;border-bottom:1px solid #cdd3e8;padding:.45rem 1.5rem;display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center;">
-      <span style="font-size:.75rem;color:#374151;display:flex;align-items:center;gap:.35rem;"><strong style="font-family:'Courier New',monospace;color:#2563eb;" id="pe2-total">295</strong> municípios</span>
+      <span style="font-size:.75rem;color:#374151;display:flex;align-items:center;gap:.35rem;"><strong style="font-family:'Courier New',monospace;color:#2563eb;">295</strong> municípios</span>
       <span style="width:1px;height:14px;background:#c8d0e8;"></span>
       <span style="font-size:.75rem;color:#374151;display:flex;align-items:center;gap:.35rem;"><strong style="font-family:'Courier New',monospace;color:#16a34a;">54</strong> unidades</span>
       <span style="width:1px;height:14px;background:#c8d0e8;"></span>
       <span style="font-size:.75rem;color:#374151;display:flex;align-items:center;gap:.35rem;"><strong style="font-family:'Courier New',monospace;color:#d97706;">16</strong> VRGs</span>
       <span style="width:1px;height:14px;background:#c8d0e8;"></span>
-      <span style="font-size:.75rem;color:#374151;display:flex;align-items:center;gap:.35rem;"><strong style="font-family:'Courier New',monospace;color:#374151;" id="pe2-visible">—</strong> exibidos</span>
+      <span style="font-size:.75rem;color:#374151;display:flex;align-items:center;gap:.35rem;"><strong id="pe2vis" style="font-family:'Courier New',monospace;">—</strong> exibidos</span>
     </div>
 
-    <!-- Filtros -->
-    <div style="background:#fff;border-bottom:1.5px solid #dde3f0;padding:.6rem 1.5rem;position:sticky;top:64px;z-index:9;box-shadow:0 1px 4px rgba(0,0,0,.04);">
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
-        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;flex-shrink:0;">Regional:</span>
-        <button class="pe2-sr" data-sr="all" onclick="pe2SrFilter(this)" style="background:#1a2a4a;color:#fff;border:1.5px solid #1a2a4a;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">Todas</button>
-        <button class="pe2-sr" data-sr="SR01" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR01</button>
-        <button class="pe2-sr" data-sr="SR02" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR02</button>
-        <button class="pe2-sr" data-sr="SR03" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR03</button>
-        <button class="pe2-sr" data-sr="SR04" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR04</button>
-        <button class="pe2-sr" data-sr="SR05" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR05</button>
-        <button class="pe2-sr" data-sr="SR06" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR06</button>
-        <button class="pe2-sr" data-sr="SR07" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR07</button>
-        <button class="pe2-sr" data-sr="SR08" onclick="pe2SrFilter(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.22rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR08</button>
-        <div style="width:1px;height:18px;background:#dde1ee;margin:0 .2rem;"></div>
-        <div style="position:relative;flex:1;min-width:180px;max-width:380px;">
-          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;pointer-events:none;">🔍</span>
-          <input id="pe2-search" type="text" placeholder="Buscar município, comarca, VRG, unidade…" autocomplete="off" spellcheck="false"
-            style="width:100%;padding:.42rem 2rem .42rem 2.1rem;border:1.5px solid #dde1ee;border-radius:9px;font-size:.8rem;font-family:inherit;outline:none;color:#111827;background:#f4f6fb;"
-            oninput="pe2Render()" onfocus="this.style.borderColor='#2563eb';this.style.background='#fff'" onblur="this.style.borderColor='#dde1ee';this.style.background='#f4f6fb'">
-          <button id="pe2-clear" onclick="pe2ClearSearch()" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:2px;font-size:.9rem;">✕</button>
+    <div style="background:#fff;border-bottom:1.5px solid #dde3f0;padding:.6rem 1.5rem;position:sticky;top:65px;z-index:9;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+      <div style="display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;flex-shrink:0;">SR:</span>
+        <button class="pe2sr active" data-sr="all" onclick="pe2FiltroSR(this)" style="background:#1a2a4a;color:#fff;border:1.5px solid #1a2a4a;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">Todas</button>
+        <button class="pe2sr" data-sr="SR01" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR01</button>
+        <button class="pe2sr" data-sr="SR02" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR02</button>
+        <button class="pe2sr" data-sr="SR03" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR03</button>
+        <button class="pe2sr" data-sr="SR04" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR04</button>
+        <button class="pe2sr" data-sr="SR05" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR05</button>
+        <button class="pe2sr" data-sr="SR06" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR06</button>
+        <button class="pe2sr" data-sr="SR07" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR07</button>
+        <button class="pe2sr" data-sr="SR08" onclick="pe2FiltroSR(this)" style="background:#fff;color:#374151;border:1.5px solid #dde1ee;border-radius:20px;padding:.2rem .65rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;">SR08</button>
+        <div style="width:1px;height:18px;background:#dde1ee;margin:0 .15rem;flex-shrink:0;"></div>
+        <div style="position:relative;flex:1;min-width:180px;max-width:360px;">
+          <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:.8rem;pointer-events:none;">🔍</span>
+          <input id="pe2busca" type="text" placeholder="Buscar município, comarca, VRG, unidade…" autocomplete="off" spellcheck="false"
+            oninput="pe2Render()"
+            onfocus="this.style.borderColor='#2563eb';this.style.background='#fff'"
+            onblur="this.style.borderColor='#dde1ee';this.style.background='#f4f6fb'"
+            style="width:100%;padding:.4rem 1.8rem .4rem 2rem;border:1.5px solid #dde1ee;border-radius:9px;font-size:.8rem;font-family:inherit;outline:none;color:#111827;background:#f4f6fb;">
+          <button id="pe2limpar" onclick="pe2LimparBusca()" style="display:none;position:absolute;right:7px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;font-size:.85rem;padding:2px;">✕</button>
         </div>
-        <span id="pe2-result-info" style="margin-left:auto;font-size:.72rem;color:#9ca3af;font-family:'Courier New',monospace;white-space:nowrap;"></span>
+        <span id="pe2info" style="margin-left:auto;font-size:.7rem;color:#9ca3af;font-family:'Courier New',monospace;white-space:nowrap;"></span>
       </div>
     </div>
 
-    <!-- Conteúdo -->
-    <div id="pe2-content" style="padding:1.25rem 1.5rem;min-height:200px;">
+    <div id="pe2conteudo" style="padding:1.25rem 1.5rem;min-height:180px;">
       <div style="text-align:center;padding:3rem;color:#9ca3af;">Carregando…</div>
     </div>
-
   </div>
 </div>
 
-<style>
-.pe2-chip-prov{background:#ede9fe;color:#5b21b6}
-.pe2-chip-fech{background:#fee2e2;color:#991b1b}
-.pe2-chip-semi{background:#d1fae5;color:#065f46}
-.pe2-chip-aber{background:#fef3c7;color:#92400e}
-.pe2-chip-civ{background:#e0f2fe;color:#075985}
-.pe2-muni-card{background:#fff;border:1.5px solid #dde1ee;border-radius:13px;box-shadow:0 1px 3px rgba(30,40,90,.07),0 4px 14px rgba(30,40,90,.04);transition:border-color .18s,box-shadow .18s;overflow:hidden;}
-.pe2-muni-card:hover{border-color:#2563eb;box-shadow:0 2px 8px rgba(30,40,90,.1),0 8px 24px rgba(30,40,90,.07);}
-.pe2-card-hd{padding:.85rem 1rem;cursor:pointer;user-select:none;display:flex;align-items:flex-start;gap:.7rem;transition:background .15s;}
-.pe2-card-hd:hover{background:#f4f6fb}
-.pe2-card-bd{display:none;border-top:1.5px solid #dde1ee;padding:.85rem 1rem;background:#f8f9fd;}
-.pe2-card-bd.open{display:block}
-.pe2-card-hd.open .pe2-chev{transform:rotate(180deg)}
-.pe2-chev{color:#9ca3af;transition:transform .22s;flex-shrink:0;margin-top:3px;}
-.pe2-tag{display:inline-flex;align-items:center;border-radius:6px;padding:.16rem .45rem;font-size:.66rem;font-weight:600;white-space:nowrap;}
-.pe2-chip{display:inline-block;border-radius:20px;padding:.16rem .5rem;font-size:.67rem;font-weight:600;}
-.pe2-obs{background:#fef3c7;border:1px solid rgba(217,119,6,.25);border-radius:8px;padding:.45rem .65rem;font-size:.73rem;color:#78350f;margin-top:.6rem;line-height:1.5;}
-.pe2-nome mark{background:rgba(37,99,235,.15);color:#2563eb;border-radius:3px;padding:0 2px;font-style:normal;}
-</style>
-
 <script>
-(function(){
+var PE2_CORES={SR01:"#2f5ae8",SR02:"#0ea472",SR03:"#d97706",SR04:"#7c3aed",SR05:"#e05a2b",SR06:"#db2777",SR07:"#059669",SR08:"#0284c7"};
+var PE2_NOMES={SR01:"SR01 — Grande Florianópolis",SR02:"SR02 — Norte / Joinville",SR03:"SR03 — Vale do Itajaí / Blumenau",SR04:"SR04 — Planalto Norte",SR05:"SR05 — Serrana / Meio-Oeste",SR06:"SR06 — Oeste Catarinense",SR07:"SR07 — Alto Vale do Itajaí",SR08:"SR08 — Sul Catarinense"};
+var pe2SR='all';
 
-var PE2_MUNIS = [
+var PE2D = [
   // SR01
   {municipio:"Florianópolis",sr:"SR01",vrg:"Florianópolis (Capital)",comarca:"Florianópolis",portas:["Penitenciária de Florianópolis"],regimes:["Provisório","Fechado","Semiaberto","Aberto","Prisão Civil"],obs:"Crimes contra liberdade sexual: Presídio Masculino Regional de Florianópolis (regime semiaberto vedado por determinação judicial nesta unidade)."},
   {municipio:"São José",sr:"SR01",vrg:"São José",comarca:"São José",portas:["Penitenciária de Florianópolis"],regimes:["Provisório","Fechado","Semiaberto","Aberto","Prisão Civil"]},
@@ -4131,159 +4130,93 @@ var PE2_MUNIS = [
   {municipio:"Maracajá",sr:"SR08",vrg:"Criciúma",comarca:"Araranguá",portas:["Presídio Regional de Araranguá"],regimes:["Provisório","Semiaberto"]},
 ];
 
-var PE2_COLORS={SR01:"#2f5ae8",SR02:"#0ea472",SR03:"#d97706",SR04:"#7c3aed",SR05:"#e05a2b",SR06:"#db2777",SR07:"#059669",SR08:"#0284c7"};
-var PE2_LABELS={SR01:"SR01 — Grande Florianópolis",SR02:"SR02 — Norte / Joinville",SR03:"SR03 — Vale do Itajaí / Blumenau",SR04:"SR04 — Planalto Norte",SR05:"SR05 — Serrana / Meio-Oeste",SR06:"SR06 — Oeste Catarinense",SR07:"SR07 — Alto Vale do Itajaí",SR08:"SR08 — Sul Catarinense"};
+function pe2N(s){return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+function pe2E(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function pe2HL(t,q){if(!q)return pe2E(t);var n=pe2N(t),i=n.indexOf(q);if(i<0)return pe2E(t);return pe2E(t.slice(0,i))+'<mark>'+pe2E(t.slice(i,i+q.length))+'</mark>'+pe2E(t.slice(i+q.length));}
+function pe2CC(r){var n=pe2N(r);if(n.includes('provisorio')||n.includes('provisório'))return 'pe2chip-prov';if(n.includes('fechado'))return 'pe2chip-fech';if(n.includes('semiaberto'))return 'pe2chip-semi';if(n.includes('aberto')&&!n.includes('semi'))return 'pe2chip-aber';return 'pe2chip-civ';}
 
-var pe2ActiveSR='all';
-
-function pe2Norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
-function pe2Esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function pe2Hl(text,q){
-  if(!q) return pe2Esc(text);
-  var ntext=pe2Norm(text),idx=ntext.indexOf(q);
-  if(idx<0) return pe2Esc(text);
-  return pe2Esc(text.slice(0,idx))+'<mark>'+pe2Esc(text.slice(idx,idx+q.length))+'</mark>'+pe2Esc(text.slice(idx+q.length));
+function pe2Abrir(){
+  document.getElementById('pe2-modal').style.display='flex';
+  pe2Render();
 }
-function pe2ChipClass(r){
-  var n=pe2Norm(r);
-  if(n.includes('provisório')||n.includes('provisorio')) return 'pe2-chip-prov';
-  if(n.includes('fechado')) return 'pe2-chip-fech';
-  if(n.includes('semiaberto')) return 'pe2-chip-semi';
-  if(n.includes('aberto')&&!n.includes('semi')) return 'pe2-chip-aber';
-  return 'pe2-chip-civ';
+function pe2Fechar(){
+  document.getElementById('pe2-modal').style.display='none';
 }
-
-window.pe2Toggle=function(idx){
-  var hd=document.getElementById('pe2h-'+idx);
-  var bd=document.getElementById('pe2b-'+idx);
-  if(!hd||!bd) return;
-  var isOpen=bd.classList.contains('open');
-  bd.classList.toggle('open');
-  hd.classList.toggle('open');
-};
-
-window.pe2SrFilter=function(btn){
-  document.querySelectorAll('.pe2-sr').forEach(function(b){
-    b.style.background='#fff';b.style.color='#374151';b.style.borderColor='#dde1ee';
-  });
+function pe2FiltroSR(btn){
+  document.querySelectorAll('.pe2sr').forEach(function(b){b.style.background='#fff';b.style.color='#374151';b.style.borderColor='#dde1ee';});
   btn.style.background='#1a2a4a';btn.style.color='#fff';btn.style.borderColor='#1a2a4a';
-  pe2ActiveSR=btn.dataset.sr;
+  pe2SR=btn.dataset.sr;pe2Render();
+}
+function pe2LimparBusca(){
+  document.getElementById('pe2busca').value='';
+  document.getElementById('pe2limpar').style.display='none';
   pe2Render();
-};
-
-window.pe2ClearSearch=function(){
-  document.getElementById('pe2-search').value='';
-  document.getElementById('pe2-clear').style.display='none';
-  pe2Render();
-};
-
-window.pe2Render=function(){
-  var raw=document.getElementById('pe2-search').value;
-  var q=pe2Norm(raw);
-  var clr=document.getElementById('pe2-clear');
-  if(clr) clr.style.display=raw.length?'flex':'none';
-
-  var filtered=PE2_MUNIS.filter(function(m){
-    var srOk=pe2ActiveSR==='all'||m.sr===pe2ActiveSR;
-    var txtOk=!q||
-      pe2Norm(m.municipio).includes(q)||
-      pe2Norm(m.comarca).includes(q)||
-      pe2Norm(m.vrg).includes(q)||
-      pe2Norm(m.sr).includes(q)||
-      m.portas.some(function(p){return pe2Norm(p).includes(q);});
-    return srOk&&txtOk;
+}
+function pe2Toggle(i){
+  var bd=document.getElementById('pe2bd'+i);
+  var hd=document.getElementById('pe2hd'+i);
+  if(!bd||!hd)return;
+  var aberto=bd.classList.contains('aberto');
+  bd.classList.toggle('aberto');hd.classList.toggle('aberto');
+  bd.parentElement.style.borderColor=aberto?'#dde1ee':'#2563eb';
+}
+function pe2Render(){
+  var raw=document.getElementById('pe2busca').value||'';
+  var q=pe2N(raw);
+  var clr=document.getElementById('pe2limpar');
+  if(clr)clr.style.display=raw.length?'flex':'none';
+  var f=PE2D.filter(function(m){
+    var sOk=pe2SR==='all'||m.sr===pe2SR;
+    var tOk=!q||pe2N(m.municipio).includes(q)||pe2N(m.comarca).includes(q)||pe2N(m.vrg).includes(q)||pe2N(m.sr).includes(q)||m.portas.some(function(p){return pe2N(p).includes(q);});
+    return sOk&&tOk;
   });
-
-  var vis=document.getElementById('pe2-visible');
-  var info=document.getElementById('pe2-result-info');
-  if(vis) vis.textContent=filtered.length;
-  if(info) info.textContent=filtered.length+' resultado'+(filtered.length!==1?'s':'');
-
-  var container=document.getElementById('pe2-content');
-  if(!container) return;
-
-  if(filtered.length===0){
-    container.innerHTML='<div style="text-align:center;padding:4rem 2rem;color:#9ca3af;"><div style="font-size:2.5rem;margin-bottom:.75rem;">🔍</div><div style="font-size:1rem;font-weight:600;color:#6b7280;">Nenhum resultado encontrado</div><div style="font-size:.82rem;margin-top:.4rem;">Tente outro município, comarca ou unidade prisional.</div></div>';
-    return;
-  }
-
-  var bySR={};
-  filtered.forEach(function(m){if(!bySR[m.sr])bySR[m.sr]=[];bySR[m.sr].push(m);});
-
-  var html='';
+  var vis=document.getElementById('pe2vis');if(vis)vis.textContent=f.length;
+  var info=document.getElementById('pe2info');if(info)info.textContent=f.length+' resultado'+(f.length!==1?'s':'');
+  var el=document.getElementById('pe2conteudo');if(!el)return;
+  if(!f.length){el.innerHTML='<div style="text-align:center;padding:4rem;color:#9ca3af;"><div style="font-size:2.5rem;margin-bottom:.7rem;">🔍</div><div style="font-weight:600;color:#6b7280;">Nenhum resultado</div><div style="font-size:.82rem;margin-top:.35rem;">Tente outro município, comarca ou unidade prisional.</div></div>';return;}
+  var bySR={};f.forEach(function(m){if(!bySR[m.sr])bySR[m.sr]=[];bySR[m.sr].push(m);});
+  var h='';
   Object.keys(bySR).sort().forEach(function(sr){
-    var color=PE2_COLORS[sr]||'#1a2a4a';
-    var label=PE2_LABELS[sr]||sr;
-    html+='<div style="margin-bottom:1.75rem;">';
-    html+='<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.7rem;">';
-    html+='<div style="width:4px;height:22px;border-radius:2px;background:'+color+';flex-shrink:0;"></div>';
-    html+='<span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#374151;">'+pe2Esc(label)+'</span>';
-    html+='<span style="font-family:\'Courier New\',monospace;font-size:.7rem;color:#9ca3af;background:#eceef5;border:1px solid #dde1ee;border-radius:20px;padding:.08rem .5rem;">'+bySR[sr].length+' município'+(bySR[sr].length!==1?'s':'')+'</span>';
-    html+='<div style="flex:1;height:1px;background:#dde1ee;"></div></div>';
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:.85rem;">';
-
+    var c=PE2_CORES[sr]||'#1a2a4a';
+    h+='<div style="margin-bottom:1.75rem;">';
+    h+='<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.7rem;">';
+    h+='<div style="width:4px;height:22px;border-radius:2px;background:'+c+';flex-shrink:0;"></div>';
+    h+='<span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#374151;">'+pe2E(PE2_NOMES[sr]||sr)+'</span>';
+    h+='<span style="font-family:Courier New,monospace;font-size:.7rem;color:#9ca3af;background:#eceef5;border:1px solid #dde1ee;border-radius:20px;padding:.08rem .5rem;">'+bySR[sr].length+' município'+(bySR[sr].length!==1?'s':'')+'</span>';
+    h+='<div style="flex:1;height:1px;background:#dde1ee;"></div></div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:.85rem;">';
     bySR[sr].forEach(function(m){
-      var idx=PE2_MUNIS.indexOf(m);
-      var chips=m.regimes.map(function(r){return '<span class="pe2-chip '+pe2ChipClass(r)+'">'+pe2Esc(r)+'</span>';}).join(' ');
-      var portaTags=m.portas.map(function(p){return '<span style="display:inline-block;background:#e8eeff;color:#2563eb;border-radius:6px;padding:.16rem .45rem;font-size:.69rem;font-weight:600;margin:.1rem .1rem .1rem 0;">'+pe2Hl(p,q)+'</span>';}).join('');
-
-      html+='<div class="pe2-muni-card">';
-      // Header do card
-      html+='<div class="pe2-card-hd" id="pe2h-'+idx+'" onclick="pe2Toggle('+idx+')">';
-      html+='<div style="width:9px;height:9px;border-radius:50%;background:'+color+';flex-shrink:0;margin-top:5px;"></div>';
-      html+='<div style="flex:1;min-width:0;">';
-      html+='<div class="pe2-nome" style="font-size:.97rem;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+pe2Hl(m.municipio,q)+'</div>';
-      html+='<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem;">';
-      html+='<span class="pe2-tag" style="background:#e8eeff;color:#2563eb;border:1px solid rgba(37,99,235,.2);">'+pe2Hl(m.vrg,q)+'</span>';
-      html+='<span class="pe2-tag" style="background:#eceef5;color:#374151;border:1px solid #dde1ee;">'+pe2Hl(m.comarca,q)+'</span>';
-      html+='</div>';
-      html+='<div style="font-size:.74rem;color:#6b7280;margin-top:.38rem;display:flex;align-items:flex-start;gap:.3rem;">';
-      html+='<span style="color:#d97706;flex-shrink:0;">⛪</span>';
-      html+=pe2Hl(m.portas[0],q)+(m.portas.length>1?' <span style="color:#9ca3af;font-size:.67rem;">+'+( m.portas.length-1)+'</span>':'');
-      html+='</div></div>';
-      html+='<svg class="pe2-chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
-      html+='</div>';
-
-      // Body do card (expandido)
-      html+='<div class="pe2-card-bd" id="pe2b-'+idx+'">';
-      html+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.4rem;">Porta(s) de Entrada</div>';
-      html+='<div style="margin-bottom:.7rem;">'+portaTags+'</div>';
-      html+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.35rem;">Regimes Atendidos</div>';
-      html+='<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.65rem;">'+chips+'</div>';
-      html+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.35rem;">Jurisdição</div>';
-      html+='<div style="font-size:.78rem;color:#374151;line-height:1.5;">';
-      html+='<strong style="color:#1a2a4a;">'+pe2Esc(m.vrg)+'</strong> <span style="color:#9ca3af;">—</span> Vara Regional de Garantias<br>';
-      html+='<strong style="color:#1a2a4a;">'+pe2Esc(m.comarca)+'</strong> <span style="color:#9ca3af;">—</span> Comarca';
-      html+='</div>';
-      if(m.obs){
-        html+='<div class="pe2-obs">⚠️ '+pe2Esc(m.obs)+'</div>';
-      }
-      html+='</div>';
-      html+='</div>';
+      var i=PE2D.indexOf(m);
+      var chips=m.regimes.map(function(r){return '<span class="pe2chip '+pe2CC(r)+'">'+pe2E(r)+'</span>';}).join(' ');
+      var ptags=m.portas.map(function(p){return '<span style="display:inline-block;background:#e8eeff;color:#2563eb;border-radius:6px;padding:.16rem .45rem;font-size:.69rem;font-weight:600;margin:.1rem .1rem .1rem 0;">'+pe2HL(p,q)+'</span>';}).join('');
+      h+='<div class="pe2card">';
+      h+='<div class="pe2hd" id="pe2hd'+i+'" onclick="pe2Toggle('+i+')">';
+      h+='<div style="width:9px;height:9px;border-radius:50%;background:'+c+';flex-shrink:0;margin-top:5px;"></div>';
+      h+='<div style="flex:1;min-width:0;">';
+      h+='<div style="font-size:.97rem;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+pe2HL(m.municipio,q)+'</div>';
+      h+='<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem;">';
+      h+='<span class="pe2tag" style="background:#e8eeff;color:#2563eb;border:1px solid rgba(37,99,235,.2);">'+pe2HL(m.vrg,q)+'</span>';
+      h+='<span class="pe2tag" style="background:#eceef5;color:#374151;border:1px solid #dde1ee;">'+pe2HL(m.comarca,q)+'</span>';
+      h+='</div>';
+      h+='<div style="font-size:.74rem;color:#6b7280;margin-top:.38rem;">⛪ '+pe2HL(m.portas[0],q)+(m.portas.length>1?' <span style="color:#9ca3af;font-size:.67rem;">+'+(m.portas.length-1)+'</span>':'')+'</div>';
+      h+='</div>';
+      h+='<svg class="pe2chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+      h+='</div>';
+      h+='<div class="pe2bd" id="pe2bd'+i+'">';
+      h+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.4rem;">Porta(s) de Entrada</div>';
+      h+='<div style="margin-bottom:.7rem;">'+ptags+'</div>';
+      h+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.35rem;">Regimes Atendidos</div>';
+      h+='<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.65rem;">'+chips+'</div>';
+      h+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.35rem;">Jurisdição</div>';
+      h+='<div style="font-size:.78rem;color:#374151;line-height:1.5;"><strong style="color:#1a2a4a;">'+pe2E(m.vrg)+'</strong> — Vara Regional de Garantias<br><strong style="color:#1a2a4a;">'+pe2E(m.comarca)+'</strong> — Comarca</div>';
+      if(m.obs)h+='<div class="pe2obs">⚠️ '+pe2E(m.obs)+'</div>';
+      h+='</div></div>';
     });
-
-    html+='</div></div>';
+    h+='</div></div>';
   });
-
-  container.innerHTML=html;
-};
-
-// Abrir automaticamente ao clicar no botão da área restrita
-document.addEventListener('DOMContentLoaded',function(){
-  var btn=document.querySelector('[onclick*="modal-porta-entrada"]');
-  if(btn){
-    btn.addEventListener('click',function(){
-      setTimeout(function(){
-        if(window.pe2Render) window.pe2Render();
-      },50);
-    });
-  }
-});
-
-})();
+  el.innerHTML=h;
+}
 </script>
-
-
 <!-- ========== MODAL GERADOR DE OFÍCIO ========== -->
 <div id="modal-gerador-oficio" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9990;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1rem;" onclick="if(event.target===this)window.fecharModal('modal-gerador-oficio')">
   <div style="background:#e8eaf0;border-radius:12px;width:100%;max-width:850px;margin:1.5rem auto;box-shadow:0 24px 64px rgba(0,0,0,.4);overflow:hidden;">
