@@ -7756,28 +7756,28 @@ window.abrirAreaRestrita = function() {
 
 <script>
 // ── PE3: Regional > Unidade > Municípios ─────────────────────────────
-function pe3Abrir(){
+window.pe3Abrir = function pe3Abrir(){
   document.getElementById('pe3-modal').style.display='flex';
   pe3Voltar();
   document.getElementById('pe3-busca').value='';
   document.getElementById('pe3-limpar').style.display='none';
 }
-function pe3Fechar(){
+window.pe3Fechar = function pe3Fechar(){
   document.getElementById('pe3-modal').style.display='none';
 }
-function pe3AbrirSR(sr){
+window.pe3AbrirSR = function pe3AbrirSR(sr){
   document.getElementById('pe3-srs').style.display='none';
   document.querySelectorAll('[id^="pe3-painel-"]').forEach(function(el){el.style.display='none';});
   var p=document.getElementById('pe3-painel-'+sr);
   if(p) p.style.display='block';
 }
-function pe3Voltar(){
+window.pe3Voltar = function pe3Voltar(){
   document.getElementById('pe3-srs').style.display='block';
   document.querySelectorAll('[id^="pe3-painel-"]').forEach(function(el){el.style.display='none';});
   document.getElementById('pe3-normal').style.display='block';
   document.getElementById('pe3-resultados').style.display='none';
 }
-function pe3ToggleU(uid){
+window.pe3ToggleU = function pe3ToggleU(uid){
   var bd=document.getElementById('pe3munis-'+uid);
   var ch=document.getElementById('pe3chev-'+uid);
   if(!bd)return;
@@ -7785,7 +7785,7 @@ function pe3ToggleU(uid){
   bd.style.display=aberto?'none':'block';
   if(ch)ch.style.transform=aberto?'':'rotate(180deg)';
 }
-function pe3Buscar(q){
+window.pe3Buscar = function pe3Buscar(q){
   var limpar=document.getElementById('pe3-limpar');
   if(limpar)limpar.style.display=q.length?'flex':'none';
   if(!q.trim()){pe3Voltar();return;}
@@ -7845,7 +7845,7 @@ function pe3Buscar(q){
   });
   res.innerHTML=h;
 }
-function pe3LimparBusca(){
+window.pe3LimparBusca = function pe3LimparBusca(){
   document.getElementById('pe3-busca').value='';
   document.getElementById('pe3-limpar').style.display='none';
   pe3Voltar();
@@ -8104,14 +8104,14 @@ window.abrirEscalaPlantao = function() {
   <iframe id="iframe-gen-frame" src="" style="flex:1;border:none;width:100%;height:calc(100vh - 48px);background:#fff;"></iframe>
 </div>
 <script>
-function abrirIframeRestrito(url, icon, titulo){
+window.abrirIframeRestrito = function abrirIframeRestrito(url, icon, titulo){
   document.getElementById('iframe-gen-icon').textContent = icon;
   document.getElementById('iframe-gen-titulo').textContent = titulo;
   document.getElementById('iframe-gen-link').href = url;
   document.getElementById('iframe-gen-frame').src = url;
   document.getElementById('modal-iframe-gen').style.display = 'flex';
 }
-function fecharIframeRestrito(){
+window.fecharIframeRestrito = function fecharIframeRestrito(){
   document.getElementById('modal-iframe-gen').style.display = 'none';
   document.getElementById('iframe-gen-frame').src = '';
 }
