@@ -3638,7 +3638,604 @@ window.abrirEscalaPlantao = function() {
       '<div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;text-align:justify;">' + corpo + '</div>' +
       getRod() +
       '<scr' + 'ipt>window.onload=function(){window.print();}<\/scr' + 'ipt>' +
-      '</body></html>';
+      '<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
+    authDomain: "crv-dpp-sc.firebaseapp.com",
+    projectId: "crv-dpp-sc",
+    storageBucket: "crv-dpp-sc.firebasestorage.app",
+    messagingSenderId: "707080008192",
+    appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // E-mails autorizados
+  const EMAILS_AUTORIZADOS = [
+    'rodrigo.l.pastore@gmail.com',
+    'ivana.schafer@gmail.com',
+    'brunawlongen@gmail.com',
+    'ricardobritomarques12@gmail.com',
+    'abeljuliana2012@gmail.com',
+    'jessicaveiga9@gmail.com',
+    'day.sestren88@gmail.com'
+  ];
+
+  const SENHA_TEMPORARIA = 'CRV@2026temp';
+
+  let usuarioAtual = null;
+
+  // ── Expõe funções para o escopo global ──
+  window.abrirAreaRestrita = function() {
+    if (usuarioAtual) {
+      mostrarAreaRestrita(usuarioAtual);
+    } else {
+      document.getElementById('modal-login').style.display = 'flex';
+      document.getElementById('login-email').focus();
+    }
+  };
+
+  window.fecharModalLogin = function() {
+    document.getElementById('modal-login').style.display = 'none';
+    document.getElementById('login-erro').style.display = 'none';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
+  };
+
+  window.fazerLogin = async function() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const senha = document.getElementById('login-senha').value;
+    const erroEl = document.getElementById('login-erro');
+    const btn = document.getElementById('btn-entrar');
+
+    erroEl.style.display = 'none';
+
+    if (!email || !senha) {
+      erroEl.textContent = 'Preencha o e-mail e a senha.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    if (!EMAILS_AUTORIZADOS.includes(email)) {
+      erroEl.textContent = 'Este e-mail não tem autorização de acesso.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, senha);
+      usuarioAtual = cred.user;
+
+      // Verifica no Firestore se já configurou senha própria
+      let primeiroAcesso = false;
+      try {
+        const docRef = doc(db, 'usuarios', cred.user.uid);
+        const snap = await getDoc(docRef);
+        // Se não existe documento ou senhaConfigurada = false → primeiro acesso
+        if (!snap.exists() || snap.data().senhaConfigurada !== true) {
+          primeiroAcesso = true;
+        }
+      } catch (e) {
+        // Se não conseguir ler o Firestore, verifica pela senha temporária
+        if (senha === SENHA_TEMPORARIA) primeiroAcesso = true;
+      }
+
+      if (primeiroAcesso) {
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-trocar-senha').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('modal-login').style.display = 'none';
+      await entrarNaAreaRestrita(cred.user);
+
+    } catch (e) {
+      let msg = 'Erro: ' + e.code + ' — ' + e.message;
+      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') msg = 'E-mail ou senha incorretos. Verifique os dados e tente novamente.';
+      if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
+      if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
+      if (e.code === 'auth/invalid-api-key') msg = 'Erro de configuração do sistema. Contate o administrador.';
+      if (e.code === 'auth/unauthorized-domain') msg = 'Domínio não autorizado. Contate o administrador.';
+      erroEl.textContent = msg;
+      erroEl.style.display = 'block';
+    } finally {
+      btn.textContent = 'Entrar';
+      btn.disabled = false;
+    }
+  };
+
+  window.trocarSenha = async function() {
+    const nova = document.getElementById('nova-senha').value;
+    const conf = document.getElementById('confirmar-senha').value;
+    const erroEl = document.getElementById('trocar-erro');
+
+    erroEl.style.display = 'none';
+
+    if (nova.length < 8) {
+      erroEl.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova !== conf) {
+      erroEl.textContent = 'As senhas não coincidem.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova === SENHA_TEMPORARIA) {
+      erroEl.textContent = 'Escolha uma senha diferente da temporária.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      await updatePassword(usuarioAtual, nova);
+      // Marca no Firestore que a senha foi configurada
+      try {
+        const docRef = doc(db, 'usuarios', usuarioAtual.uid);
+        await setDoc(docRef, { senhaConfigurada: true, email: usuarioAtual.email }, { merge: true });
+      } catch(e) { /* silencioso */ }
+      document.getElementById('modal-login').style.display = 'none';
+      document.getElementById('tela-login').style.display = 'block';
+      document.getElementById('tela-trocar-senha').style.display = 'none';
+      document.getElementById('nova-senha').value = '';
+      document.getElementById('confirmar-senha').value = '';
+      await entrarNaAreaRestrita(usuarioAtual);
+      mostrarToastCRV('✅ Senha criada com sucesso! Bem-vindo(a)!');
+    } catch (e) {
+      erroEl.textContent = 'Erro ao salvar senha. Tente novamente.';
+      erroEl.style.display = 'block';
+    }
+  };
+
+  window.fazerLogout = async function() {
+    await signOut(auth);
+    usuarioAtual = null;
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('ativo'));
+    const inicio = document.getElementById('inicio');
+    if (inicio) inicio.classList.add('ativo');
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Início';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.toggleSenhaVis = function(id) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+  };
+
+
+  window.fecharNovidades = function() {
+    document.getElementById('modal-novidades').style.display = 'none';
+  };
+
+  // ── Funções internas ──
+  async function entrarNaAreaRestrita(user) {
+    const uid = user.uid;
+    const email = user.email;
+    const agora = new Date();
+    const agoraISO = agora.toISOString();
+
+    // Busca último acesso e novidades
+    let ultimoAcesso = null;
+    try {
+      const docRef = doc(db, 'usuarios', uid);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) ultimoAcesso = snap.data().ultimoAcesso || null;
+      // Atualiza último acesso
+      await setDoc(docRef, { ultimoAcesso: agoraISO, email }, { merge: true });
+    } catch (e) { /* silencioso */ }
+
+    // Verifica novidades
+    if (ultimoAcesso) {
+      try {
+        const novSnap = await getDocs(collection(db, 'novidades'));
+        const novas = [];
+        novSnap.forEach(d => {
+          const n = d.data();
+          if (n.data && n.data > ultimoAcesso) {
+            novas.push({ titulo: n.titulo || '', descricao: n.descricao || '', data: n.data });
+          }
+        });
+        if (novas.length > 0) {
+          novas.sort((a,b) => b.data.localeCompare(a.data));
+          const html = novas.map(n =>
+            `<div style="margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid #e5e7eb;">
+              <div style="font-weight:600;color:#1a2a4a;">${n.titulo}</div>
+              <div style="color:#4b5563;font-size:.84rem;margin-top:.2rem;">${n.descricao}</div>
+            </div>`
+          ).join('');
+          document.getElementById('novidades-conteudo').innerHTML = html;
+          document.getElementById('modal-novidades').style.display = 'flex';
+        }
+      } catch (e) { /* silencioso */ }
+    }
+
+    mostrarAreaRestrita(user);
+  }
+
+  function mostrarAreaRestrita(user) {
+    // Oculta todas as seções
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('ativo'));
+    // Mostra a restrita
+    const sec = document.getElementById('restrito');
+    if (sec) sec.classList.add('ativo');
+    // Atualiza nav
+    document.querySelectorAll('.nav-principal a').forEach(a => a.classList.remove('ativo'));
+    const navBtn = document.getElementById('nav-restrito');
+    if (navBtn) navBtn.classList.add('ativo');
+    // Atualiza breadcrumb
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Área Restrita';
+    // Info do usuário
+    const info = document.getElementById('restrito-usuario-info');
+    if (info) info.textContent = '👮 Conectado como: ' + (user.email || '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function mostrarToastCRV(msg) {
+    if (typeof showToast === 'function') showToast(msg);
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PAINEL DE RESPOSTAS — Fluxo Ingresso de Presos
+  // ══════════════════════════════════════════════════════════════════════════
+
+  const COLECAO_QUESTIONARIO = 'Respostas_Fluxo_Ingresso_Presos';
+  let todasRespostas = [];
+  let respostasFiltradas = [];
+  let painelCarregado = false;
+
+  window.abrirPainelRespostas = async function() {
+    const modal = document.getElementById('modal-painel-respostas');
+    modal.style.display = 'flex';
+    if (!painelCarregado) {
+      await carregarRespostas();
+      painelCarregado = true;
+    }
+  };
+
+  window.fecharPainelRespostas = function() {
+    document.getElementById('modal-painel-respostas').style.display = 'none';
+  };
+
+  async function carregarRespostas() {
+    try {
+      const snap = await getDocs(collection(db, COLECAO_QUESTIONARIO));
+      todasRespostas = [];
+      snap.forEach(d => todasRespostas.push({ id: d.id, ...d.data() }));
+      // Ordena por data decrescente
+      todasRespostas.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+      aplicarFiltros();
+    } catch(e) {
+      document.getElementById('loading-respostas').textContent = '❌ Erro ao carregar respostas. Verifique as permissões do Firestore.';
+      console.error(e);
+    }
+  }
+
+  window.aplicarFiltros = function() {
+    const fReg   = document.getElementById('f-regional')?.value || '';
+    const fSexo  = document.getElementById('f-sexo')?.value || '';
+    const fRec   = document.getElementById('f-recebe')?.value || '';
+    const fHor   = document.getElementById('f-horario')?.value || '';
+    const fIgp   = document.getElementById('f-igp')?.value || '';
+
+    respostasFiltradas = todasRespostas.filter(r => {
+      if (fReg  && r.regional_sr !== fReg) return false;
+      if (fSexo && !((r.sexo_presos || '').toUpperCase().includes(fSexo))) return false;
+      if (fRec) {
+        const rec = (r.recebe_presos || '').toUpperCase().trim();
+        if (fRec === 'RECEBE' && rec !== 'SIM') return false;
+        if (fRec === 'BUSCA'  && rec !== 'NÃO' && rec !== 'NAO') return false;
+      }
+      if (fHor) {
+        const hor = (r.forca_horario || '').toUpperCase();
+        if (fHor === 'QUALQUER' && !hor.includes('QUALQUER') && !hor.includes('24')) return false;
+        if (fHor === 'ACORDO' && (hor.includes('QUALQUER') || hor.includes('24'))) return false;
+      }
+      if (fIgp) {
+        const cidade = (r.ecd_cidade || '').toLowerCase();
+        const unidade = (r.unidade || '').toLowerCase();
+        // Se a cidade do IGP for a mesma/similar à da unidade → "sim"
+        const mesmaCidade = cidade.length > 2 && unidade.includes(cidade.split(' ')[0]);
+        if (fIgp === 'sim' && !mesmaCidade) return false;
+        if (fIgp === 'nao' && mesmaCidade) return false;
+      }
+      return true;
+    });
+
+    const total = todasRespostas.length;
+    const filtrado = respostasFiltradas.length;
+    const statusEl = document.getElementById('filtro-status');
+    if (statusEl) statusEl.textContent = filtrado === total
+      ? `Total: ${total} resposta(s)`
+      : `Exibindo ${filtrado} de ${total} resposta(s)`;
+
+    renderizarTabela();
+    renderizarCompilado();
+  };
+
+  window.limparFiltros = function() {
+    ['f-regional','f-sexo','f-recebe','f-horario','f-igp'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    aplicarFiltros();
+  };
+
+
+  // Tradução de códigos para texto legível
+  function traduzir(campo, val) {
+    const v = (val || '').trim();
+    const mapas = {
+      recebe_presos:      { 'SIM': 'Recebe na unidade', 'NAO': 'Vai buscar nas delegacias', 'NÃO': 'Vai buscar nas delegacias' },
+      forca_horario:      { 'QUALQUER': 'Qualquer horário (sem restrição)', 'ACORDO': 'Há acordo / restrição de horário' },
+      flagrante_transporte:{ 'PC_LEVA': 'Polícia Civil leva ao presídio', 'PP_BUSCA': 'Polícia Penal busca na Delegacia', 'VIATURA_PP': 'Polícia Penal busca na Delegacia', 'OUTRO': 'Outro' },
+      mandado_fluxo:      { 'DIRETO_UNIDADE': 'Vai direto à unidade prisional', 'PASSA_DELEGACIA': 'Passa pela delegacia antes', 'OUTRO': 'Outro' },
+    };
+    if (mapas[campo] && mapas[campo][v.toUpperCase()]) return mapas[campo][v.toUpperCase()];
+    return v || '—';
+  }
+
+  function renderizarTabela() {
+    const loading  = document.getElementById('loading-respostas');
+    const tabela   = document.getElementById('tabela-respostas');
+    const semDados = document.getElementById('sem-respostas');
+    const tbody    = document.getElementById('tbody-respostas');
+
+    loading.style.display = 'none';
+
+    if (!respostasFiltradas.length) {
+      tabela.style.display = 'none';
+      semDados.style.display = 'block';
+      return;
+    }
+
+    tabela.style.display = 'block';
+    semDados.style.display = 'none';
+
+    // Atualiza cabeçalho
+    const thead = tabela.querySelector('thead tr');
+    if (thead) thead.innerHTML = `
+      <th style="padding:.5rem .6rem;text-align:left;white-space:nowrap;background:#1a2a4a;color:#fff;">Data/Hora</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Unidade</th>
+      <th style="padding:.5rem .6rem;text-align:left;white-space:nowrap;background:#1a2a4a;color:#fff;">Regional</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Respondente</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Função</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Tipo de Unidade Prisional</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Modalidade de Recebimento</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Horário (forças)</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">IGP — Sede</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">IGP — Plantão</th>
+      <th style="padding:.5rem .6rem;text-align:center;background:#1a2a4a;color:#fff;">Detalhes</th>
+    `;
+
+    const linhas = respostasFiltradas.map((r, i) => {
+      const cor = i % 2 === 0 ? '#fff' : '#f9fafb';
+      const horario = (r.forca_horario||'') === 'QUALQUER'
+        ? '<span style="color:#15803d;font-weight:600;">Qualquer horário</span>'
+        : '<span style="color:#b45309;font-weight:600;">Com acordo</span>';
+      const modalidade = traduzir('recebe_presos', r.recebe_presos);
+      const igpSede = r.ecd_cidade ? `${r.ecd_cidade} (${r.ecd_distancia||'?'})` : '—';
+      const igpPlantao = r.plantao_mun ? `${r.plantao_mun} (${r.plantao_dist||'?'})` : '—';
+      return `<tr style="background:${cor};">
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.data_br||'—'}<br><span style="color:#9ca3af;font-size:.72rem;">${r.hora_br||''}</span></td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;font-weight:600;min-width:160px;">${r.unidade||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.regional_sr||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${r.resp_nome||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.resp_funcao||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${r.sexo_presos||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${modalidade}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${horario}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${igpSede}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${igpPlantao}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;text-align:center;">
+          <button onclick="verDetalhe('${r.id}')" style="padding:3px 10px;background:#1a2a4a;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Ver</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    tbody.innerHTML = linhas;
+  }
+
+  window.verDetalhe = function(id) {
+    const r = todasRespostas.find(x => x.id === id);
+    if (!r) return;
+    const linha = (label, val) => val
+      ? `<div style="display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid #f3f4f6;"><span style="font-weight:600;color:#374151;min-width:190px;flex-shrink:0;">${label}</span><span style="color:#1f2937;">${val}</span></div>`
+      : '';
+    document.getElementById('detalhe-corpo').innerHTML = `
+      <div style="background:#f0f4ff;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;">
+        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">${r.unidade||'—'}</div>
+        <div style="font-size:.78rem;color:#6b7280;">${r.regional_nome||''} · ${r.data_br||''} às ${r.hora_br||''}</div>
+      </div>
+      ${linha('Respondente', r.resp_nome)}
+      ${linha('Função', r.resp_funcao)}
+      ${linha('Tipo de Unidade Prisional', r.sexo_presos)}
+      ${linha('Modalidade de Recebimento', traduzir('recebe_presos', r.recebe_presos))}
+      ${linha('Horário (forças de segurança)', traduzir('forca_horario', r.forca_horario))}
+      ${r.forca_acordo_desc ? linha('Descrição do acordo', r.forca_acordo_desc) : ''}
+      ${linha('Flagrante — transporte', traduzir('flagrante_transporte', r.flagrante_transporte))}
+      ${r.flagrante_outro ? linha('Flagrante — outro (desc.)', r.flagrante_outro) : ''}
+      ${linha('Mandado de Prisão — fluxo', traduzir('mandado_fluxo', r.mandado_fluxo))}
+      ${r.mandado_outro ? linha('Mandado — outro (desc.)', r.mandado_outro) : ''}
+      <div style="margin:.8rem 0 .3rem;font-weight:700;color:#1a2a4a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Exame de Corpo de Delito</div>
+      ${linha('IGP — Sede (cidade)', r.ecd_cidade)}
+      ${linha('IGP — Sede (distância)', r.ecd_distancia)}
+      ${linha('IGP — Plantão (município)', r.plantao_mun)}
+      ${linha('IGP — Plantão (distância)', r.plantao_dist)}
+    `;
+    document.getElementById('modal-detalhe-resp').style.display = 'flex';
+  };
+
+  function renderizarCompilado() {
+    const el = document.getElementById('compilado-content');
+    if (!el) return;
+    const r = respostasFiltradas;
+    const total = r.length;
+    if (!total) { el.innerHTML = '<p style="color:#6b7280;text-align:center;padding:2rem;">Nenhum dado para compilar com os filtros selecionados.</p>'; return; }
+
+    function contar(arr, fn) { return arr.filter(fn).length; }
+    function listar(arr, fn)  { return arr.filter(fn).map(x => x.unidade || '—'); }
+
+    function barraHTML(items, tot) {
+      return items.map(({label, n, uns}) => {
+        const pct = tot ? Math.round((n/tot)*100) : 0;
+        const uid = 'dr_' + Math.random().toString(36).slice(2,9);
+        const liHtml = uns && uns.length
+          ? uns.map(u => `<li>${u}</li>`).join('')
+          : '<li style="color:#9ca3af;font-style:italic;">Nenhuma unidade</li>';
+        return `<div style="margin-bottom:.85rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:3px;cursor:pointer;user-select:none;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';"
+               title="Clique para ver as unidades">
+            <span style="color:#374151;">${label}</span>
+            <span style="font-weight:700;color:#1a2a4a;">${n} <span style="font-weight:400;color:#9ca3af;">(${pct}%)</span> <span style="font-size:.65rem;color:#9ca3af;">▼</span></span>
+          </div>
+          <div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;cursor:pointer;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';">
+            <div style="background:#1a2a4a;height:100%;width:${pct}%;border-radius:99px;transition:width .4s;"></div>
+          </div>
+          <div id="${uid}" style="display:none;margin-top:.5rem;background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:.6rem 1rem .6rem 1.2rem;">
+            <div style="font-size:.68rem;font-weight:700;color:#4a6494;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;">Unidades que selecionaram esta opção (${n}):</div>
+            <ul style="list-style:disc;padding-left:1rem;font-size:.78rem;line-height:1.9;color:#1f2937;">${liHtml}</ul>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function card(titulo, corpo) {
+      return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;">
+        <div style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem;">${titulo}</div>
+        ${corpo}
+      </div>`;
+    }
+
+    // Por Regional
+    const regionais = [...new Set(r.map(x => x.regional_sr))].sort();
+    const porRegional = regionais.map(sr => ({
+      label: `${sr} – ${r.find(x=>x.regional_sr===sr)?.regional_nome||sr}`,
+      n: contar(r, x => x.regional_sr===sr),
+      uns: listar(r, x => x.regional_sr===sr)
+    }));
+
+    // Tipo de Unidade (sexo_presos) — questionário salva o .label: 'Masculino','Feminino','Ambos'
+    const tipoUnidade = [
+      { label: 'Masculino', n: contar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')), uns: listar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')) },
+      { label: 'Feminino',  n: contar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')),   uns: listar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')) },
+      { label: 'Misto / Ambos', n: contar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')), uns: listar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')) },
+    ];
+
+    // Modalidade — campo salva 'SIM' ou 'NÃO'
+    const modalidade = [
+      { label: 'Recebe na unidade (porta de entrada)', n: contar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM'),               uns: listar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM') },
+      { label: 'Não recebe / encaminha para outra UP', n: contar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())), uns: listar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())) },
+    ];
+
+    // Horário forças de segurança
+    const horario = [
+      { label: 'Qualquer horário (sem restrição)', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER'), uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER') },
+      { label: 'Há acordo / restrição de horário', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO'),   uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO') },
+    ];
+
+    // Flagrante — transporte (questionário salva PP_BUSCA, versões antigas salvavam VIATURA_PP)
+    const flagrante = [
+      { label: 'Polícia Civil leva ao presídio',   n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA'),                                                                    uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA') },
+      { label: 'Polícia Penal busca na Delegacia', n: contar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())),                                             uns: listar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())) },
+      { label: 'Outro',                            n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO'),                                                                       uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO') },
+    ];
+
+    // Mandado de Prisão
+    const mandado = [
+      { label: 'Vai direto à unidade prisional', n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE'),  uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE') },
+      { label: 'Passa pela delegacia antes',     n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA'), uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA') },
+      { label: 'Outro',                          n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO'),           uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO') },
+    ];
+
+    // IGP Sede — mesma cidade ou outra
+    const igpSedeFn  = x => { const c=(x.ecd_cidade||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
+    const igpSede = [
+      { label: 'IGP na própria cidade da unidade', n: contar(r, igpSedeFn),  uns: listar(r, igpSedeFn) },
+      { label: 'IGP em outra cidade',              n: contar(r, x=>!igpSedeFn(x)), uns: listar(r, x=>!igpSedeFn(x)) },
+    ];
+
+    // IGP Plantão — mesma cidade ou outra
+    const igpPlantaoFn = x => { const c=(x.plantao_mun||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
+    const igpPlantao = [
+      { label: 'IGP de plantão na própria cidade', n: contar(r, igpPlantaoFn),  uns: listar(r, igpPlantaoFn) },
+      { label: 'IGP de plantão em outra cidade',   n: contar(r, x=>!igpPlantaoFn(x)), uns: listar(r, x=>!igpPlantaoFn(x)) },
+    ];
+
+    el.innerHTML =
+      `<div style="background:#1a2a4a;color:#fff;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;">📊</div>
+        <div><div style="font-size:1.5rem;font-weight:700;">${total}</div><div style="font-size:.8rem;opacity:.8;">resposta(s) no filtro atual</div></div>
+      </div>` +
+      card('Por Regional', barraHTML(porRegional, total)) +
+      card('Tipo de Unidade Prisional', barraHTML(tipoUnidade, total)) +
+      card('Modalidade de Recebimento', barraHTML(modalidade, total)) +
+      card('Horário de Recebimento (forças de segurança)', barraHTML(horario, total)) +
+      card('Flagrante Delito — Como os presos chegam à unidade', barraHTML(flagrante, total)) +
+      card('Cumprimento de Mandado de Prisão — Fluxo', barraHTML(mandado, total)) +
+      card('Sede do IGP — Exame de Corpo de Delito (dias úteis)', barraHTML(igpSede, total)) +
+      card('Sede do IGP — Plantão (noturno / fins de semana / feriados)', barraHTML(igpPlantao, total));
+  }
+
+  window.mudarAba = function(aba) {
+    const isIndividual = aba === 'individual';
+    document.getElementById('painel-individual').style.display = isIndividual ? 'block' : 'none';
+    document.getElementById('painel-compilado').style.display = isIndividual ? 'none' : 'block';
+    document.getElementById('aba-individual').style.borderBottomColor = isIndividual ? '#1a2a4a' : 'transparent';
+    document.getElementById('aba-individual').style.color = isIndividual ? '#1a2a4a' : '#6b7280';
+    document.getElementById('aba-individual').style.fontWeight = isIndividual ? '700' : '500';
+    document.getElementById('aba-compilado').style.borderBottomColor = isIndividual ? 'transparent' : '#1a2a4a';
+    document.getElementById('aba-compilado').style.color = isIndividual ? '#6b7280' : '#1a2a4a';
+    document.getElementById('aba-compilado').style.fontWeight = isIndividual ? '500' : '700';
+    if (!isIndividual) renderizarCompilado();
+  };
+
+  window.exportarCSV = function() {
+    if (!respostasFiltradas.length) { alert('Nenhum dado para exportar.'); return; }
+    const cabecalho = ['Data','Hora','Unidade','Regional SR','Regional Nome','Respondente','Função','Público (sexo_presos)','Recebe Presos','Encam. Masculino','Encam. Feminino','Horário Forças','Acordo Desc','Transporte Flagrante','Flagrante Outro','Cidade IGP','Distância IGP','Município Plantão','Dist Plantão','Mandado Fluxo','Mandado Outro'];
+    const esc = v => '"' + String(v||'').replace(/"/g,'""') + '"';
+    const linhas = respostasFiltradas.map(r => [
+      r.data_br, r.hora_br, r.unidade, r.regional_sr, r.regional_nome,
+      r.resp_nome, r.resp_funcao, r.sexo_presos, r.recebe_presos,
+      r.encaminhamento_masculino, r.encaminhamento_feminino,
+      r.forca_horario, r.forca_acordo_desc,
+      r.flagrante_transporte, r.flagrante_outro,
+      r.ecd_cidade, r.ecd_distancia,
+      r.plantao_mun, r.plantao_dist, r.mandado_fluxo, r.mandado_outro
+    ].map(esc).join(','));
+    const csv = [cabecalho.map(esc).join(','), ...linhas].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fluxo_ingresso_presos_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Monitora estado de autenticação (para persistir sessão)
+  onAuthStateChanged(auth, user => {
+    if (user && EMAILS_AUTORIZADOS.includes(user.email)) {
+      usuarioAtual = user;
+    } else {
+      usuarioAtual = null;
+    }
+  });
+</script>
+</body></html>';
     var w = window.open('', '_blank');
     if (w) { w.document.write(html); w.document.close(); }
     else { alert('Permita pop-ups para gerar o PDF.'); }
@@ -3658,7 +4255,604 @@ window.abrirEscalaPlantao = function() {
       (data ? '<p style="text-align:right;font-family:Arial;font-size:11pt;">' + data + '</p>' : '') +
       '<div style="font-family:Arial;font-size:11pt;line-height:1.0;text-align:justify;">' + corpo + '</div>' +
       getRod() +
-      '</body></html>';
+      '<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
+    authDomain: "crv-dpp-sc.firebaseapp.com",
+    projectId: "crv-dpp-sc",
+    storageBucket: "crv-dpp-sc.firebasestorage.app",
+    messagingSenderId: "707080008192",
+    appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // E-mails autorizados
+  const EMAILS_AUTORIZADOS = [
+    'rodrigo.l.pastore@gmail.com',
+    'ivana.schafer@gmail.com',
+    'brunawlongen@gmail.com',
+    'ricardobritomarques12@gmail.com',
+    'abeljuliana2012@gmail.com',
+    'jessicaveiga9@gmail.com',
+    'day.sestren88@gmail.com'
+  ];
+
+  const SENHA_TEMPORARIA = 'CRV@2026temp';
+
+  let usuarioAtual = null;
+
+  // ── Expõe funções para o escopo global ──
+  window.abrirAreaRestrita = function() {
+    if (usuarioAtual) {
+      mostrarAreaRestrita(usuarioAtual);
+    } else {
+      document.getElementById('modal-login').style.display = 'flex';
+      document.getElementById('login-email').focus();
+    }
+  };
+
+  window.fecharModalLogin = function() {
+    document.getElementById('modal-login').style.display = 'none';
+    document.getElementById('login-erro').style.display = 'none';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
+  };
+
+  window.fazerLogin = async function() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const senha = document.getElementById('login-senha').value;
+    const erroEl = document.getElementById('login-erro');
+    const btn = document.getElementById('btn-entrar');
+
+    erroEl.style.display = 'none';
+
+    if (!email || !senha) {
+      erroEl.textContent = 'Preencha o e-mail e a senha.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    if (!EMAILS_AUTORIZADOS.includes(email)) {
+      erroEl.textContent = 'Este e-mail não tem autorização de acesso.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, senha);
+      usuarioAtual = cred.user;
+
+      // Verifica no Firestore se já configurou senha própria
+      let primeiroAcesso = false;
+      try {
+        const docRef = doc(db, 'usuarios', cred.user.uid);
+        const snap = await getDoc(docRef);
+        // Se não existe documento ou senhaConfigurada = false → primeiro acesso
+        if (!snap.exists() || snap.data().senhaConfigurada !== true) {
+          primeiroAcesso = true;
+        }
+      } catch (e) {
+        // Se não conseguir ler o Firestore, verifica pela senha temporária
+        if (senha === SENHA_TEMPORARIA) primeiroAcesso = true;
+      }
+
+      if (primeiroAcesso) {
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-trocar-senha').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('modal-login').style.display = 'none';
+      await entrarNaAreaRestrita(cred.user);
+
+    } catch (e) {
+      let msg = 'Erro: ' + e.code + ' — ' + e.message;
+      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') msg = 'E-mail ou senha incorretos. Verifique os dados e tente novamente.';
+      if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
+      if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
+      if (e.code === 'auth/invalid-api-key') msg = 'Erro de configuração do sistema. Contate o administrador.';
+      if (e.code === 'auth/unauthorized-domain') msg = 'Domínio não autorizado. Contate o administrador.';
+      erroEl.textContent = msg;
+      erroEl.style.display = 'block';
+    } finally {
+      btn.textContent = 'Entrar';
+      btn.disabled = false;
+    }
+  };
+
+  window.trocarSenha = async function() {
+    const nova = document.getElementById('nova-senha').value;
+    const conf = document.getElementById('confirmar-senha').value;
+    const erroEl = document.getElementById('trocar-erro');
+
+    erroEl.style.display = 'none';
+
+    if (nova.length < 8) {
+      erroEl.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova !== conf) {
+      erroEl.textContent = 'As senhas não coincidem.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova === SENHA_TEMPORARIA) {
+      erroEl.textContent = 'Escolha uma senha diferente da temporária.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      await updatePassword(usuarioAtual, nova);
+      // Marca no Firestore que a senha foi configurada
+      try {
+        const docRef = doc(db, 'usuarios', usuarioAtual.uid);
+        await setDoc(docRef, { senhaConfigurada: true, email: usuarioAtual.email }, { merge: true });
+      } catch(e) { /* silencioso */ }
+      document.getElementById('modal-login').style.display = 'none';
+      document.getElementById('tela-login').style.display = 'block';
+      document.getElementById('tela-trocar-senha').style.display = 'none';
+      document.getElementById('nova-senha').value = '';
+      document.getElementById('confirmar-senha').value = '';
+      await entrarNaAreaRestrita(usuarioAtual);
+      mostrarToastCRV('✅ Senha criada com sucesso! Bem-vindo(a)!');
+    } catch (e) {
+      erroEl.textContent = 'Erro ao salvar senha. Tente novamente.';
+      erroEl.style.display = 'block';
+    }
+  };
+
+  window.fazerLogout = async function() {
+    await signOut(auth);
+    usuarioAtual = null;
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('ativo'));
+    const inicio = document.getElementById('inicio');
+    if (inicio) inicio.classList.add('ativo');
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Início';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.toggleSenhaVis = function(id) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+  };
+
+
+  window.fecharNovidades = function() {
+    document.getElementById('modal-novidades').style.display = 'none';
+  };
+
+  // ── Funções internas ──
+  async function entrarNaAreaRestrita(user) {
+    const uid = user.uid;
+    const email = user.email;
+    const agora = new Date();
+    const agoraISO = agora.toISOString();
+
+    // Busca último acesso e novidades
+    let ultimoAcesso = null;
+    try {
+      const docRef = doc(db, 'usuarios', uid);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) ultimoAcesso = snap.data().ultimoAcesso || null;
+      // Atualiza último acesso
+      await setDoc(docRef, { ultimoAcesso: agoraISO, email }, { merge: true });
+    } catch (e) { /* silencioso */ }
+
+    // Verifica novidades
+    if (ultimoAcesso) {
+      try {
+        const novSnap = await getDocs(collection(db, 'novidades'));
+        const novas = [];
+        novSnap.forEach(d => {
+          const n = d.data();
+          if (n.data && n.data > ultimoAcesso) {
+            novas.push({ titulo: n.titulo || '', descricao: n.descricao || '', data: n.data });
+          }
+        });
+        if (novas.length > 0) {
+          novas.sort((a,b) => b.data.localeCompare(a.data));
+          const html = novas.map(n =>
+            `<div style="margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid #e5e7eb;">
+              <div style="font-weight:600;color:#1a2a4a;">${n.titulo}</div>
+              <div style="color:#4b5563;font-size:.84rem;margin-top:.2rem;">${n.descricao}</div>
+            </div>`
+          ).join('');
+          document.getElementById('novidades-conteudo').innerHTML = html;
+          document.getElementById('modal-novidades').style.display = 'flex';
+        }
+      } catch (e) { /* silencioso */ }
+    }
+
+    mostrarAreaRestrita(user);
+  }
+
+  function mostrarAreaRestrita(user) {
+    // Oculta todas as seções
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('ativo'));
+    // Mostra a restrita
+    const sec = document.getElementById('restrito');
+    if (sec) sec.classList.add('ativo');
+    // Atualiza nav
+    document.querySelectorAll('.nav-principal a').forEach(a => a.classList.remove('ativo'));
+    const navBtn = document.getElementById('nav-restrito');
+    if (navBtn) navBtn.classList.add('ativo');
+    // Atualiza breadcrumb
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Área Restrita';
+    // Info do usuário
+    const info = document.getElementById('restrito-usuario-info');
+    if (info) info.textContent = '👮 Conectado como: ' + (user.email || '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function mostrarToastCRV(msg) {
+    if (typeof showToast === 'function') showToast(msg);
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PAINEL DE RESPOSTAS — Fluxo Ingresso de Presos
+  // ══════════════════════════════════════════════════════════════════════════
+
+  const COLECAO_QUESTIONARIO = 'Respostas_Fluxo_Ingresso_Presos';
+  let todasRespostas = [];
+  let respostasFiltradas = [];
+  let painelCarregado = false;
+
+  window.abrirPainelRespostas = async function() {
+    const modal = document.getElementById('modal-painel-respostas');
+    modal.style.display = 'flex';
+    if (!painelCarregado) {
+      await carregarRespostas();
+      painelCarregado = true;
+    }
+  };
+
+  window.fecharPainelRespostas = function() {
+    document.getElementById('modal-painel-respostas').style.display = 'none';
+  };
+
+  async function carregarRespostas() {
+    try {
+      const snap = await getDocs(collection(db, COLECAO_QUESTIONARIO));
+      todasRespostas = [];
+      snap.forEach(d => todasRespostas.push({ id: d.id, ...d.data() }));
+      // Ordena por data decrescente
+      todasRespostas.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+      aplicarFiltros();
+    } catch(e) {
+      document.getElementById('loading-respostas').textContent = '❌ Erro ao carregar respostas. Verifique as permissões do Firestore.';
+      console.error(e);
+    }
+  }
+
+  window.aplicarFiltros = function() {
+    const fReg   = document.getElementById('f-regional')?.value || '';
+    const fSexo  = document.getElementById('f-sexo')?.value || '';
+    const fRec   = document.getElementById('f-recebe')?.value || '';
+    const fHor   = document.getElementById('f-horario')?.value || '';
+    const fIgp   = document.getElementById('f-igp')?.value || '';
+
+    respostasFiltradas = todasRespostas.filter(r => {
+      if (fReg  && r.regional_sr !== fReg) return false;
+      if (fSexo && !((r.sexo_presos || '').toUpperCase().includes(fSexo))) return false;
+      if (fRec) {
+        const rec = (r.recebe_presos || '').toUpperCase().trim();
+        if (fRec === 'RECEBE' && rec !== 'SIM') return false;
+        if (fRec === 'BUSCA'  && rec !== 'NÃO' && rec !== 'NAO') return false;
+      }
+      if (fHor) {
+        const hor = (r.forca_horario || '').toUpperCase();
+        if (fHor === 'QUALQUER' && !hor.includes('QUALQUER') && !hor.includes('24')) return false;
+        if (fHor === 'ACORDO' && (hor.includes('QUALQUER') || hor.includes('24'))) return false;
+      }
+      if (fIgp) {
+        const cidade = (r.ecd_cidade || '').toLowerCase();
+        const unidade = (r.unidade || '').toLowerCase();
+        // Se a cidade do IGP for a mesma/similar à da unidade → "sim"
+        const mesmaCidade = cidade.length > 2 && unidade.includes(cidade.split(' ')[0]);
+        if (fIgp === 'sim' && !mesmaCidade) return false;
+        if (fIgp === 'nao' && mesmaCidade) return false;
+      }
+      return true;
+    });
+
+    const total = todasRespostas.length;
+    const filtrado = respostasFiltradas.length;
+    const statusEl = document.getElementById('filtro-status');
+    if (statusEl) statusEl.textContent = filtrado === total
+      ? `Total: ${total} resposta(s)`
+      : `Exibindo ${filtrado} de ${total} resposta(s)`;
+
+    renderizarTabela();
+    renderizarCompilado();
+  };
+
+  window.limparFiltros = function() {
+    ['f-regional','f-sexo','f-recebe','f-horario','f-igp'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    aplicarFiltros();
+  };
+
+
+  // Tradução de códigos para texto legível
+  function traduzir(campo, val) {
+    const v = (val || '').trim();
+    const mapas = {
+      recebe_presos:      { 'SIM': 'Recebe na unidade', 'NAO': 'Vai buscar nas delegacias', 'NÃO': 'Vai buscar nas delegacias' },
+      forca_horario:      { 'QUALQUER': 'Qualquer horário (sem restrição)', 'ACORDO': 'Há acordo / restrição de horário' },
+      flagrante_transporte:{ 'PC_LEVA': 'Polícia Civil leva ao presídio', 'PP_BUSCA': 'Polícia Penal busca na Delegacia', 'VIATURA_PP': 'Polícia Penal busca na Delegacia', 'OUTRO': 'Outro' },
+      mandado_fluxo:      { 'DIRETO_UNIDADE': 'Vai direto à unidade prisional', 'PASSA_DELEGACIA': 'Passa pela delegacia antes', 'OUTRO': 'Outro' },
+    };
+    if (mapas[campo] && mapas[campo][v.toUpperCase()]) return mapas[campo][v.toUpperCase()];
+    return v || '—';
+  }
+
+  function renderizarTabela() {
+    const loading  = document.getElementById('loading-respostas');
+    const tabela   = document.getElementById('tabela-respostas');
+    const semDados = document.getElementById('sem-respostas');
+    const tbody    = document.getElementById('tbody-respostas');
+
+    loading.style.display = 'none';
+
+    if (!respostasFiltradas.length) {
+      tabela.style.display = 'none';
+      semDados.style.display = 'block';
+      return;
+    }
+
+    tabela.style.display = 'block';
+    semDados.style.display = 'none';
+
+    // Atualiza cabeçalho
+    const thead = tabela.querySelector('thead tr');
+    if (thead) thead.innerHTML = `
+      <th style="padding:.5rem .6rem;text-align:left;white-space:nowrap;background:#1a2a4a;color:#fff;">Data/Hora</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Unidade</th>
+      <th style="padding:.5rem .6rem;text-align:left;white-space:nowrap;background:#1a2a4a;color:#fff;">Regional</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Respondente</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Função</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Tipo de Unidade Prisional</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Modalidade de Recebimento</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Horário (forças)</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">IGP — Sede</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">IGP — Plantão</th>
+      <th style="padding:.5rem .6rem;text-align:center;background:#1a2a4a;color:#fff;">Detalhes</th>
+    `;
+
+    const linhas = respostasFiltradas.map((r, i) => {
+      const cor = i % 2 === 0 ? '#fff' : '#f9fafb';
+      const horario = (r.forca_horario||'') === 'QUALQUER'
+        ? '<span style="color:#15803d;font-weight:600;">Qualquer horário</span>'
+        : '<span style="color:#b45309;font-weight:600;">Com acordo</span>';
+      const modalidade = traduzir('recebe_presos', r.recebe_presos);
+      const igpSede = r.ecd_cidade ? `${r.ecd_cidade} (${r.ecd_distancia||'?'})` : '—';
+      const igpPlantao = r.plantao_mun ? `${r.plantao_mun} (${r.plantao_dist||'?'})` : '—';
+      return `<tr style="background:${cor};">
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.data_br||'—'}<br><span style="color:#9ca3af;font-size:.72rem;">${r.hora_br||''}</span></td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;font-weight:600;min-width:160px;">${r.unidade||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.regional_sr||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${r.resp_nome||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.resp_funcao||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${r.sexo_presos||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${modalidade}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${horario}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${igpSede}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${igpPlantao}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;text-align:center;">
+          <button onclick="verDetalhe('${r.id}')" style="padding:3px 10px;background:#1a2a4a;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Ver</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    tbody.innerHTML = linhas;
+  }
+
+  window.verDetalhe = function(id) {
+    const r = todasRespostas.find(x => x.id === id);
+    if (!r) return;
+    const linha = (label, val) => val
+      ? `<div style="display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid #f3f4f6;"><span style="font-weight:600;color:#374151;min-width:190px;flex-shrink:0;">${label}</span><span style="color:#1f2937;">${val}</span></div>`
+      : '';
+    document.getElementById('detalhe-corpo').innerHTML = `
+      <div style="background:#f0f4ff;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;">
+        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">${r.unidade||'—'}</div>
+        <div style="font-size:.78rem;color:#6b7280;">${r.regional_nome||''} · ${r.data_br||''} às ${r.hora_br||''}</div>
+      </div>
+      ${linha('Respondente', r.resp_nome)}
+      ${linha('Função', r.resp_funcao)}
+      ${linha('Tipo de Unidade Prisional', r.sexo_presos)}
+      ${linha('Modalidade de Recebimento', traduzir('recebe_presos', r.recebe_presos))}
+      ${linha('Horário (forças de segurança)', traduzir('forca_horario', r.forca_horario))}
+      ${r.forca_acordo_desc ? linha('Descrição do acordo', r.forca_acordo_desc) : ''}
+      ${linha('Flagrante — transporte', traduzir('flagrante_transporte', r.flagrante_transporte))}
+      ${r.flagrante_outro ? linha('Flagrante — outro (desc.)', r.flagrante_outro) : ''}
+      ${linha('Mandado de Prisão — fluxo', traduzir('mandado_fluxo', r.mandado_fluxo))}
+      ${r.mandado_outro ? linha('Mandado — outro (desc.)', r.mandado_outro) : ''}
+      <div style="margin:.8rem 0 .3rem;font-weight:700;color:#1a2a4a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Exame de Corpo de Delito</div>
+      ${linha('IGP — Sede (cidade)', r.ecd_cidade)}
+      ${linha('IGP — Sede (distância)', r.ecd_distancia)}
+      ${linha('IGP — Plantão (município)', r.plantao_mun)}
+      ${linha('IGP — Plantão (distância)', r.plantao_dist)}
+    `;
+    document.getElementById('modal-detalhe-resp').style.display = 'flex';
+  };
+
+  function renderizarCompilado() {
+    const el = document.getElementById('compilado-content');
+    if (!el) return;
+    const r = respostasFiltradas;
+    const total = r.length;
+    if (!total) { el.innerHTML = '<p style="color:#6b7280;text-align:center;padding:2rem;">Nenhum dado para compilar com os filtros selecionados.</p>'; return; }
+
+    function contar(arr, fn) { return arr.filter(fn).length; }
+    function listar(arr, fn)  { return arr.filter(fn).map(x => x.unidade || '—'); }
+
+    function barraHTML(items, tot) {
+      return items.map(({label, n, uns}) => {
+        const pct = tot ? Math.round((n/tot)*100) : 0;
+        const uid = 'dr_' + Math.random().toString(36).slice(2,9);
+        const liHtml = uns && uns.length
+          ? uns.map(u => `<li>${u}</li>`).join('')
+          : '<li style="color:#9ca3af;font-style:italic;">Nenhuma unidade</li>';
+        return `<div style="margin-bottom:.85rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:3px;cursor:pointer;user-select:none;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';"
+               title="Clique para ver as unidades">
+            <span style="color:#374151;">${label}</span>
+            <span style="font-weight:700;color:#1a2a4a;">${n} <span style="font-weight:400;color:#9ca3af;">(${pct}%)</span> <span style="font-size:.65rem;color:#9ca3af;">▼</span></span>
+          </div>
+          <div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;cursor:pointer;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';">
+            <div style="background:#1a2a4a;height:100%;width:${pct}%;border-radius:99px;transition:width .4s;"></div>
+          </div>
+          <div id="${uid}" style="display:none;margin-top:.5rem;background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:.6rem 1rem .6rem 1.2rem;">
+            <div style="font-size:.68rem;font-weight:700;color:#4a6494;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;">Unidades que selecionaram esta opção (${n}):</div>
+            <ul style="list-style:disc;padding-left:1rem;font-size:.78rem;line-height:1.9;color:#1f2937;">${liHtml}</ul>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function card(titulo, corpo) {
+      return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;">
+        <div style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem;">${titulo}</div>
+        ${corpo}
+      </div>`;
+    }
+
+    // Por Regional
+    const regionais = [...new Set(r.map(x => x.regional_sr))].sort();
+    const porRegional = regionais.map(sr => ({
+      label: `${sr} – ${r.find(x=>x.regional_sr===sr)?.regional_nome||sr}`,
+      n: contar(r, x => x.regional_sr===sr),
+      uns: listar(r, x => x.regional_sr===sr)
+    }));
+
+    // Tipo de Unidade (sexo_presos) — questionário salva o .label: 'Masculino','Feminino','Ambos'
+    const tipoUnidade = [
+      { label: 'Masculino', n: contar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')), uns: listar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')) },
+      { label: 'Feminino',  n: contar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')),   uns: listar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')) },
+      { label: 'Misto / Ambos', n: contar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')), uns: listar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')) },
+    ];
+
+    // Modalidade — campo salva 'SIM' ou 'NÃO'
+    const modalidade = [
+      { label: 'Recebe na unidade (porta de entrada)', n: contar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM'),               uns: listar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM') },
+      { label: 'Não recebe / encaminha para outra UP', n: contar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())), uns: listar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())) },
+    ];
+
+    // Horário forças de segurança
+    const horario = [
+      { label: 'Qualquer horário (sem restrição)', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER'), uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER') },
+      { label: 'Há acordo / restrição de horário', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO'),   uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO') },
+    ];
+
+    // Flagrante — transporte (questionário salva PP_BUSCA, versões antigas salvavam VIATURA_PP)
+    const flagrante = [
+      { label: 'Polícia Civil leva ao presídio',   n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA'),                                                                    uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA') },
+      { label: 'Polícia Penal busca na Delegacia', n: contar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())),                                             uns: listar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())) },
+      { label: 'Outro',                            n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO'),                                                                       uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO') },
+    ];
+
+    // Mandado de Prisão
+    const mandado = [
+      { label: 'Vai direto à unidade prisional', n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE'),  uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE') },
+      { label: 'Passa pela delegacia antes',     n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA'), uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA') },
+      { label: 'Outro',                          n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO'),           uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO') },
+    ];
+
+    // IGP Sede — mesma cidade ou outra
+    const igpSedeFn  = x => { const c=(x.ecd_cidade||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
+    const igpSede = [
+      { label: 'IGP na própria cidade da unidade', n: contar(r, igpSedeFn),  uns: listar(r, igpSedeFn) },
+      { label: 'IGP em outra cidade',              n: contar(r, x=>!igpSedeFn(x)), uns: listar(r, x=>!igpSedeFn(x)) },
+    ];
+
+    // IGP Plantão — mesma cidade ou outra
+    const igpPlantaoFn = x => { const c=(x.plantao_mun||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
+    const igpPlantao = [
+      { label: 'IGP de plantão na própria cidade', n: contar(r, igpPlantaoFn),  uns: listar(r, igpPlantaoFn) },
+      { label: 'IGP de plantão em outra cidade',   n: contar(r, x=>!igpPlantaoFn(x)), uns: listar(r, x=>!igpPlantaoFn(x)) },
+    ];
+
+    el.innerHTML =
+      `<div style="background:#1a2a4a;color:#fff;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;">📊</div>
+        <div><div style="font-size:1.5rem;font-weight:700;">${total}</div><div style="font-size:.8rem;opacity:.8;">resposta(s) no filtro atual</div></div>
+      </div>` +
+      card('Por Regional', barraHTML(porRegional, total)) +
+      card('Tipo de Unidade Prisional', barraHTML(tipoUnidade, total)) +
+      card('Modalidade de Recebimento', barraHTML(modalidade, total)) +
+      card('Horário de Recebimento (forças de segurança)', barraHTML(horario, total)) +
+      card('Flagrante Delito — Como os presos chegam à unidade', barraHTML(flagrante, total)) +
+      card('Cumprimento de Mandado de Prisão — Fluxo', barraHTML(mandado, total)) +
+      card('Sede do IGP — Exame de Corpo de Delito (dias úteis)', barraHTML(igpSede, total)) +
+      card('Sede do IGP — Plantão (noturno / fins de semana / feriados)', barraHTML(igpPlantao, total));
+  }
+
+  window.mudarAba = function(aba) {
+    const isIndividual = aba === 'individual';
+    document.getElementById('painel-individual').style.display = isIndividual ? 'block' : 'none';
+    document.getElementById('painel-compilado').style.display = isIndividual ? 'none' : 'block';
+    document.getElementById('aba-individual').style.borderBottomColor = isIndividual ? '#1a2a4a' : 'transparent';
+    document.getElementById('aba-individual').style.color = isIndividual ? '#1a2a4a' : '#6b7280';
+    document.getElementById('aba-individual').style.fontWeight = isIndividual ? '700' : '500';
+    document.getElementById('aba-compilado').style.borderBottomColor = isIndividual ? 'transparent' : '#1a2a4a';
+    document.getElementById('aba-compilado').style.color = isIndividual ? '#6b7280' : '#1a2a4a';
+    document.getElementById('aba-compilado').style.fontWeight = isIndividual ? '500' : '700';
+    if (!isIndividual) renderizarCompilado();
+  };
+
+  window.exportarCSV = function() {
+    if (!respostasFiltradas.length) { alert('Nenhum dado para exportar.'); return; }
+    const cabecalho = ['Data','Hora','Unidade','Regional SR','Regional Nome','Respondente','Função','Público (sexo_presos)','Recebe Presos','Encam. Masculino','Encam. Feminino','Horário Forças','Acordo Desc','Transporte Flagrante','Flagrante Outro','Cidade IGP','Distância IGP','Município Plantão','Dist Plantão','Mandado Fluxo','Mandado Outro'];
+    const esc = v => '"' + String(v||'').replace(/"/g,'""') + '"';
+    const linhas = respostasFiltradas.map(r => [
+      r.data_br, r.hora_br, r.unidade, r.regional_sr, r.regional_nome,
+      r.resp_nome, r.resp_funcao, r.sexo_presos, r.recebe_presos,
+      r.encaminhamento_masculino, r.encaminhamento_feminino,
+      r.forca_horario, r.forca_acordo_desc,
+      r.flagrante_transporte, r.flagrante_outro,
+      r.ecd_cidade, r.ecd_distancia,
+      r.plantao_mun, r.plantao_dist, r.mandado_fluxo, r.mandado_outro
+    ].map(esc).join(','));
+    const csv = [cabecalho.map(esc).join(','), ...linhas].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fluxo_ingresso_presos_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Monitora estado de autenticação (para persistir sessão)
+  onAuthStateChanged(auth, user => {
+    if (user && EMAILS_AUTORIZADOS.includes(user.email)) {
+      usuarioAtual = user;
+    } else {
+      usuarioAtual = null;
+    }
+  });
+</script>
+</body></html>';
     var blob = new Blob(['\ufeff' + doc], {type: 'application/msword'});
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -3670,5 +4864,602 @@ window.abrirEscalaPlantao = function() {
 
 </script>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
+    authDomain: "crv-dpp-sc.firebaseapp.com",
+    projectId: "crv-dpp-sc",
+    storageBucket: "crv-dpp-sc.firebasestorage.app",
+    messagingSenderId: "707080008192",
+    appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // E-mails autorizados
+  const EMAILS_AUTORIZADOS = [
+    'rodrigo.l.pastore@gmail.com',
+    'ivana.schafer@gmail.com',
+    'brunawlongen@gmail.com',
+    'ricardobritomarques12@gmail.com',
+    'abeljuliana2012@gmail.com',
+    'jessicaveiga9@gmail.com',
+    'day.sestren88@gmail.com'
+  ];
+
+  const SENHA_TEMPORARIA = 'CRV@2026temp';
+
+  let usuarioAtual = null;
+
+  // ── Expõe funções para o escopo global ──
+  window.abrirAreaRestrita = function() {
+    if (usuarioAtual) {
+      mostrarAreaRestrita(usuarioAtual);
+    } else {
+      document.getElementById('modal-login').style.display = 'flex';
+      document.getElementById('login-email').focus();
+    }
+  };
+
+  window.fecharModalLogin = function() {
+    document.getElementById('modal-login').style.display = 'none';
+    document.getElementById('login-erro').style.display = 'none';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
+  };
+
+  window.fazerLogin = async function() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const senha = document.getElementById('login-senha').value;
+    const erroEl = document.getElementById('login-erro');
+    const btn = document.getElementById('btn-entrar');
+
+    erroEl.style.display = 'none';
+
+    if (!email || !senha) {
+      erroEl.textContent = 'Preencha o e-mail e a senha.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    if (!EMAILS_AUTORIZADOS.includes(email)) {
+      erroEl.textContent = 'Este e-mail não tem autorização de acesso.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, senha);
+      usuarioAtual = cred.user;
+
+      // Verifica no Firestore se já configurou senha própria
+      let primeiroAcesso = false;
+      try {
+        const docRef = doc(db, 'usuarios', cred.user.uid);
+        const snap = await getDoc(docRef);
+        // Se não existe documento ou senhaConfigurada = false → primeiro acesso
+        if (!snap.exists() || snap.data().senhaConfigurada !== true) {
+          primeiroAcesso = true;
+        }
+      } catch (e) {
+        // Se não conseguir ler o Firestore, verifica pela senha temporária
+        if (senha === SENHA_TEMPORARIA) primeiroAcesso = true;
+      }
+
+      if (primeiroAcesso) {
+        document.getElementById('tela-login').style.display = 'none';
+        document.getElementById('tela-trocar-senha').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('modal-login').style.display = 'none';
+      await entrarNaAreaRestrita(cred.user);
+
+    } catch (e) {
+      let msg = 'Erro: ' + e.code + ' — ' + e.message;
+      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') msg = 'E-mail ou senha incorretos. Verifique os dados e tente novamente.';
+      if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos.';
+      if (e.code === 'auth/network-request-failed') msg = 'Erro de conexão. Verifique sua internet.';
+      if (e.code === 'auth/invalid-api-key') msg = 'Erro de configuração do sistema. Contate o administrador.';
+      if (e.code === 'auth/unauthorized-domain') msg = 'Domínio não autorizado. Contate o administrador.';
+      erroEl.textContent = msg;
+      erroEl.style.display = 'block';
+    } finally {
+      btn.textContent = 'Entrar';
+      btn.disabled = false;
+    }
+  };
+
+  window.trocarSenha = async function() {
+    const nova = document.getElementById('nova-senha').value;
+    const conf = document.getElementById('confirmar-senha').value;
+    const erroEl = document.getElementById('trocar-erro');
+
+    erroEl.style.display = 'none';
+
+    if (nova.length < 8) {
+      erroEl.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova !== conf) {
+      erroEl.textContent = 'As senhas não coincidem.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (nova === SENHA_TEMPORARIA) {
+      erroEl.textContent = 'Escolha uma senha diferente da temporária.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      await updatePassword(usuarioAtual, nova);
+      // Marca no Firestore que a senha foi configurada
+      try {
+        const docRef = doc(db, 'usuarios', usuarioAtual.uid);
+        await setDoc(docRef, { senhaConfigurada: true, email: usuarioAtual.email }, { merge: true });
+      } catch(e) { /* silencioso */ }
+      document.getElementById('modal-login').style.display = 'none';
+      document.getElementById('tela-login').style.display = 'block';
+      document.getElementById('tela-trocar-senha').style.display = 'none';
+      document.getElementById('nova-senha').value = '';
+      document.getElementById('confirmar-senha').value = '';
+      await entrarNaAreaRestrita(usuarioAtual);
+      mostrarToastCRV('✅ Senha criada com sucesso! Bem-vindo(a)!');
+    } catch (e) {
+      erroEl.textContent = 'Erro ao salvar senha. Tente novamente.';
+      erroEl.style.display = 'block';
+    }
+  };
+
+  window.fazerLogout = async function() {
+    await signOut(auth);
+    usuarioAtual = null;
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('ativo'));
+    const inicio = document.getElementById('inicio');
+    if (inicio) inicio.classList.add('ativo');
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Início';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.toggleSenhaVis = function(id) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+  };
+
+
+  window.fecharNovidades = function() {
+    document.getElementById('modal-novidades').style.display = 'none';
+  };
+
+  // ── Funções internas ──
+  async function entrarNaAreaRestrita(user) {
+    const uid = user.uid;
+    const email = user.email;
+    const agora = new Date();
+    const agoraISO = agora.toISOString();
+
+    // Busca último acesso e novidades
+    let ultimoAcesso = null;
+    try {
+      const docRef = doc(db, 'usuarios', uid);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) ultimoAcesso = snap.data().ultimoAcesso || null;
+      // Atualiza último acesso
+      await setDoc(docRef, { ultimoAcesso: agoraISO, email }, { merge: true });
+    } catch (e) { /* silencioso */ }
+
+    // Verifica novidades
+    if (ultimoAcesso) {
+      try {
+        const novSnap = await getDocs(collection(db, 'novidades'));
+        const novas = [];
+        novSnap.forEach(d => {
+          const n = d.data();
+          if (n.data && n.data > ultimoAcesso) {
+            novas.push({ titulo: n.titulo || '', descricao: n.descricao || '', data: n.data });
+          }
+        });
+        if (novas.length > 0) {
+          novas.sort((a,b) => b.data.localeCompare(a.data));
+          const html = novas.map(n =>
+            `<div style="margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid #e5e7eb;">
+              <div style="font-weight:600;color:#1a2a4a;">${n.titulo}</div>
+              <div style="color:#4b5563;font-size:.84rem;margin-top:.2rem;">${n.descricao}</div>
+            </div>`
+          ).join('');
+          document.getElementById('novidades-conteudo').innerHTML = html;
+          document.getElementById('modal-novidades').style.display = 'flex';
+        }
+      } catch (e) { /* silencioso */ }
+    }
+
+    mostrarAreaRestrita(user);
+  }
+
+  function mostrarAreaRestrita(user) {
+    // Oculta todas as seções
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('ativo'));
+    // Mostra a restrita
+    const sec = document.getElementById('restrito');
+    if (sec) sec.classList.add('ativo');
+    // Atualiza nav
+    document.querySelectorAll('.nav-principal a').forEach(a => a.classList.remove('ativo'));
+    const navBtn = document.getElementById('nav-restrito');
+    if (navBtn) navBtn.classList.add('ativo');
+    // Atualiza breadcrumb
+    const bc = document.getElementById('breadcrumbAtual');
+    if (bc) bc.textContent = 'Área Restrita';
+    // Info do usuário
+    const info = document.getElementById('restrito-usuario-info');
+    if (info) info.textContent = '👮 Conectado como: ' + (user.email || '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function mostrarToastCRV(msg) {
+    if (typeof showToast === 'function') showToast(msg);
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PAINEL DE RESPOSTAS — Fluxo Ingresso de Presos
+  // ══════════════════════════════════════════════════════════════════════════
+
+  const COLECAO_QUESTIONARIO = 'Respostas_Fluxo_Ingresso_Presos';
+  let todasRespostas = [];
+  let respostasFiltradas = [];
+  let painelCarregado = false;
+
+  window.abrirPainelRespostas = async function() {
+    const modal = document.getElementById('modal-painel-respostas');
+    modal.style.display = 'flex';
+    if (!painelCarregado) {
+      await carregarRespostas();
+      painelCarregado = true;
+    }
+  };
+
+  window.fecharPainelRespostas = function() {
+    document.getElementById('modal-painel-respostas').style.display = 'none';
+  };
+
+  async function carregarRespostas() {
+    try {
+      const snap = await getDocs(collection(db, COLECAO_QUESTIONARIO));
+      todasRespostas = [];
+      snap.forEach(d => todasRespostas.push({ id: d.id, ...d.data() }));
+      // Ordena por data decrescente
+      todasRespostas.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+      aplicarFiltros();
+    } catch(e) {
+      document.getElementById('loading-respostas').textContent = '❌ Erro ao carregar respostas. Verifique as permissões do Firestore.';
+      console.error(e);
+    }
+  }
+
+  window.aplicarFiltros = function() {
+    const fReg   = document.getElementById('f-regional')?.value || '';
+    const fSexo  = document.getElementById('f-sexo')?.value || '';
+    const fRec   = document.getElementById('f-recebe')?.value || '';
+    const fHor   = document.getElementById('f-horario')?.value || '';
+    const fIgp   = document.getElementById('f-igp')?.value || '';
+
+    respostasFiltradas = todasRespostas.filter(r => {
+      if (fReg  && r.regional_sr !== fReg) return false;
+      if (fSexo && !((r.sexo_presos || '').toUpperCase().includes(fSexo))) return false;
+      if (fRec) {
+        const rec = (r.recebe_presos || '').toUpperCase().trim();
+        if (fRec === 'RECEBE' && rec !== 'SIM') return false;
+        if (fRec === 'BUSCA'  && rec !== 'NÃO' && rec !== 'NAO') return false;
+      }
+      if (fHor) {
+        const hor = (r.forca_horario || '').toUpperCase();
+        if (fHor === 'QUALQUER' && !hor.includes('QUALQUER') && !hor.includes('24')) return false;
+        if (fHor === 'ACORDO' && (hor.includes('QUALQUER') || hor.includes('24'))) return false;
+      }
+      if (fIgp) {
+        const cidade = (r.ecd_cidade || '').toLowerCase();
+        const unidade = (r.unidade || '').toLowerCase();
+        // Se a cidade do IGP for a mesma/similar à da unidade → "sim"
+        const mesmaCidade = cidade.length > 2 && unidade.includes(cidade.split(' ')[0]);
+        if (fIgp === 'sim' && !mesmaCidade) return false;
+        if (fIgp === 'nao' && mesmaCidade) return false;
+      }
+      return true;
+    });
+
+    const total = todasRespostas.length;
+    const filtrado = respostasFiltradas.length;
+    const statusEl = document.getElementById('filtro-status');
+    if (statusEl) statusEl.textContent = filtrado === total
+      ? `Total: ${total} resposta(s)`
+      : `Exibindo ${filtrado} de ${total} resposta(s)`;
+
+    renderizarTabela();
+    renderizarCompilado();
+  };
+
+  window.limparFiltros = function() {
+    ['f-regional','f-sexo','f-recebe','f-horario','f-igp'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    aplicarFiltros();
+  };
+
+
+  // Tradução de códigos para texto legível
+  function traduzir(campo, val) {
+    const v = (val || '').trim();
+    const mapas = {
+      recebe_presos:      { 'SIM': 'Recebe na unidade', 'NAO': 'Vai buscar nas delegacias', 'NÃO': 'Vai buscar nas delegacias' },
+      forca_horario:      { 'QUALQUER': 'Qualquer horário (sem restrição)', 'ACORDO': 'Há acordo / restrição de horário' },
+      flagrante_transporte:{ 'PC_LEVA': 'Polícia Civil leva ao presídio', 'PP_BUSCA': 'Polícia Penal busca na Delegacia', 'VIATURA_PP': 'Polícia Penal busca na Delegacia', 'OUTRO': 'Outro' },
+      mandado_fluxo:      { 'DIRETO_UNIDADE': 'Vai direto à unidade prisional', 'PASSA_DELEGACIA': 'Passa pela delegacia antes', 'OUTRO': 'Outro' },
+    };
+    if (mapas[campo] && mapas[campo][v.toUpperCase()]) return mapas[campo][v.toUpperCase()];
+    return v || '—';
+  }
+
+  function renderizarTabela() {
+    const loading  = document.getElementById('loading-respostas');
+    const tabela   = document.getElementById('tabela-respostas');
+    const semDados = document.getElementById('sem-respostas');
+    const tbody    = document.getElementById('tbody-respostas');
+
+    loading.style.display = 'none';
+
+    if (!respostasFiltradas.length) {
+      tabela.style.display = 'none';
+      semDados.style.display = 'block';
+      return;
+    }
+
+    tabela.style.display = 'block';
+    semDados.style.display = 'none';
+
+    // Atualiza cabeçalho
+    const thead = tabela.querySelector('thead tr');
+    if (thead) thead.innerHTML = `
+      <th style="padding:.5rem .6rem;text-align:left;white-space:nowrap;background:#1a2a4a;color:#fff;">Data/Hora</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Unidade</th>
+      <th style="padding:.5rem .6rem;text-align:left;white-space:nowrap;background:#1a2a4a;color:#fff;">Regional</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Respondente</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Função</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Tipo de Unidade Prisional</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Modalidade de Recebimento</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">Horário (forças)</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">IGP — Sede</th>
+      <th style="padding:.5rem .6rem;text-align:left;background:#1a2a4a;color:#fff;">IGP — Plantão</th>
+      <th style="padding:.5rem .6rem;text-align:center;background:#1a2a4a;color:#fff;">Detalhes</th>
+    `;
+
+    const linhas = respostasFiltradas.map((r, i) => {
+      const cor = i % 2 === 0 ? '#fff' : '#f9fafb';
+      const horario = (r.forca_horario||'') === 'QUALQUER'
+        ? '<span style="color:#15803d;font-weight:600;">Qualquer horário</span>'
+        : '<span style="color:#b45309;font-weight:600;">Com acordo</span>';
+      const modalidade = traduzir('recebe_presos', r.recebe_presos);
+      const igpSede = r.ecd_cidade ? `${r.ecd_cidade} (${r.ecd_distancia||'?'})` : '—';
+      const igpPlantao = r.plantao_mun ? `${r.plantao_mun} (${r.plantao_dist||'?'})` : '—';
+      return `<tr style="background:${cor};">
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.data_br||'—'}<br><span style="color:#9ca3af;font-size:.72rem;">${r.hora_br||''}</span></td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;font-weight:600;min-width:160px;">${r.unidade||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.regional_sr||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${r.resp_nome||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;white-space:nowrap;">${r.resp_funcao||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${r.sexo_presos||'—'}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${modalidade}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${horario}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${igpSede}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;">${igpPlantao}</td>
+        <td style="padding:.45rem .6rem;border:1px solid #e5e7eb;text-align:center;">
+          <button onclick="verDetalhe('${r.id}')" style="padding:3px 10px;background:#1a2a4a;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Ver</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    tbody.innerHTML = linhas;
+  }
+
+  window.verDetalhe = function(id) {
+    const r = todasRespostas.find(x => x.id === id);
+    if (!r) return;
+    const linha = (label, val) => val
+      ? `<div style="display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid #f3f4f6;"><span style="font-weight:600;color:#374151;min-width:190px;flex-shrink:0;">${label}</span><span style="color:#1f2937;">${val}</span></div>`
+      : '';
+    document.getElementById('detalhe-corpo').innerHTML = `
+      <div style="background:#f0f4ff;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;">
+        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">${r.unidade||'—'}</div>
+        <div style="font-size:.78rem;color:#6b7280;">${r.regional_nome||''} · ${r.data_br||''} às ${r.hora_br||''}</div>
+      </div>
+      ${linha('Respondente', r.resp_nome)}
+      ${linha('Função', r.resp_funcao)}
+      ${linha('Tipo de Unidade Prisional', r.sexo_presos)}
+      ${linha('Modalidade de Recebimento', traduzir('recebe_presos', r.recebe_presos))}
+      ${linha('Horário (forças de segurança)', traduzir('forca_horario', r.forca_horario))}
+      ${r.forca_acordo_desc ? linha('Descrição do acordo', r.forca_acordo_desc) : ''}
+      ${linha('Flagrante — transporte', traduzir('flagrante_transporte', r.flagrante_transporte))}
+      ${r.flagrante_outro ? linha('Flagrante — outro (desc.)', r.flagrante_outro) : ''}
+      ${linha('Mandado de Prisão — fluxo', traduzir('mandado_fluxo', r.mandado_fluxo))}
+      ${r.mandado_outro ? linha('Mandado — outro (desc.)', r.mandado_outro) : ''}
+      <div style="margin:.8rem 0 .3rem;font-weight:700;color:#1a2a4a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Exame de Corpo de Delito</div>
+      ${linha('IGP — Sede (cidade)', r.ecd_cidade)}
+      ${linha('IGP — Sede (distância)', r.ecd_distancia)}
+      ${linha('IGP — Plantão (município)', r.plantao_mun)}
+      ${linha('IGP — Plantão (distância)', r.plantao_dist)}
+    `;
+    document.getElementById('modal-detalhe-resp').style.display = 'flex';
+  };
+
+  function renderizarCompilado() {
+    const el = document.getElementById('compilado-content');
+    if (!el) return;
+    const r = respostasFiltradas;
+    const total = r.length;
+    if (!total) { el.innerHTML = '<p style="color:#6b7280;text-align:center;padding:2rem;">Nenhum dado para compilar com os filtros selecionados.</p>'; return; }
+
+    function contar(arr, fn) { return arr.filter(fn).length; }
+    function listar(arr, fn)  { return arr.filter(fn).map(x => x.unidade || '—'); }
+
+    function barraHTML(items, tot) {
+      return items.map(({label, n, uns}) => {
+        const pct = tot ? Math.round((n/tot)*100) : 0;
+        const uid = 'dr_' + Math.random().toString(36).slice(2,9);
+        const liHtml = uns && uns.length
+          ? uns.map(u => `<li>${u}</li>`).join('')
+          : '<li style="color:#9ca3af;font-style:italic;">Nenhuma unidade</li>';
+        return `<div style="margin-bottom:.85rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:3px;cursor:pointer;user-select:none;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';"
+               title="Clique para ver as unidades">
+            <span style="color:#374151;">${label}</span>
+            <span style="font-weight:700;color:#1a2a4a;">${n} <span style="font-weight:400;color:#9ca3af;">(${pct}%)</span> <span style="font-size:.65rem;color:#9ca3af;">▼</span></span>
+          </div>
+          <div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;cursor:pointer;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';">
+            <div style="background:#1a2a4a;height:100%;width:${pct}%;border-radius:99px;transition:width .4s;"></div>
+          </div>
+          <div id="${uid}" style="display:none;margin-top:.5rem;background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:.6rem 1rem .6rem 1.2rem;">
+            <div style="font-size:.68rem;font-weight:700;color:#4a6494;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;">Unidades que selecionaram esta opção (${n}):</div>
+            <ul style="list-style:disc;padding-left:1rem;font-size:.78rem;line-height:1.9;color:#1f2937;">${liHtml}</ul>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function card(titulo, corpo) {
+      return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;">
+        <div style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem;">${titulo}</div>
+        ${corpo}
+      </div>`;
+    }
+
+    // Por Regional
+    const regionais = [...new Set(r.map(x => x.regional_sr))].sort();
+    const porRegional = regionais.map(sr => ({
+      label: `${sr} – ${r.find(x=>x.regional_sr===sr)?.regional_nome||sr}`,
+      n: contar(r, x => x.regional_sr===sr),
+      uns: listar(r, x => x.regional_sr===sr)
+    }));
+
+    // Tipo de Unidade (sexo_presos) — questionário salva o .label: 'Masculino','Feminino','Ambos'
+    const tipoUnidade = [
+      { label: 'Masculino', n: contar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')), uns: listar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')) },
+      { label: 'Feminino',  n: contar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')),   uns: listar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')) },
+      { label: 'Misto / Ambos', n: contar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')), uns: listar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')) },
+    ];
+
+    // Modalidade — campo salva 'SIM' ou 'NÃO'
+    const modalidade = [
+      { label: 'Recebe na unidade (porta de entrada)', n: contar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM'),               uns: listar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM') },
+      { label: 'Não recebe / encaminha para outra UP', n: contar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())), uns: listar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())) },
+    ];
+
+    // Horário forças de segurança
+    const horario = [
+      { label: 'Qualquer horário (sem restrição)', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER'), uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER') },
+      { label: 'Há acordo / restrição de horário', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO'),   uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO') },
+    ];
+
+    // Flagrante — transporte (questionário salva PP_BUSCA, versões antigas salvavam VIATURA_PP)
+    const flagrante = [
+      { label: 'Polícia Civil leva ao presídio',   n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA'),                                                                    uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA') },
+      { label: 'Polícia Penal busca na Delegacia', n: contar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())),                                             uns: listar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())) },
+      { label: 'Outro',                            n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO'),                                                                       uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO') },
+    ];
+
+    // Mandado de Prisão
+    const mandado = [
+      { label: 'Vai direto à unidade prisional', n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE'),  uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE') },
+      { label: 'Passa pela delegacia antes',     n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA'), uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA') },
+      { label: 'Outro',                          n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO'),           uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO') },
+    ];
+
+    // IGP Sede — mesma cidade ou outra
+    const igpSedeFn  = x => { const c=(x.ecd_cidade||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
+    const igpSede = [
+      { label: 'IGP na própria cidade da unidade', n: contar(r, igpSedeFn),  uns: listar(r, igpSedeFn) },
+      { label: 'IGP em outra cidade',              n: contar(r, x=>!igpSedeFn(x)), uns: listar(r, x=>!igpSedeFn(x)) },
+    ];
+
+    // IGP Plantão — mesma cidade ou outra
+    const igpPlantaoFn = x => { const c=(x.plantao_mun||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
+    const igpPlantao = [
+      { label: 'IGP de plantão na própria cidade', n: contar(r, igpPlantaoFn),  uns: listar(r, igpPlantaoFn) },
+      { label: 'IGP de plantão em outra cidade',   n: contar(r, x=>!igpPlantaoFn(x)), uns: listar(r, x=>!igpPlantaoFn(x)) },
+    ];
+
+    el.innerHTML =
+      `<div style="background:#1a2a4a;color:#fff;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;">📊</div>
+        <div><div style="font-size:1.5rem;font-weight:700;">${total}</div><div style="font-size:.8rem;opacity:.8;">resposta(s) no filtro atual</div></div>
+      </div>` +
+      card('Por Regional', barraHTML(porRegional, total)) +
+      card('Tipo de Unidade Prisional', barraHTML(tipoUnidade, total)) +
+      card('Modalidade de Recebimento', barraHTML(modalidade, total)) +
+      card('Horário de Recebimento (forças de segurança)', barraHTML(horario, total)) +
+      card('Flagrante Delito — Como os presos chegam à unidade', barraHTML(flagrante, total)) +
+      card('Cumprimento de Mandado de Prisão — Fluxo', barraHTML(mandado, total)) +
+      card('Sede do IGP — Exame de Corpo de Delito (dias úteis)', barraHTML(igpSede, total)) +
+      card('Sede do IGP — Plantão (noturno / fins de semana / feriados)', barraHTML(igpPlantao, total));
+  }
+
+  window.mudarAba = function(aba) {
+    const isIndividual = aba === 'individual';
+    document.getElementById('painel-individual').style.display = isIndividual ? 'block' : 'none';
+    document.getElementById('painel-compilado').style.display = isIndividual ? 'none' : 'block';
+    document.getElementById('aba-individual').style.borderBottomColor = isIndividual ? '#1a2a4a' : 'transparent';
+    document.getElementById('aba-individual').style.color = isIndividual ? '#1a2a4a' : '#6b7280';
+    document.getElementById('aba-individual').style.fontWeight = isIndividual ? '700' : '500';
+    document.getElementById('aba-compilado').style.borderBottomColor = isIndividual ? 'transparent' : '#1a2a4a';
+    document.getElementById('aba-compilado').style.color = isIndividual ? '#6b7280' : '#1a2a4a';
+    document.getElementById('aba-compilado').style.fontWeight = isIndividual ? '500' : '700';
+    if (!isIndividual) renderizarCompilado();
+  };
+
+  window.exportarCSV = function() {
+    if (!respostasFiltradas.length) { alert('Nenhum dado para exportar.'); return; }
+    const cabecalho = ['Data','Hora','Unidade','Regional SR','Regional Nome','Respondente','Função','Público (sexo_presos)','Recebe Presos','Encam. Masculino','Encam. Feminino','Horário Forças','Acordo Desc','Transporte Flagrante','Flagrante Outro','Cidade IGP','Distância IGP','Município Plantão','Dist Plantão','Mandado Fluxo','Mandado Outro'];
+    const esc = v => '"' + String(v||'').replace(/"/g,'""') + '"';
+    const linhas = respostasFiltradas.map(r => [
+      r.data_br, r.hora_br, r.unidade, r.regional_sr, r.regional_nome,
+      r.resp_nome, r.resp_funcao, r.sexo_presos, r.recebe_presos,
+      r.encaminhamento_masculino, r.encaminhamento_feminino,
+      r.forca_horario, r.forca_acordo_desc,
+      r.flagrante_transporte, r.flagrante_outro,
+      r.ecd_cidade, r.ecd_distancia,
+      r.plantao_mun, r.plantao_dist, r.mandado_fluxo, r.mandado_outro
+    ].map(esc).join(','));
+    const csv = [cabecalho.map(esc).join(','), ...linhas].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fluxo_ingresso_presos_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Monitora estado de autenticação (para persistir sessão)
+  onAuthStateChanged(auth, user => {
+    if (user && EMAILS_AUTORIZADOS.includes(user.email)) {
+      usuarioAtual = user;
+    } else {
+      usuarioAtual = null;
+    }
+  });
+</script>
 </body>
 </html>
