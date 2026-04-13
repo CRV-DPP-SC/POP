@@ -66,6 +66,38 @@
     font-style: italic;
   }
 </style>
+<script>
+// Funções globais da Área Restrita
+window.abrirIframeRestrito = function(url, icon, titulo) {
+  var m = document.getElementById('modal-iframe-gen');
+  if (!m) { window.open(url, '_blank'); return; }
+  document.getElementById('iframe-gen-icon').textContent = icon;
+  document.getElementById('iframe-gen-titulo').textContent = titulo;
+  document.getElementById('iframe-gen-link').href = url;
+  document.getElementById('iframe-gen-frame').src = url;
+  m.style.display = 'flex';
+};
+window.fecharIframeRestrito = function() {
+  var m = document.getElementById('modal-iframe-gen');
+  if (m) { m.style.display = 'none'; }
+  var f = document.getElementById('iframe-gen-frame');
+  if (f) { f.src = ''; }
+};
+window.pe3Abrir = function() {
+  var m = document.getElementById('pe3-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  if (window.pe3Voltar) window.pe3Voltar();
+  var b = document.getElementById('pe3-busca');
+  if (b) b.value = '';
+  var l = document.getElementById('pe3-limpar');
+  if (l) l.style.display = 'none';
+};
+window.pe3Fechar = function() {
+  var m = document.getElementById('pe3-modal');
+  if (m) m.style.display = 'none';
+};
+</script>
 </head>
 <body>
 
@@ -2993,7 +3025,39 @@ function generateDOC(){
     '.tr td{font-weight:bold;}'+
     '.fs{border:none;border-top:1px solid #000;margin-top:180pt;margin-bottom:3pt;}'+
     '.ft{text-align:center;font-size:8pt;color:#555;margin:1pt 0;}'+
-    '</style></head><body>'+
+    '</style><script>
+// Funções globais da Área Restrita
+window.abrirIframeRestrito = function(url, icon, titulo) {
+  var m = document.getElementById('modal-iframe-gen');
+  if (!m) { window.open(url, '_blank'); return; }
+  document.getElementById('iframe-gen-icon').textContent = icon;
+  document.getElementById('iframe-gen-titulo').textContent = titulo;
+  document.getElementById('iframe-gen-link').href = url;
+  document.getElementById('iframe-gen-frame').src = url;
+  m.style.display = 'flex';
+};
+window.fecharIframeRestrito = function() {
+  var m = document.getElementById('modal-iframe-gen');
+  if (m) { m.style.display = 'none'; }
+  var f = document.getElementById('iframe-gen-frame');
+  if (f) { f.src = ''; }
+};
+window.pe3Abrir = function() {
+  var m = document.getElementById('pe3-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  if (window.pe3Voltar) window.pe3Voltar();
+  var b = document.getElementById('pe3-busca');
+  if (b) b.value = '';
+  var l = document.getElementById('pe3-limpar');
+  if (l) l.style.display = 'none';
+};
+window.pe3Fechar = function() {
+  var m = document.getElementById('pe3-modal');
+  if (m) m.style.display = 'none';
+};
+</script>
+</head><body>'+
     '<table class="ht"><tr>'+
     '<td class="hl"><img src="data:image/jpeg;base64,'+LOGO_B64+'" width="50" /></td>'+
     '<td class="hr">'+
@@ -8054,7 +8118,39 @@ window.abrirEscalaPlantao = function() {
     var corpo = document.getElementById('oficio-texto-livre').innerHTML || '';
     var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Ofício CRV</title>' +
       '<style>@page{margin:2cm 3cm 2.5cm 3cm;}body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;color:#000;margin:0;}table{border-collapse:collapse;}td{padding:0;}</style>' +
-      '</head><body>' +
+      '<script>
+// Funções globais da Área Restrita
+window.abrirIframeRestrito = function(url, icon, titulo) {
+  var m = document.getElementById('modal-iframe-gen');
+  if (!m) { window.open(url, '_blank'); return; }
+  document.getElementById('iframe-gen-icon').textContent = icon;
+  document.getElementById('iframe-gen-titulo').textContent = titulo;
+  document.getElementById('iframe-gen-link').href = url;
+  document.getElementById('iframe-gen-frame').src = url;
+  m.style.display = 'flex';
+};
+window.fecharIframeRestrito = function() {
+  var m = document.getElementById('modal-iframe-gen');
+  if (m) { m.style.display = 'none'; }
+  var f = document.getElementById('iframe-gen-frame');
+  if (f) { f.src = ''; }
+};
+window.pe3Abrir = function() {
+  var m = document.getElementById('pe3-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  if (window.pe3Voltar) window.pe3Voltar();
+  var b = document.getElementById('pe3-busca');
+  if (b) b.value = '';
+  var l = document.getElementById('pe3-limpar');
+  if (l) l.style.display = 'none';
+};
+window.pe3Fechar = function() {
+  var m = document.getElementById('pe3-modal');
+  if (m) m.style.display = 'none';
+};
+</script>
+</head><body>' +
       getCab() +
       (data ? '<p style="text-align:right;font-family:Arial;font-size:11pt;margin-bottom:14pt;">' + data + '</p>' : '') +
       '<div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;text-align:justify;">' + corpo + '</div>' +
@@ -8075,7 +8171,39 @@ window.abrirEscalaPlantao = function() {
       '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom>' +
       '<w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->' +
       '<style>@page{margin:2cm 3cm 2.5cm 3cm;} body{font-family:Arial;font-size:11pt;line-height:1.0;color:#000;}</style>' +
-      '</head><body>' +
+      '<script>
+// Funções globais da Área Restrita
+window.abrirIframeRestrito = function(url, icon, titulo) {
+  var m = document.getElementById('modal-iframe-gen');
+  if (!m) { window.open(url, '_blank'); return; }
+  document.getElementById('iframe-gen-icon').textContent = icon;
+  document.getElementById('iframe-gen-titulo').textContent = titulo;
+  document.getElementById('iframe-gen-link').href = url;
+  document.getElementById('iframe-gen-frame').src = url;
+  m.style.display = 'flex';
+};
+window.fecharIframeRestrito = function() {
+  var m = document.getElementById('modal-iframe-gen');
+  if (m) { m.style.display = 'none'; }
+  var f = document.getElementById('iframe-gen-frame');
+  if (f) { f.src = ''; }
+};
+window.pe3Abrir = function() {
+  var m = document.getElementById('pe3-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  if (window.pe3Voltar) window.pe3Voltar();
+  var b = document.getElementById('pe3-busca');
+  if (b) b.value = '';
+  var l = document.getElementById('pe3-limpar');
+  if (l) l.style.display = 'none';
+};
+window.pe3Fechar = function() {
+  var m = document.getElementById('pe3-modal');
+  if (m) m.style.display = 'none';
+};
+</script>
+</head><body>' +
       getCab() +
       (data ? '<p style="text-align:right;font-family:Arial;font-size:11pt;">' + data + '</p>' : '') +
       '<div style="font-family:Arial;font-size:11pt;line-height:1.0;text-align:justify;">' + corpo + '</div>' +
