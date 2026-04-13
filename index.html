@@ -3400,9 +3400,9 @@ window.abrirAreaRestrita = function() {
       if (fReg  && r.regional_sr !== fReg) return false;
       if (fSexo && !((r.sexo_presos || '').toUpperCase().includes(fSexo))) return false;
       if (fRec) {
-        const rec = (r.recebe_presos || '').toUpperCase();
-        if (fRec === 'RECEBE' && !rec.includes('RECEBE') && !rec.includes('PROPIA') && !rec.includes('PRÓPRIA') && !rec.includes('NA UNIDADE')) return false;
-        if (fRec === 'BUSCA' && !rec.includes('BUSCA') && !rec.includes('DELEGACIA')) return false;
+        const rec = (r.recebe_presos || '').toUpperCase().trim();
+        if (fRec === 'RECEBE' && rec !== 'SIM') return false;
+        if (fRec === 'BUSCA'  && rec !== 'NÃO' && rec !== 'NAO') return false;
       }
       if (fHor) {
         const hor = (r.forca_horario || '').toUpperCase();
@@ -3446,7 +3446,7 @@ window.abrirAreaRestrita = function() {
     const mapas = {
       recebe_presos:      { 'SIM': 'Recebe na unidade', 'NAO': 'Vai buscar nas delegacias', 'NÃO': 'Vai buscar nas delegacias' },
       forca_horario:      { 'QUALQUER': 'Qualquer horário (sem restrição)', 'ACORDO': 'Há acordo / restrição de horário' },
-      flagrante_transporte:{ 'PC_LEVA': 'Polícia Civil leva ao presídio', 'VIATURA_PP': 'Viatura da Polícia Penal busca', 'OUTRO': 'Outro' },
+      flagrante_transporte:{ 'PC_LEVA': 'Polícia Civil leva ao presídio', 'PP_BUSCA': 'Polícia Penal busca na Delegacia', 'VIATURA_PP': 'Polícia Penal busca na Delegacia', 'OUTRO': 'Outro' },
       mandado_fluxo:      { 'DIRETO_UNIDADE': 'Vai direto à unidade prisional', 'PASSA_DELEGACIA': 'Passa pela delegacia antes', 'OUTRO': 'Outro' },
     };
     if (mapas[campo] && mapas[campo][v.toUpperCase()]) return mapas[campo][v.toUpperCase()];
@@ -3552,17 +3552,29 @@ window.abrirAreaRestrita = function() {
     if (!total) { el.innerHTML = '<p style="color:#6b7280;text-align:center;padding:2rem;">Nenhum dado para compilar com os filtros selecionados.</p>'; return; }
 
     function contar(arr, fn) { return arr.filter(fn).length; }
+    function listar(arr, fn)  { return arr.filter(fn).map(x => x.unidade || '—'); }
 
     function barraHTML(items, tot) {
-      return items.map(({label, n}) => {
+      return items.map(({label, n, uns}) => {
         const pct = tot ? Math.round((n/tot)*100) : 0;
-        return `<div style="margin-bottom:.7rem;">
-          <div style="display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:3px;">
+        const uid = 'dr_' + Math.random().toString(36).slice(2,9);
+        const liHtml = uns && uns.length
+          ? uns.map(u => `<li>${u}</li>`).join('')
+          : '<li style="color:#9ca3af;font-style:italic;">Nenhuma unidade</li>';
+        return `<div style="margin-bottom:.85rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:3px;cursor:pointer;user-select:none;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';"
+               title="Clique para ver as unidades">
             <span style="color:#374151;">${label}</span>
-            <span style="font-weight:700;color:#1a2a4a;">${n} <span style="font-weight:400;color:#9ca3af;">(${pct}%)</span></span>
+            <span style="font-weight:700;color:#1a2a4a;">${n} <span style="font-weight:400;color:#9ca3af;">(${pct}%)</span> <span style="font-size:.65rem;color:#9ca3af;">▼</span></span>
           </div>
-          <div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="background:#1a2a4a;height:100%;width:${pct}%;border-radius:99px;"></div>
+          <div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;cursor:pointer;"
+               onclick="var d=document.getElementById('${uid}');d.style.display=d.style.display==='none'?'block':'none';">
+            <div style="background:#1a2a4a;height:100%;width:${pct}%;border-radius:99px;transition:width .4s;"></div>
+          </div>
+          <div id="${uid}" style="display:none;margin-top:.5rem;background:#f0f4ff;border:1px solid #c7d7f5;border-radius:8px;padding:.6rem 1rem .6rem 1.2rem;">
+            <div style="font-size:.68rem;font-weight:700;color:#4a6494;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;">Unidades que selecionaram esta opção (${n}):</div>
+            <ul style="list-style:disc;padding-left:1rem;font-size:.78rem;line-height:1.9;color:#1f2937;">${liHtml}</ul>
           </div>
         </div>`;
       }).join('');
@@ -3579,62 +3591,55 @@ window.abrirAreaRestrita = function() {
     const regionais = [...new Set(r.map(x => x.regional_sr))].sort();
     const porRegional = regionais.map(sr => ({
       label: `${sr} – ${r.find(x=>x.regional_sr===sr)?.regional_nome||sr}`,
-      n: contar(r, x => x.regional_sr===sr)
+      n: contar(r, x => x.regional_sr===sr),
+      uns: listar(r, x => x.regional_sr===sr)
     }));
 
-    // Tipo de Unidade (sexo_presos)
+    // Tipo de Unidade (sexo_presos) — questionário salva o .label: 'Masculino','Feminino','Ambos'
     const tipoUnidade = [
-      { label: 'Masculino',  n: contar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')) },
-      { label: 'Feminino',   n: contar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')) },
-      { label: 'Misto',      n: contar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')) },
+      { label: 'Masculino', n: contar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')), uns: listar(r, x => /MASCULINO|MASC/i.test(x.sexo_presos||'')) },
+      { label: 'Feminino',  n: contar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')),   uns: listar(r, x => /FEMININO|FEM/i.test(x.sexo_presos||'')) },
+      { label: 'Misto / Ambos', n: contar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')), uns: listar(r, x => /MISTO|MISTA|AMBOS/i.test(x.sexo_presos||'')) },
     ];
 
-    // Modalidade — baseada no valor real "SIM" / "NAO"
+    // Modalidade — campo salva 'SIM' ou 'NÃO'
     const modalidade = [
-      { label: 'Recebe na unidade (porta de entrada)',  n: contar(r, x => (x.recebe_presos||'').toUpperCase()==='SIM') },
-      { label: 'Vai buscar nas delegacias',             n: contar(r, x => (x.recebe_presos||'').toUpperCase()==='NAO' || (x.recebe_presos||'').toUpperCase()==='NÃO') },
+      { label: 'Recebe na unidade (porta de entrada)', n: contar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM'),               uns: listar(r, x => (x.recebe_presos||'').toUpperCase().trim()==='SIM') },
+      { label: 'Não recebe / encaminha para outra UP', n: contar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())), uns: listar(r, x => ['NÃO','NAO'].includes((x.recebe_presos||'').toUpperCase().trim())) },
     ];
 
     // Horário forças de segurança
     const horario = [
-      { label: 'Qualquer horário (sem restrição)', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER') },
-      { label: 'Há acordo / restrição de horário', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO') },
+      { label: 'Qualquer horário (sem restrição)', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER'), uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='QUALQUER') },
+      { label: 'Há acordo / restrição de horário', n: contar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO'),   uns: listar(r, x => (x.forca_horario||'').toUpperCase()==='ACORDO') },
     ];
 
-    // Flagrante — transporte
+    // Flagrante — transporte (questionário salva PP_BUSCA, versões antigas salvavam VIATURA_PP)
     const flagrante = [
-      { label: 'Polícia Civil leva ao presídio',      n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA') },
-      { label: 'Viatura da Polícia Penal busca',      n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='VIATURA_PP') },
-      { label: 'Outro',                               n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO') },
+      { label: 'Polícia Civil leva ao presídio',   n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA'),                                                                    uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='PC_LEVA') },
+      { label: 'Polícia Penal busca na Delegacia', n: contar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())),                                             uns: listar(r, x => ['PP_BUSCA','VIATURA_PP'].includes((x.flagrante_transporte||'').toUpperCase())) },
+      { label: 'Outro',                            n: contar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO'),                                                                       uns: listar(r, x => (x.flagrante_transporte||'').toUpperCase()==='OUTRO') },
     ];
 
     // Mandado de Prisão
     const mandado = [
-      { label: 'Vai direto à unidade prisional',      n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE') },
-      { label: 'Passa pela delegacia antes',          n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA') },
-      { label: 'Outro',                               n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO') },
+      { label: 'Vai direto à unidade prisional', n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE'),  uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='DIRETO_UNIDADE') },
+      { label: 'Passa pela delegacia antes',     n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA'), uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='PASSA_DELEGACIA') },
+      { label: 'Outro',                          n: contar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO'),           uns: listar(r, x => (x.mandado_fluxo||'').toUpperCase()==='OUTRO') },
     ];
 
     // IGP Sede — mesma cidade ou outra
-    const igpSedeMesma = contar(r, x => {
-      const c = (x.ecd_cidade||'').toLowerCase();
-      const u = (x.unidade||'').toLowerCase();
-      return c.length > 2 && c.split(' ').some(p => p.length > 3 && u.includes(p));
-    });
+    const igpSedeFn  = x => { const c=(x.ecd_cidade||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
     const igpSede = [
-      { label: 'IGP na própria cidade da unidade', n: igpSedeMesma },
-      { label: 'IGP em outra cidade',              n: total - igpSedeMesma },
+      { label: 'IGP na própria cidade da unidade', n: contar(r, igpSedeFn),  uns: listar(r, igpSedeFn) },
+      { label: 'IGP em outra cidade',              n: contar(r, x=>!igpSedeFn(x)), uns: listar(r, x=>!igpSedeFn(x)) },
     ];
 
     // IGP Plantão — mesma cidade ou outra
-    const igpPlantaoMesma = contar(r, x => {
-      const c = (x.plantao_mun||'').toLowerCase();
-      const u = (x.unidade||'').toLowerCase();
-      return c.length > 2 && c.split(' ').some(p => p.length > 3 && u.includes(p));
-    });
+    const igpPlantaoFn = x => { const c=(x.plantao_mun||'').toLowerCase(); const u=(x.unidade||'').toLowerCase(); return c.length>2 && c.split(' ').some(p=>p.length>3&&u.includes(p)); };
     const igpPlantao = [
-      { label: 'IGP de plantão na própria cidade', n: igpPlantaoMesma },
-      { label: 'IGP de plantão em outra cidade',   n: total - igpPlantaoMesma },
+      { label: 'IGP de plantão na própria cidade', n: contar(r, igpPlantaoFn),  uns: listar(r, igpPlantaoFn) },
+      { label: 'IGP de plantão em outra cidade',   n: contar(r, x=>!igpPlantaoFn(x)), uns: listar(r, x=>!igpPlantaoFn(x)) },
     ];
 
     el.innerHTML =
@@ -3667,13 +3672,15 @@ window.abrirAreaRestrita = function() {
 
   window.exportarCSV = function() {
     if (!respostasFiltradas.length) { alert('Nenhum dado para exportar.'); return; }
-    const cabecalho = ['Data','Hora','Unidade','Regional SR','Regional Nome','Respondente','Função','Público','Modalidade Recebimento','Encaminhamento','Horário Forças','Acordo Desc','Transporte Flagrante','Cidade IGP','Distância IGP','Município Plantão','Dist Plantão','Mandado Fluxo','Mandado Outro'];
+    const cabecalho = ['Data','Hora','Unidade','Regional SR','Regional Nome','Respondente','Função','Público (sexo_presos)','Recebe Presos','Encam. Masculino','Encam. Feminino','Horário Forças','Acordo Desc','Transporte Flagrante','Flagrante Outro','Cidade IGP','Distância IGP','Município Plantão','Dist Plantão','Mandado Fluxo','Mandado Outro'];
     const esc = v => '"' + String(v||'').replace(/"/g,'""') + '"';
     const linhas = respostasFiltradas.map(r => [
       r.data_br, r.hora_br, r.unidade, r.regional_sr, r.regional_nome,
       r.resp_nome, r.resp_funcao, r.sexo_presos, r.recebe_presos,
-      r.encaminhamento, r.forca_horario, r.forca_acordo_desc,
-      r.flagrante_transporte, r.ecd_cidade, r.ecd_distancia,
+      r.encaminhamento_masculino, r.encaminhamento_feminino,
+      r.forca_horario, r.forca_acordo_desc,
+      r.flagrante_transporte, r.flagrante_outro,
+      r.ecd_cidade, r.ecd_distancia,
       r.plantao_mun, r.plantao_dist, r.mandado_fluxo, r.mandado_outro
     ].map(esc).join(','));
     const csv = [cabecalho.map(esc).join(','), ...linhas].join('\n');
