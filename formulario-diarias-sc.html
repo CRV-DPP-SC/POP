@@ -8,7 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, onSnapshot, serverTimestamp, orderBy }
     from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
@@ -21,8 +22,21 @@
     appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+  // Reutiliza app já inicializado se existir (evita conflito)
+  const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // Monitora sessão — mostra aviso se não estiver logado
+  onAuthStateChanged(auth, user => {
+    const aviso = document.getElementById('aviso-login');
+    if (!user && aviso) aviso.style.display = 'block';
+    // Inicia escuta dos servidores independente do login
+    // (funciona porque as regras permitem leitura com write:true/read:true
+    //  ou quando o usuário está autenticado via sessão compartilhada)
+    if (typeof window._iniciarEscutaServidores === 'function')
+      window._iniciarEscutaServidores();
+  });
 
   // ── DIÁRIAS ──────────────────────────────────────────────────
   window._saveToFirebase = async function(dados) {
@@ -246,6 +260,11 @@ table.desloc input,table.desloc select{padding:0.3rem 0.45rem;font-size:0.79rem;
 </div>
 
 <div class="container">
+
+<!-- Aviso de sessão -->
+<div id="aviso-login" style="display:none;background:var(--erro-claro);border:1px solid #F7C1C1;border-radius:var(--raio);padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.82rem;color:var(--erro);">
+  ⚠️ <strong>Sessão não detectada.</strong> Acesse este sistema pelo botão <strong>Sistema de Diárias</strong> na <a href="https://crv-dpp-sc.github.io/manual/#restrito" style="color:var(--erro);font-weight:600;">Área Restrita</a> do site principal — é necessário estar logado para carregar os servidores.
+</div>
 
 <!-- ════════ ABA 1 — REQUERIMENTO MLR-41 ════════ -->
 <div id="painel-requerimento" class="painel ativo">
@@ -1045,20 +1064,27 @@ function inicializar() {
   popularSelectMunicipio('rl-municipio', 'FLORIANÓPOLIS');
   adicionarLinha('r');
   adicionarLinha('rl');
-  // Inicia escuta em tempo real dos servidores no Firebase
-  if (typeof window._iniciarEscutaServidores === 'function') {
-    window._iniciarEscutaServidores();
-  } else {
-    // Firebase ainda não carregou — tenta após breve delay
-    setTimeout(() => {
-      if (typeof window._iniciarEscutaServidores === 'function')
-        window._iniciarEscutaServidores();
-    }, 1500);
-  }
+
+  // Data de hoje formatada
+  const hoje = new Date();
+  const hojeStr = hoje.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+  const cidadeData = 'FLORIANÓPOLIS, ' + hojeStr;
+  document.getElementById('r-local-data').value = cidadeData;
+  document.getElementById('rl-data-ass').value  = hojeStr;
+
   // Fechar modal ao clicar fora
   document.getElementById('modal-servidor').addEventListener('click', e => {
     if (e.target === document.getElementById('modal-servidor')) fecharModalServidor();
   });
+
+  // _iniciarEscutaServidores é chamado pelo onAuthStateChanged no bloco Firebase
+  // Mas como fallback, tenta também após 2s caso a auth já esteja resolvida
+  setTimeout(() => {
+    if (typeof window._iniciarEscutaServidores === 'function' &&
+        (!window._servidoresCache || window._servidoresCache.length === 0)) {
+      window._iniciarEscutaServidores();
+    }
+  }, 2000);
 }
 
 function trocarAba(id, btn) {
