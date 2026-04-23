@@ -879,72 +879,70 @@ const fmtR = v => 'R$ ' + v.toFixed(2).replace('.',',');
 
 // ══════════════════════════════════════════════════
 // CÁLCULO DE DIÁRIAS — lógica central (Dec. 1.662/2022)
+// A regra é POR DIA: soma todos os deslocamentos do mesmo
+// dia para obter o período total daquele dia, depois aplica
+// a tabela sobre esse total.
 // ══════════════════════════════════════════════════
 
-// Converte "HH:MM" para minutos desde meia-noite
 function toMin(hhmm) {
   if (!hhmm) return null;
   const [h, m] = hhmm.split(':').map(Number);
   return h * 60 + m;
 }
 
-// Dado um deslocamento com data+saída e data+chegada, calcula
-// duração em minutos e se há pernoite (período contém meia-noite a 06h)
-function analisarDeslocamento(linha) {
-  const { data, saida, chegada } = linha;
-  if (!data || !saida || !chegada) return null;
+// Agrupa deslocamentos por data e calcula o período total de cada dia
+// Retorna array de { data, deslocamentos[], totalMinutos, saidaMin, chegadaFinalMin, pernoite }
+function agruparPorDia(linhas) {
+  const mapa = {};
+  linhas.forEach(l => {
+    if (!l.data || !l.saida || !l.chegada) return;
+    if (!mapa[l.data]) mapa[l.data] = [];
+    mapa[l.data].push(l);
+  });
 
-  const saidaMin  = toMin(saida);
-  const chegadaMin = toMin(chegada);
-  if (saidaMin === null || chegadaMin === null) return null;
+  return Object.entries(mapa).map(([data, deslocs]) => {
+    // Ordena por horário de saída
+    deslocs.sort((a, b) => (toMin(a.saida) || 0) - (toMin(b.saida) || 0));
 
-  // Duração em minutos (chegada pode ser no dia seguinte se < saída)
-  let duracaoMin = chegadaMin - saidaMin;
-  if (duracaoMin <= 0) duracaoMin += 24 * 60; // virada de dia
+    // Saída mais cedo do dia
+    const saidaMin = toMin(deslocs[0].saida);
+    // Chegada mais tardia do dia
+    let chegadaFinalMin = 0;
+    deslocs.forEach(d => {
+      const ch = toMin(d.chegada);
+      if (ch !== null && ch > chegadaFinalMin) chegadaFinalMin = ch;
+    });
 
-  // Pernoite: o intervalo [saída, chegada] contém algum momento de 00:00 a 06:00
-  // Simplificação: se duração >= 12h, verificamos se passa pela madrugada
-  let pernoite = false;
-  if (duracaoMin >= 12 * 60) {
-    // chegada depois de meia-noite do dia seguinte OU saída antes das 6h com chegada após 6h
-    if (chegadaMin < saidaMin) {
-      // passou a meia-noite — pernoite sempre que chegada > 0 (qualquer hora após meia-noite)
-      pernoite = true;
-    } else if (saidaMin <= 6 * 60 || chegadaMin >= 22 * 60) {
-      // saída muito cedo ou chegada muito tarde — provável pernoite
-      pernoite = true;
-    }
-  }
+    // Duração total do dia: da primeira saída à última chegada
+    let totalMin = chegadaFinalMin - saidaMin;
+    if (totalMin <= 0) totalMin += 24 * 60; // passou meia-noite
 
-  return { duracaoMin, pernoite };
+    // Pernoite: passou pela madrugada (chegada < saída) ou saída antes das 6h
+    const pernoite = chegadaFinalMin < saidaMin ||
+                     saidaMin < 6 * 60 ||
+                     chegadaFinalMin >= 22 * 60;
+
+    return { data, deslocs, totalMin, saidaMin, chegadaFinalMin, pernoite };
+  }).sort((a, b) => a.data.localeCompare(b.data));
 }
 
-// Calcula o valor da diária para um deslocamento
-// Retorna { tipo, quantidade, valor, descricao }
-function calcularDiaria(durMin, pernoite, grupo, tipoViagem) {
-  const horas = durMin / 60;
+function calcularDiariaDia(totalMin, pernoite, grupo, tipoViagem) {
+  const horas = totalMin / 60;
+  const valorIntegral = 110;
+  const valorPernoite = 220;
+  const valorMeia     = 55;
 
   if (horas <= 4) {
-    return { tipo: 'sem', quantidade: 0, valor: 0, descricao: 'Até 4h — sem direito a diária' };
+    return { tipo: 'sem', quantidade: 0, valor: 0, label: 'Sem direito', desc: `${horas.toFixed(1)}h — até 4h` };
   }
-
-  // Valor base por grupo e tipo
-  // Dentro do Estado: R$110 integral / R$220 com pernoite (grupos 1,2,3)
-  // Fora do Estado:   R$110 integral / R$220 com pernoite (grupos 1,2); grupo 3 = R$110 sem pernoite
-  let valorIntegral = 110;
-  let valorPernoite = 220;
-  if (tipoViagem === 'fora' && grupo === '3') valorPernoite = 220; // mesmo valor pelo Dec. 2.048/2022
-
   if (horas >= 12) {
     if (pernoite) {
-      return { tipo: 'pernoite', quantidade: 1, valor: valorPernoite, descricao: `≥12h + pernoite → ${fmtR(valorPernoite)}` };
+      return { tipo: 'pernoite', quantidade: 1, valor: valorPernoite, label: 'Pernoite', desc: `${horas.toFixed(1)}h + pernoite → ${fmtR(valorPernoite)}` };
     }
-    return { tipo: 'inteira', quantidade: 1, valor: valorIntegral, descricao: `≥12h → diária inteira ${fmtR(valorIntegral)}` };
+    return { tipo: 'inteira', quantidade: 1, valor: valorIntegral, label: 'Integral', desc: `${horas.toFixed(1)}h → diária inteira ${fmtR(valorIntegral)}` };
   }
-
-  // Entre 4h e 12h → meia diária
-  const meia = valorIntegral / 2;
-  return { tipo: 'meia', quantidade: 0.5, valor: meia, descricao: `4h–12h → meia diária ${fmtR(meia)}` };
+  // entre 4h e 12h → meia diária
+  return { tipo: 'meia', quantidade: 0.5, valor: valorMeia, label: 'Meia', desc: `${horas.toFixed(1)}h (4h–12h) → meia diária ${fmtR(valorMeia)}` };
 }
 
 // ══════════════════════════════════════════════════
@@ -963,47 +961,52 @@ function recalcular(p) {
   if (validas.length === 0) { calcDiv.style.display = 'none'; return; }
   calcDiv.style.display = 'block';
 
+  // Agrupa por dia
+  const dias = agruparPorDia(validas);
+
   let totalQtd = 0, totalValor = 0;
   let qtInteiras = 0, qtMetades = 0, qtPernoites = 0, qtSem = 0;
   let detalhesHTML = '';
   let ultimaData = '';
 
-  validas.forEach((linha, i) => {
-    const analise = analisarDeslocamento(linha);
-    if (!analise) return;
-    const { duracaoMin, pernoite } = analise;
-    const diaria = calcularDiaria(duracaoMin, pernoite, grupo, tipoViagem);
+  dias.forEach(dia => {
+    const diaria = calcularDiariaDia(dia.totalMin, dia.pernoite, grupo, tipoViagem);
 
-    totalQtd += diaria.quantidade;
+    totalQtd   += diaria.quantidade;
     totalValor += diaria.valor;
-    if (diaria.tipo === 'inteira') qtInteiras++;
-    else if (diaria.tipo === 'meia') qtMetades++;
+    if (diaria.tipo === 'inteira')  qtInteiras++;
+    else if (diaria.tipo === 'meia')    qtMetades++;
     else if (diaria.tipo === 'pernoite') qtPernoites++;
     else qtSem++;
 
-    const h = Math.floor(duracaoMin / 60), m = duracaoMin % 60;
-    const duracaoStr = `${h}h${m > 0 ? m + 'min' : ''}`;
+    if (dia.data > ultimaData) ultimaData = dia.data;
+
     const tagClass = { inteira:'tag-inteira', meia:'tag-meia', pernoite:'tag-pernoite', sem:'tag-sem' }[diaria.tipo];
-    const tagLabel = { inteira:'Integral', meia:'Meia', pernoite:'Pernoite', sem:'Sem direito' }[diaria.tipo];
+    const hTot = Math.floor(dia.totalMin / 60), mTot = dia.totalMin % 60;
+    const duracaoStr = `${hTot}h${mTot > 0 ? mTot + 'min' : ''}`;
+
+    // Lista dos trechos do dia
+    const trechos = dia.deslocs.map(d =>
+      `${d.origem} → ${d.destino} (${d.saida}–${d.chegada})`
+    ).join(' · ');
 
     detalhesHTML += `
       <div class="detalhe-linha">
         <div>
-          <strong style="font-size:0.82rem;">${linha.data} — ${linha.origem} → ${linha.destino}</strong>
-          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px;">${linha.saida} às ${linha.chegada} · ${duracaoStr} · ${linha.transporte}</div>
+          <strong style="font-size:0.82rem;">${dia.data}</strong>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px;">${trechos}</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);">Período total do dia: ${duracaoStr} · ${diaria.desc}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span class="dl-tag ${tagClass}">${tagLabel}</span>
+          <span class="dl-tag ${tagClass}">${diaria.label}</span>
           <span style="font-family:var(--mono);font-size:0.82rem;font-weight:600;color:var(--verde-escuro);">${fmtR(diaria.valor)}</span>
         </div>
       </div>`;
-
-    if (linha.data > ultimaData) ultimaData = linha.data;
   });
 
   // Resumo
   resumoGrid.innerHTML = `
-    <div class="resumo-card"><div class="rc-label">Deslocamentos</div><div class="rc-val">${validas.length}</div><div class="rc-sub">registros</div></div>
+    <div class="resumo-card"><div class="rc-label">Dias com viagem</div><div class="rc-val">${dias.length}</div><div class="rc-sub">${validas.length} trecho(s)</div></div>
     <div class="resumo-card"><div class="rc-label">Diárias Inteiras</div><div class="rc-val">${qtInteiras + qtPernoites}</div><div class="rc-sub">${qtPernoites > 0 ? qtPernoites + ' c/ pernoite' : 'sem pernoite'}</div></div>
     <div class="resumo-card"><div class="rc-label">Meias Diárias</div><div class="rc-val">${qtMetades}</div><div class="rc-sub">× R$ 55,00</div></div>
     <div class="resumo-card destaque"><div class="rc-label">Total a Pagar</div><div class="rc-val">${fmtR(totalValor)}</div><div class="rc-sub">${totalQtd} diária(s)</div></div>`;
