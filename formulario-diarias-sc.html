@@ -879,9 +879,12 @@ const fmtR = v => 'R$ ' + v.toFixed(2).replace('.',',');
 
 // ══════════════════════════════════════════════════
 // CÁLCULO DE DIÁRIAS — lógica central (Dec. 1.662/2022)
-// A regra é POR DIA: soma todos os deslocamentos do mesmo
-// dia para obter o período total daquele dia, depois aplica
-// a tabela sobre esse total.
+//
+// Regra: calcula o PERÍODO TOTAL DA MISSÃO —
+// da primeira saída de Florianópolis até a última chegada.
+// A cada 24h completas = 1 pernoite (R$ 220,00).
+// O restante (< 24h) segue: ≥12h = integral (R$110),
+// 4–12h = meia (R$55), ≤4h = sem direito.
 // ══════════════════════════════════════════════════
 
 function toMin(hhmm) {
@@ -890,130 +893,131 @@ function toMin(hhmm) {
   return h * 60 + m;
 }
 
-// Agrupa deslocamentos por data e calcula o período total de cada dia
-// Retorna array de { data, deslocamentos[], totalMinutos, saidaMin, chegadaFinalMin, pernoite }
-function agruparPorDia(linhas) {
-  const mapa = {};
-  linhas.forEach(l => {
-    if (!l.data || !l.saida || !l.chegada) return;
-    if (!mapa[l.data]) mapa[l.data] = [];
-    mapa[l.data].push(l);
-  });
-
-  return Object.entries(mapa).map(([data, deslocs]) => {
-    // Ordena por horário de saída
-    deslocs.sort((a, b) => (toMin(a.saida) || 0) - (toMin(b.saida) || 0));
-
-    // Saída mais cedo do dia
-    const saidaMin = toMin(deslocs[0].saida);
-    // Chegada mais tardia do dia
-    let chegadaFinalMin = 0;
-    deslocs.forEach(d => {
-      const ch = toMin(d.chegada);
-      if (ch !== null && ch > chegadaFinalMin) chegadaFinalMin = ch;
-    });
-
-    // Duração total do dia: da primeira saída à última chegada
-    let totalMin = chegadaFinalMin - saidaMin;
-    if (totalMin <= 0) totalMin += 24 * 60; // passou meia-noite
-
-    // Pernoite: passou pela madrugada (chegada < saída) ou saída antes das 6h
-    const pernoite = chegadaFinalMin < saidaMin ||
-                     saidaMin < 6 * 60 ||
-                     chegadaFinalMin >= 22 * 60;
-
-    return { data, deslocs, totalMin, saidaMin, chegadaFinalMin, pernoite };
-  }).sort((a, b) => a.data.localeCompare(b.data));
+// Converte data "YYYY-MM-DD" + hora "HH:MM" em minutos absolutos
+function toMinAbs(data, hora) {
+  if (!data || !hora) return null;
+  const [ano, mes, dia] = data.split('-').map(Number);
+  const [h, m] = hora.split(':').map(Number);
+  // Minutos desde 01/01/2020 (referência arbitrária)
+  const ref = new Date(2020, 0, 1);
+  const dt  = new Date(ano, mes - 1, dia, h, m);
+  return Math.round((dt - ref) / 60000);
 }
 
-function calcularDiariaDia(totalMin, pernoite, grupo, tipoViagem) {
-  const horas = totalMin / 60;
-  const valorIntegral = 110;
-  const valorPernoite = 220;
-  const valorMeia     = 55;
+// Calcula o resultado dado o total de minutos da missão
+function calcularMissao(totalMin, tipoViagem) {
+  const H24 = 24 * 60;
+  const pernoites  = Math.floor(totalMin / H24);
+  const restMin    = totalMin % H24;
+  const restHoras  = restMin / 60;
 
-  if (horas <= 4) {
-    return { tipo: 'sem', quantidade: 0, valor: 0, label: 'Sem direito', desc: `${horas.toFixed(1)}h — até 4h` };
+  let qtdExtra = 0, valorExtra = 0, labelExtra = '';
+  if (restHoras > 12) {
+    qtdExtra = 1; valorExtra = 110; labelExtra = 'diária inteira';
+  } else if (restHoras > 4) {
+    qtdExtra = 0.5; valorExtra = 55; labelExtra = 'meia diária';
   }
-  if (horas >= 12) {
-    if (pernoite) {
-      return { tipo: 'pernoite', quantidade: 1, valor: valorPernoite, label: 'Pernoite', desc: `${horas.toFixed(1)}h + pernoite → ${fmtR(valorPernoite)}` };
-    }
-    return { tipo: 'inteira', quantidade: 1, valor: valorIntegral, label: 'Integral', desc: `${horas.toFixed(1)}h → diária inteira ${fmtR(valorIntegral)}` };
-  }
-  // entre 4h e 12h → meia diária
-  return { tipo: 'meia', quantidade: 0.5, valor: valorMeia, label: 'Meia', desc: `${horas.toFixed(1)}h (4h–12h) → meia diária ${fmtR(valorMeia)}` };
+
+  const valorPernoite = 220;
+  const totalValor = pernoites * valorPernoite + valorExtra;
+  const totalQtd   = pernoites + qtdExtra;
+
+  return { pernoites, qtdExtra, valorExtra, labelExtra, totalValor, totalQtd, totalMin, restMin };
 }
 
 // ══════════════════════════════════════════════════
 // RECALCULAR — lê linhas da tabela e atualiza painel
 // ══════════════════════════════════════════════════
 function recalcular(p) {
-  const linhas = coletarDeslocamentos(p);
-  const grupo = document.getElementById(p + '-grupo-cargo').value;
+  const linhas     = coletarDeslocamentos(p);
+  const grupo      = document.getElementById(p + '-grupo-cargo').value;
   const tipoViagem = document.getElementById(p + '-tipo-desloc').value;
-  const calcDiv = document.getElementById(p + '-calc-auto');
+  const calcDiv    = document.getElementById(p + '-calc-auto');
   const resumoGrid = document.getElementById(p + '-resumo-grid');
   const detalheDiv = document.getElementById(p + '-detalhe-linhas');
-  const prazoBox = document.getElementById(p + '-prazo-box');
+  const prazoBox   = document.getElementById(p + '-prazo-box');
 
   const validas = linhas.filter(l => l.data && l.saida && l.chegada);
   if (validas.length === 0) { calcDiv.style.display = 'none'; return; }
   calcDiv.style.display = 'block';
 
-  // Agrupa por dia
-  const dias = agruparPorDia(validas);
-
-  let totalQtd = 0, totalValor = 0;
-  let qtInteiras = 0, qtMetades = 0, qtPernoites = 0, qtSem = 0;
-  let detalhesHTML = '';
-  let ultimaData = '';
-
-  dias.forEach(dia => {
-    const diaria = calcularDiariaDia(dia.totalMin, dia.pernoite, grupo, tipoViagem);
-
-    totalQtd   += diaria.quantidade;
-    totalValor += diaria.valor;
-    if (diaria.tipo === 'inteira')  qtInteiras++;
-    else if (diaria.tipo === 'meia')    qtMetades++;
-    else if (diaria.tipo === 'pernoite') qtPernoites++;
-    else qtSem++;
-
-    if (dia.data > ultimaData) ultimaData = dia.data;
-
-    const tagClass = { inteira:'tag-inteira', meia:'tag-meia', pernoite:'tag-pernoite', sem:'tag-sem' }[diaria.tipo];
-    const hTot = Math.floor(dia.totalMin / 60), mTot = dia.totalMin % 60;
-    const duracaoStr = `${hTot}h${mTot > 0 ? mTot + 'min' : ''}`;
-
-    // Lista dos trechos do dia
-    const trechos = dia.deslocs.map(d =>
-      `${d.origem} → ${d.destino} (${d.saida}–${d.chegada})`
-    ).join(' · ');
-
-    detalhesHTML += `
-      <div class="detalhe-linha">
-        <div>
-          <strong style="font-size:0.82rem;">${dia.data}</strong>
-          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px;">${trechos}</div>
-          <div style="font-size:0.72rem;color:var(--texto-sec);">Período total do dia: ${duracaoStr} · ${diaria.desc}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="dl-tag ${tagClass}">${diaria.label}</span>
-          <span style="font-family:var(--mono);font-size:0.82rem;font-weight:600;color:var(--verde-escuro);">${fmtR(diaria.valor)}</span>
-        </div>
-      </div>`;
+  // Ordena por data+hora de saída
+  validas.sort((a, b) => {
+    const ma = toMinAbs(a.data, a.saida), mb = toMinAbs(b.data, b.saida);
+    return (ma || 0) - (mb || 0);
   });
+
+  // Período total: primeira saída → última chegada
+  const primSaida   = validas[0];
+  const ultChegada  = validas[validas.length - 1];
+  const minInicio   = toMinAbs(primSaida.data, primSaida.saida);
+  const minFim      = toMinAbs(ultChegada.data, ultChegada.chegada);
+
+  if (minInicio === null || minFim === null) {
+    calcDiv.style.display = 'none'; return;
+  }
+
+  const totalMin = minFim - minInicio;
+  if (totalMin <= 0) { calcDiv.style.display = 'none'; return; }
+
+  const missao = calcularMissao(totalMin, tipoViagem);
+
+  // Para contador e PDF
+  const qtInteiras  = missao.qtdExtra === 1 ? 1 : 0;
+  const qtMetades   = missao.qtdExtra === 0.5 ? 1 : 0;
+  const qtPernoites = missao.pernoites;
+  const totalQtd    = missao.totalQtd;
+  const totalValor  = missao.totalValor;
+
+  // Última data para prazo de prestação de contas
+  const ultimaData = ultChegada.data;
+
+  // Monta descrição do período
+  const hTot = Math.floor(totalMin / 60), mTot = totalMin % 60;
+  const duracaoStr = `${hTot}h${mTot > 0 ? mTot + 'min' : ''}`;
+
+  const hRest = Math.floor(missao.restMin / 60), mRest = missao.restMin % 60;
+  const restStr = missao.restMin > 0 ? `${hRest}h${mRest > 0 ? mRest + 'min' : ''}` : '0h';
+
+  // Detalhe da missão
+  let detalhesHTML = `
+    <div class="detalhe-linha" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+      <div>
+        <strong style="font-size:0.85rem;">📍 Período total da missão: ${duracaoStr}</strong>
+        <div style="font-size:0.75rem;color:var(--texto-sec);margin-top:3px;">
+          Saída: ${primSaida.data} às ${primSaida.saida} · Retorno: ${ultChegada.data} às ${ultChegada.chegada}
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem;">`;
+
+  if (missao.pernoites > 0) {
+    detalhesHTML += `<span class="dl-tag tag-pernoite">${missao.pernoites} pernoite${missao.pernoites > 1 ? 's' : ''} × R$ 220,00 = ${fmtR(missao.pernoites * 220)}</span>`;
+  }
+  if (missao.qtdExtra > 0) {
+    const tagClass = missao.qtdExtra === 1 ? 'tag-inteira' : 'tag-meia';
+    detalhesHTML += `<span class="dl-tag ${tagClass}">Restam ${restStr} → ${missao.labelExtra} = ${fmtR(missao.valorExtra)}</span>`;
+  }
+  if (missao.pernoites === 0 && missao.qtdExtra === 0) {
+    detalhesHTML += `<span class="dl-tag tag-sem">Até 4h — sem direito a diária</span>`;
+  }
+
+  detalhesHTML += `</div>`;
+
+  // Lista dos trechos
+  detalhesHTML += `<div style="font-size:0.72rem;color:var(--texto-sec);margin-top:0.25rem;line-height:1.6;">
+    ${validas.map(d => `${d.data} · ${d.origem} → ${d.destino} (${d.saida}–${d.chegada}) · ${d.transporte}`).join('<br>')}
+  </div></div>`;
 
   // Resumo
   resumoGrid.innerHTML = `
-    <div class="resumo-card"><div class="rc-label">Dias com viagem</div><div class="rc-val">${dias.length}</div><div class="rc-sub">${validas.length} trecho(s)</div></div>
-    <div class="resumo-card"><div class="rc-label">Diárias Inteiras</div><div class="rc-val">${qtInteiras + qtPernoites}</div><div class="rc-sub">${qtPernoites > 0 ? qtPernoites + ' c/ pernoite' : 'sem pernoite'}</div></div>
-    <div class="resumo-card"><div class="rc-label">Meias Diárias</div><div class="rc-val">${qtMetades}</div><div class="rc-sub">× R$ 55,00</div></div>
+    <div class="resumo-card"><div class="rc-label">Duração total</div><div class="rc-val">${duracaoStr}</div><div class="rc-sub">${validas.length} trecho(s)</div></div>
+    <div class="resumo-card"><div class="rc-label">Pernoites</div><div class="rc-val">${missao.pernoites}</div><div class="rc-sub">× R$ 220,00</div></div>
+    <div class="resumo-card"><div class="rc-label">${missao.labelExtra || 'Sem adicional'}</div><div class="rc-val">${missao.qtdExtra > 0 ? fmtR(missao.valorExtra) : '—'}</div><div class="rc-sub">${restStr} restantes</div></div>
     <div class="resumo-card destaque"><div class="rc-label">Total a Pagar</div><div class="rc-val">${fmtR(totalValor)}</div><div class="rc-sub">${totalQtd} diária(s)</div></div>`;
 
   detalheDiv.innerHTML = detalhesHTML;
 
-  // Prazo prestação de contas
+  // Prazo prestação de contas (MLR-42)
   if (ultimaData && p === 'rl') {
     const dtRetorno = new Date(ultimaData + 'T12:00:00');
     let diasUteis = 0, dt = new Date(dtRetorno);
@@ -1022,9 +1026,10 @@ function recalcular(p) {
     prazoBox.style.display = 'block';
   }
 
-  // Guarda resultado no objeto global para uso ao salvar
+  // Guarda resultado global para salvar/PDF
   window[p + '_calc'] = { totalQtd, totalValor, qtInteiras, qtMetades, qtPernoites, grupo, tipoViagem };
 }
+
 
 // ══════════════════════════════════════════════════
 // CONTADOR DIÁRIAS DO MÊS
