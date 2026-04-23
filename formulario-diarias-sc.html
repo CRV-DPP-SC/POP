@@ -9,24 +9,22 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, onSnapshot, serverTimestamp, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-  // ============================================================
-  // SUBSTITUA PELOS DADOS DO SEU PROJETO FIREBASE
-  // ============================================================
   const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_PROJETO.firebaseapp.com",
-    projectId: "SEU_PROJETO_ID",
-    storageBucket: "SEU_PROJETO.appspot.com",
-    messagingSenderId: "SEU_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
+    authDomain: "crv-dpp-sc.firebaseapp.com",
+    projectId: "crv-dpp-sc",
+    storageBucket: "crv-dpp-sc.firebasestorage.app",
+    messagingSenderId: "707080008192",
+    appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
   };
-  // ============================================================
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db  = getFirestore(app);
 
+  // ── DIÁRIAS ──────────────────────────────────────────────────
   window._saveToFirebase = async function(dados) {
     try {
       const docRef = await addDoc(collection(db, "diarias"), {
@@ -36,7 +34,6 @@
     } catch(e) { return { ok: false, erro: e.message }; }
   };
 
-  // Consulta quantas diárias o servidor já tem no mês corrente
   window._consultarDiariasDoMes = async function(matricula) {
     try {
       const agora = new Date();
@@ -49,17 +46,47 @@
       );
       const snap = await getDocs(q);
       let total = 0;
-      snap.forEach(doc => {
-        const d = doc.data();
-        const ts = d.criadoEm?.toDate?.();
-        if (ts && ts >= inicioMes && ts <= fimMes) {
-          total += parseFloat(d.totalDiarias || 0);
-        }
+      snap.forEach(d => {
+        const ts = d.data().criadoEm?.toDate?.();
+        if (ts && ts >= inicioMes && ts <= fimMes)
+          total += parseFloat(d.data().totalDiarias || 0);
       });
       return { ok: true, total };
     } catch(e) { return { ok: false, erro: e.message }; }
   };
-</script>
+
+  // ── SERVIDORES — CRUD ────────────────────────────────────────
+  window._iniciarEscutaServidores = function() {
+    const q = query(collection(db, "servidores"), orderBy("nome"));
+    onSnapshot(q, snap => {
+      const lista = [];
+      snap.forEach(d => lista.push({ id: d.id, ...d.data() }));
+      window._servidoresCache = lista;
+      if (typeof window._onServidoresAtualizado === 'function')
+        window._onServidoresAtualizado(lista);
+    }, err => console.error("Erro ao escutar servidores:", err));
+  };
+
+  window._salvarServidor = async function(dados, id = null) {
+    try {
+      if (id) {
+        await updateDoc(doc(db, "servidores", id), dados);
+        return { ok: true, id };
+      } else {
+        const ref = await addDoc(collection(db, "servidores"),
+          { ...dados, criadoEm: serverTimestamp() });
+        return { ok: true, id: ref.id };
+      }
+    } catch(e) { return { ok: false, erro: e.message }; }
+  };
+
+  window._excluirServidor = async function(id) {
+    try {
+      await deleteDoc(doc(db, "servidores", id));
+      return { ok: true };
+    } catch(e) { return { ok: false, erro: e.message }; }
+  };
+
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -444,8 +471,120 @@ table.desloc input,table.desloc select{padding:0.3rem 0.45rem;font-size:0.79rem;
 
 <!-- ════════ ABA 3 — SERVIDORES ════════ -->
 <div id="painel-servidores" class="painel">
-  <div class="alerta alerta-info">✏️ Edite os dados dos 7 servidores na variável <code style="font-family:var(--mono);background:#eee;padding:1px 5px;border-radius:4px;">SERVIDORES</code> no código HTML.</div>
+
+  <!-- Cabeçalho -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;">
+    <div>
+      <div style="font-size:1rem;font-weight:600;color:var(--verde-escuro);">👥 Servidores Cadastrados</div>
+      <div style="font-size:0.78rem;color:var(--texto-sec);margin-top:3px;">Dados carregados do Firebase em tempo real</div>
+    </div>
+    <button class="btn-primario" onclick="abrirModalServidor(null)" style="gap:6px;">
+      + Novo Servidor
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div id="serv-loading" style="text-align:center;padding:3rem;color:var(--texto-sec);font-size:0.85rem;">
+    ⏳ Carregando servidores...
+  </div>
+
+  <!-- Lista -->
   <div id="lista-servidores" style="display:grid;gap:1rem;"></div>
+
+  <!-- Vazio -->
+  <div id="serv-vazio" style="display:none;text-align:center;padding:3rem;">
+    <div style="font-size:2.5rem;margin-bottom:0.75rem;">👤</div>
+    <div style="font-weight:600;color:var(--texto-sec);margin-bottom:0.5rem;">Nenhum servidor cadastrado</div>
+    <div style="font-size:0.82rem;color:var(--texto-sec);">Clique em "Novo Servidor" para começar.</div>
+  </div>
+</div>
+
+<!-- ════ MODAL SERVIDOR ════ -->
+<div id="modal-servidor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:var(--raio-lg);width:100%;max-width:680px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+
+    <!-- Header modal -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--borda);position:sticky;top:0;background:#fff;z-index:1;">
+      <div style="font-size:1rem;font-weight:600;color:var(--verde-escuro);" id="modal-srv-titulo">Novo Servidor</div>
+      <button onclick="fecharModalServidor()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--texto-sec);line-height:1;">×</button>
+    </div>
+
+    <div style="padding:1.5rem;">
+      <input type="hidden" id="srv-id">
+
+      <!-- DADOS PESSOAIS -->
+      <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--verde);font-family:var(--mono);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--verde-claro);">Dados Pessoais</div>
+      <div class="grid-2" style="margin-bottom:1rem;">
+        <div class="campo" style="grid-column:span 2;">
+          <label>Nome Civil completo <span class="obrig">*</span></label>
+          <input type="text" id="srv-nome" placeholder="NOME COMPLETO DO SERVIDOR" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="campo">
+          <label>CPF <span class="obrig">*</span></label>
+          <input type="text" id="srv-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+        </div>
+        <div class="campo">
+          <label>Matrícula (DV e Vínculo) <span class="obrig">*</span></label>
+          <input type="text" id="srv-matricula" placeholder="0000000-0-00">
+        </div>
+      </div>
+
+      <!-- DADOS FUNCIONAIS -->
+      <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--verde);font-family:var(--mono);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--verde-claro);">Dados Funcionais</div>
+      <div class="grid-2" style="margin-bottom:1rem;">
+        <div class="campo" style="grid-column:span 2;">
+          <label>Cargo/Emprego <span class="obrig">*</span></label>
+          <input type="text" id="srv-cargo" placeholder="CARGO DO SERVIDOR" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="campo">
+          <label>Lotação</label>
+          <input type="text" id="srv-lotacao" value="DEPARTAMENTO DE POLICIA PENAL" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="campo">
+          <label>Município</label>
+          <select id="srv-municipio"></select>
+        </div>
+        <div class="campo">
+          <label>E-mail</label>
+          <input type="email" id="srv-email" placeholder="servidor@sc.gov.br">
+        </div>
+        <div class="campo">
+          <label>Celular</label>
+          <input type="text" id="srv-celular" placeholder="(47) 99999-9999">
+        </div>
+        <div class="campo">
+          <label>Telefone</label>
+          <input type="text" id="srv-telefone" placeholder="(47) 3333-3333">
+        </div>
+      </div>
+
+      <!-- DADOS BANCÁRIOS -->
+      <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--verde);font-family:var(--mono);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--verde-claro);">Dados Bancários</div>
+      <div class="grid-3" style="margin-bottom:1.5rem;">
+        <div class="campo">
+          <label>Banco</label>
+          <input type="text" id="srv-banco" placeholder="BANCO DO BRASIL" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="campo">
+          <label>Agência</label>
+          <input type="text" id="srv-agencia" placeholder="0000-0">
+        </div>
+        <div class="campo">
+          <label>Conta</label>
+          <input type="text" id="srv-conta" placeholder="000000-0">
+        </div>
+      </div>
+
+      <!-- Erro -->
+      <div id="modal-srv-erro" style="display:none;background:var(--erro-claro);border:1px solid #F7C1C1;border-radius:var(--raio);padding:0.7rem 1rem;font-size:0.8rem;color:var(--erro);margin-bottom:1rem;"></div>
+
+      <!-- Botões -->
+      <div style="display:flex;gap:1rem;justify-content:flex-end;">
+        <button class="btn-sec" onclick="fecharModalServidor()">Cancelar</button>
+        <button class="btn-primario" id="modal-srv-btn" onclick="salvarServidor()">✓ Salvar Servidor</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ════════ ABA 4 — REGRAS ════════ -->
@@ -538,20 +677,186 @@ function popularSelectMunicipio(id, valorSelecionado = "FLORIANÓPOLIS") {
 }
 
 // ══════════════════════════════════════════════════
-// CADASTRO DOS SERVIDORES — edite aqui
+// SERVIDORES — dinâmico via Firebase
 // ══════════════════════════════════════════════════
-const SERVIDORES = [
-  { nome:"RODRIGO LAUX PASTORE", cpf:"041.830.939-61", matricula:"654163-1-01", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(49)9.9911-8885", telefone:"", email:"rodrigo.l.pastore@gmail.com", banco:"Banco do Brasil", agencia:"0858-3", conta:"29.773-9" },
-  { nome:"RICARDO DE BRITO MARQUES", cpf:"060.289.889-79", matricula:"379.682-5-01", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(48)9.9901-2640", telefone:"", email:"ricardobritomarques12@gmail.com", banco:"Caixa Econômica Federal", agencia:"1011-1", conta:"24.529-2" },
-  { nome:"IVANA SCHAFER ORTIZ", cpf:"067.841.269-39", matricula:"951.405-8-05", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(47)9.8851-7820", telefone:"", email:"ivana.schafer@gmail.com", banco:"Banco do Brasil", agencia:"0276-3", conta:"47.364-2" },
-  { nome:"BRUNA ROBERTA WESSNER LONGEN", cpf:"050.932.569-60", matricula:"956.090-4-03", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(47)9.9609-4441", telefone:"", email:"brunawlongen@gmail.com", banco:"Banco do Brasil", agencia:"0276-3", conta:"105.808-8" },
-  { nome:"DAYANNE CHRISTINE SESTREN ROSA", cpf:"000.000.000-00", matricula:"0000000-0-00", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(48)9.8464-9354", telefone:"", email:"day.sestren88@gmail.com", banco:"", agencia:"", conta:"" },
-  { nome:"JÉSSICA KARLA VEIGA", cpf:"000.000.000-00", matricula:"0000000-0-00", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(47)9.9943-4426", telefone:"", email:"jessicaveiga9@gmail.com", banco:"", agencia:"", conta:"" },
-  { nome:"JULIANA DE ANDRADE ABEL", cpf:"000.000.000-00", matricula:"0000000-0-00", cargo:"POLICIAL PENAL", lotacao:"DEPARTAMENTO DE POLICIA PENAL", municipio:"FLORIANÓPOLIS", celular:"(48)9.9991-1198", telefone:"", email:"abeljuliana2012@gmail.com", banco:"", agencia:"", conta:"" }
-];
+window._servidoresCache = []; // preenchido pelo onSnapshot
+
+// Callback chamado sempre que os servidores são atualizados
+window._onServidoresAtualizado = function(lista) {
+  popularSelectsServidores(lista);
+  renderizarListaServidores(lista);
+};
+
+function popularSelectsServidores(lista) {
+  ['r-servidor','rl-servidor'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const val = sel.value;
+    sel.innerHTML = '<option value="">— Selecione o servidor —</option>';
+    lista.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id;
+      o.textContent = s.nome;
+      sel.appendChild(o);
+    });
+    if (val) sel.value = val; // mantém seleção se já havia
+  });
+}
+
+function renderizarListaServidores(lista) {
+  const loading = document.getElementById('serv-loading');
+  const vazio   = document.getElementById('serv-vazio');
+  const grid    = document.getElementById('lista-servidores');
+  if (loading) loading.style.display = 'none';
+  if (!lista.length) {
+    if (vazio) vazio.style.display = 'block';
+    grid.innerHTML = '';
+    return;
+  }
+  if (vazio) vazio.style.display = 'none';
+  grid.innerHTML = lista.map((s, i) => `
+    <div class="secao" style="position:relative;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:0.75rem;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--verde-claro);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.85rem;color:var(--verde-escuro);flex-shrink:0;">${i+1}</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;color:var(--texto);">${s.nome}</div>
+            <div style="font-size:0.75rem;color:var(--texto-sec);font-family:var(--mono);">${s.cargo||'—'}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button onclick="abrirModalServidor('${s.id}')"
+            style="font-family:var(--fonte);font-size:0.75rem;padding:5px 12px;border-radius:6px;border:1px solid var(--borda);background:var(--fundo);cursor:pointer;color:var(--texto);">
+            ✏️ Editar
+          </button>
+          <button onclick="confirmarExclusao('${s.id}','${s.nome.replace(/'/g,"\\\'")}')"
+            style="font-family:var(--fonte);font-size:0.75rem;padding:5px 12px;border-radius:6px;border:1px solid #F7C1C1;background:var(--erro-claro);cursor:pointer;color:var(--erro);">
+            🗑 Excluir
+          </button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:0.4rem 1.5rem;font-size:0.78rem;">
+        <div><span style="color:var(--texto-sec);">CPF:</span> ${s.cpf||'—'}</div>
+        <div><span style="color:var(--texto-sec);">Matrícula:</span> ${s.matricula||'—'}</div>
+        <div><span style="color:var(--texto-sec);">Município:</span> ${s.municipio||'—'}</div>
+        <div><span style="color:var(--texto-sec);">Celular:</span> ${s.celular||'—'}</div>
+        <div><span style="color:var(--texto-sec);">E-mail:</span> ${s.email||'—'}</div>
+        <div><span style="color:var(--texto-sec);">Banco:</span> ${s.banco||'—'} — Ag: ${s.agencia||'—'} / Cta: ${s.conta||'—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Modal servidor ────────────────────────────────
+function abrirModalServidor(id) {
+  const modal = document.getElementById('modal-servidor');
+  const titulo = document.getElementById('modal-srv-titulo');
+  const erro   = document.getElementById('modal-srv-erro');
+  erro.style.display = 'none';
+
+  // Popula select de município no modal
+  popularSelectMunicipio('srv-municipio', 'FLORIANÓPOLIS');
+
+  if (id) {
+    const s = window._servidoresCache.find(x => x.id === id);
+    if (!s) return;
+    titulo.textContent = '✏️ Editar Servidor';
+    document.getElementById('srv-id').value        = id;
+    document.getElementById('srv-nome').value      = s.nome      || '';
+    document.getElementById('srv-cpf').value       = s.cpf       || '';
+    document.getElementById('srv-matricula').value = s.matricula || '';
+    document.getElementById('srv-cargo').value     = s.cargo     || '';
+    document.getElementById('srv-lotacao').value   = s.lotacao   || 'DEPARTAMENTO DE POLICIA PENAL';
+    document.getElementById('srv-email').value     = s.email     || '';
+    document.getElementById('srv-celular').value   = s.celular   || '';
+    document.getElementById('srv-telefone').value  = s.telefone  || '';
+    document.getElementById('srv-banco').value     = s.banco     || '';
+    document.getElementById('srv-agencia').value   = s.agencia   || '';
+    document.getElementById('srv-conta').value     = s.conta     || '';
+    popularSelectMunicipio('srv-municipio', s.municipio || 'FLORIANÓPOLIS');
+  } else {
+    titulo.textContent = '+ Novo Servidor';
+    document.getElementById('srv-id').value = '';
+    ['srv-nome','srv-cpf','srv-matricula','srv-cargo','srv-email',
+     'srv-celular','srv-telefone','srv-banco','srv-agencia','srv-conta'].forEach(f => {
+      document.getElementById(f).value = '';
+    });
+    document.getElementById('srv-lotacao').value = 'DEPARTAMENTO DE POLICIA PENAL';
+  }
+
+  modal.style.display = 'flex';
+  document.getElementById('srv-nome').focus();
+}
+
+function fecharModalServidor() {
+  document.getElementById('modal-servidor').style.display = 'none';
+}
+
+async function salvarServidor() {
+  const id    = document.getElementById('srv-id').value;
+  const nome  = document.getElementById('srv-nome').value.trim();
+  const cpf   = document.getElementById('srv-cpf').value.trim();
+  const mat   = document.getElementById('srv-matricula').value.trim();
+  const cargo = document.getElementById('srv-cargo').value.trim();
+  const erro  = document.getElementById('modal-srv-erro');
+
+  if (!nome || !cpf || !mat || !cargo) {
+    erro.textContent = 'Preencha os campos obrigatórios: Nome, CPF, Matrícula e Cargo.';
+    erro.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('modal-srv-btn');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  const dados = {
+    nome,
+    cpf,
+    matricula : mat,
+    cargo,
+    lotacao   : document.getElementById('srv-lotacao').value.trim(),
+    municipio : document.getElementById('srv-municipio').value,
+    email     : document.getElementById('srv-email').value.trim(),
+    celular   : document.getElementById('srv-celular').value.trim(),
+    telefone  : document.getElementById('srv-telefone').value.trim(),
+    banco     : document.getElementById('srv-banco').value.trim(),
+    agencia   : document.getElementById('srv-agencia').value.trim(),
+    conta     : document.getElementById('srv-conta').value.trim(),
+  };
+
+  const res = await window._salvarServidor(dados, id || null);
+  btn.disabled = false;
+  btn.textContent = '✓ Salvar Servidor';
+
+  if (res.ok) {
+    fecharModalServidor();
+    toast('Servidor salvo com sucesso!');
+  } else {
+    erro.textContent = 'Erro ao salvar: ' + res.erro;
+    erro.style.display = 'block';
+  }
+}
+
+async function confirmarExclusao(id, nome) {
+  if (!confirm(`Excluir o servidor "${nome}"?\n\nEssa ação não pode ser desfeita.`)) return;
+  const res = await window._excluirServidor(id);
+  if (res.ok) toast('Servidor excluído.');
+  else toast('Erro ao excluir: ' + res.erro, 'erro');
+}
+
+// Máscara CPF
+function mascaraCPF(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,11);
+  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  input.value = v;
+}
 
 const TRANSPORTES = ['Veículo Oficial','Veículo Próprio','Ônibus','Avião'];
 const fmtR = v => 'R$ ' + v.toFixed(2).replace('.',',');
+
+
 
 // ══════════════════════════════════════════════════
 // CÁLCULO DE DIÁRIAS — lógica central (Dec. 1.662/2022)
@@ -738,14 +1043,22 @@ async function verificarContadorMes(matricula, prefixo) {
 function inicializar() {
   popularSelectMunicipio('r-municipio', 'FLORIANÓPOLIS');
   popularSelectMunicipio('rl-municipio', 'FLORIANÓPOLIS');
-  ['r-servidor','rl-servidor'].forEach(id => {
-    const sel = document.getElementById(id);
-    SERVIDORES.forEach((s, i) => {
-      const o = document.createElement('option'); o.value = i; o.textContent = s.nome; sel.appendChild(o);
-    });
+  adicionarLinha('r');
+  adicionarLinha('rl');
+  // Inicia escuta em tempo real dos servidores no Firebase
+  if (typeof window._iniciarEscutaServidores === 'function') {
+    window._iniciarEscutaServidores();
+  } else {
+    // Firebase ainda não carregou — tenta após breve delay
+    setTimeout(() => {
+      if (typeof window._iniciarEscutaServidores === 'function')
+        window._iniciarEscutaServidores();
+    }, 1500);
+  }
+  // Fechar modal ao clicar fora
+  document.getElementById('modal-servidor').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-servidor')) fecharModalServidor();
   });
-  adicionarLinha('r'); adicionarLinha('rl');
-  renderizarServidores();
 }
 
 function trocarAba(id, btn) {
@@ -756,28 +1069,29 @@ function trocarAba(id, btn) {
 }
 
 function preencherServidor(p) {
-  const idx = document.getElementById(p + '-servidor').value;
+  const id   = document.getElementById(p + '-servidor').value;
   const card = document.getElementById(p + '-card-servidor');
-  if (idx === '') { card.classList.remove('visivel'); return; }
-  const s = SERVIDORES[parseInt(idx)];
+  if (!id) { card.classList.remove('visivel'); return; }
+  const s = window._servidoresCache.find(x => x.id === id);
+  if (!s) { card.classList.remove('visivel'); return; }
   card.classList.add('visivel');
-  document.getElementById(p + '-srv-nome').textContent = s.nome;
-  document.getElementById(p + '-srv-cpf').textContent  = s.cpf;
-  document.getElementById(p + '-srv-mat').textContent  = s.matricula;
+  document.getElementById(p + '-srv-nome').textContent  = s.nome;
+  document.getElementById(p + '-srv-cpf').textContent   = s.cpf;
+  document.getElementById(p + '-srv-mat').textContent   = s.matricula;
   document.getElementById(p + '-srv-cargo').textContent = s.cargo;
-  document.getElementById(p + '-srv-lot').textContent  = s.lotacao;
+  document.getElementById(p + '-srv-lot').textContent   = s.lotacao;
   if (p === 'r') {
     document.getElementById('r-srv-banco').textContent = s.banco || '—';
     document.getElementById('r-srv-conta').textContent = (s.agencia || '—') + ' / ' + (s.conta || '—');
     if (s.municipio) popularSelectMunicipio('r-municipio', s.municipio.toUpperCase());
-    if (s.celular)   document.getElementById('r-celular').value   = s.celular;
-    if (s.email)     document.getElementById('r-email').value     = s.email;
+    if (s.celular)   document.getElementById('r-celular').value = s.celular;
+    if (s.email)     document.getElementById('r-email').value   = s.email;
     document.getElementById('r-btn-salvar').disabled = false;
     verificarContadorMes(s.matricula, 'r');
   } else {
     if (s.municipio) popularSelectMunicipio('rl-municipio', s.municipio.toUpperCase());
-    if (s.celular)   document.getElementById('rl-celular').value   = s.celular;
-    if (s.email)     document.getElementById('rl-email').value     = s.email;
+    if (s.celular)   document.getElementById('rl-celular').value = s.celular;
+    if (s.email)     document.getElementById('rl-email').value   = s.email;
   }
 }
 
@@ -1081,11 +1395,12 @@ function gerarPDF_MLR42(d) {
 // SALVAR + GERAR PDF
 // ══════════════════════════════════════════════════
 async function salvarEGerarPDF(tipo) {
-  const p = tipo === 'requerimento' ? 'r' : 'rl';
-  const idx = document.getElementById(p + '-servidor').value;
-  if (idx === '') { toast('Selecione um servidor primeiro.', 'erro'); return; }
-  const srv = SERVIDORES[parseInt(idx)];
-  const deslocs = coletarDeslocamentos(p);
+  const p   = tipo === 'requerimento' ? 'r' : 'rl';
+  const sid = document.getElementById(p + '-servidor').value;
+  if (!sid) { toast('Selecione um servidor primeiro.', 'erro'); return; }
+  const srv = window._servidoresCache.find(x => x.id === sid);
+  if (!srv) { toast('Servidor não encontrado. Recarregue a página.', 'erro'); return; }
+  const deslocs    = coletarDeslocamentos(p);
   const calcResult = window[p + '_calc'] || {};
 
   let dados = { tipo, srv, deslocamentos: deslocs, calc: calcResult,
@@ -1141,26 +1456,6 @@ async function salvarEGerarPDF(tipo) {
 }
 
 // ══════════════════════════════════════════════════
-// LISTA DE SERVIDORES
-// ══════════════════════════════════════════════════
-function renderizarServidores() {
-  document.getElementById('lista-servidores').innerHTML = SERVIDORES.map((s,i) => `
-    <div class="secao">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.75rem;">
-        <div style="width:38px;height:38px;border-radius:50%;background:var(--verde-claro);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.8rem;color:var(--verde-escuro);flex-shrink:0;">${i+1}</div>
-        <div><div style="font-weight:600;font-size:0.9rem;">${s.nome}</div><div style="font-size:0.75rem;color:var(--texto-sec);font-family:var(--mono);">${s.cargo}</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.4rem 1.5rem;font-size:0.78rem;">
-        <div><span style="color:var(--texto-sec);">CPF:</span> ${s.cpf}</div>
-        <div><span style="color:var(--texto-sec);">Matrícula:</span> ${s.matricula}</div>
-        <div><span style="color:var(--texto-sec);">Banco:</span> ${s.banco||'—'}</div>
-        <div><span style="color:var(--texto-sec);">Ag/Conta:</span> ${s.agencia||'—'} / ${s.conta||'—'}</div>
-        <div><span style="color:var(--texto-sec);">Celular:</span> ${s.celular||'—'}</div>
-        <div><span style="color:var(--texto-sec);">Lotação:</span> ${s.lotacao}</div>
-      </div>
-    </div>`).join('');
-}
-
 inicializar();
 </script>
 </body>
