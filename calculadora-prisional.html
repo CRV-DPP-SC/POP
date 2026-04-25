@@ -101,8 +101,8 @@
   <div class="card">
     <div class="card-title">Vagas Existentes</div>
     <div class="grid2">
-      <div><label>Total de Vagas Masculino</label><input type="number" id="tv_m_input" value="21869" min="0" oninput="calc()"></div>
-      <div><label>Total de Vagas Feminino</label><input type="number" id="tv_f_input" value="1380" min="0" oninput="calc()"></div>
+      <div><label>Total de Vagas Masculino</label><input type="number" id="tv_m_input" value="0" min="0" oninput="calc()"></div>
+      <div><label>Total de Vagas Feminino</label><input type="number" id="tv_f_input" value="0" min="0" oninput="calc()"></div>
     </div>
   </div>
 
@@ -250,7 +250,7 @@
 <script>
 var REG    = ['pr','fe','se','ab','ms','ni'];
 var REG_NOME = {pr:'Provisório',fe:'Fechado',se:'Semiaberto',ab:'Aberto',ms:'Medida de Segurança',ni:'Não Informado'};
-var TV = {m:21869, f:1380};
+var TV = {m:0, f:0};
 var P  = {m:{pr:0,fe:0,se:0,ab:0,ms:0,ni:0,tt:0}, f:{pr:0,fe:0,se:0,ab:0,ms:0,ni:0,tt:0}};
 var D  = {m:0, f:0, t:0};
 var PCT= {m:0, f:0, t:0};
