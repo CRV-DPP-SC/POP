@@ -2561,9 +2561,40 @@
         <div style="font-weight:700;color:#0F6E56;font-size:.95rem;">Sistema de Diárias</div>
         <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">MLR-41 e MLR-42 — Requerimento e Relatório</div>
       </div>
+
+      <!-- USM — Controle -->
+      <div onclick="abrirUSMControle()"
+        style="background:#0d1117;border:2px solid #3b82f6;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;position:relative;"
+        onmouseover="this.style.background='#161b22'" onmouseout="this.style.background='#0d1117'">
+        <div style="position:absolute;top:8px;right:10px;background:#3b82f6;color:#fff;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.06em;">TEMPO REAL</div>
+        <div style="font-size:2rem;margin-bottom:.6rem;">🔐</div>
+        <div style="font-weight:700;color:#3b82f6;font-size:.95rem;">USM — Controle</div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Controle de presos — Segurança Máxima</div>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- ========== MODAL USM CONTROLE ========== -->
+<div id="modal-usm-controle" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9992;flex-direction:column;" onclick="if(event.target===this)fecharUSMControle()">
+  <div style="display:flex;flex-direction:column;height:100%;width:100%;">
+    <div style="background:#161b22;border-bottom:1px solid #2d3748;padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <span style="font-family:monospace;font-size:11px;font-weight:700;color:#3b82f6;letter-spacing:.12em;">USM</span>
+      <span style="font-size:12px;color:#94a3b8;font-weight:500;">Controle de Presos — Segurança Máxima</span>
+      <div id="usm-fb-badge" style="font-size:10px;color:#94a3b8;font-family:monospace;padding:3px 10px;background:#0d1117;border-radius:20px;border:1px solid #2d3748;margin-left:8px;">🔄 Conectando…</div>
+      <div style="flex:1;"></div>
+      <button onclick="window.open('USM_controle.html','_blank')" title="Abrir em nova aba"
+        style="background:#1f2937;border:1px solid #374151;color:#94a3b8;border-radius:6px;padding:5px 12px;font-size:.75rem;cursor:pointer;">
+        ↗ Nova aba
+      </button>
+      <button onclick="fecharUSMControle()"
+        style="background:#dc2626;border:none;color:#fff;border-radius:6px;padding:5px 14px;font-size:.8rem;font-weight:700;cursor:pointer;">
+        ✕ Fechar
+      </button>
+    </div>
+    <iframe id="usm-iframe" src="" style="flex:1;border:none;width:100%;background:#0d1117;" allowfullscreen></iframe>
+  </div>
+</div>
 
 <!-- ====================================================  FOOTER  ==================================================== -->
 <footer class="site-footer">
@@ -5627,6 +5658,30 @@ window.abrirEscalaPlantao = function() {
       usuarioAtual = null;
     }
   });
+</script>
+<script>
+// ── USM CONTROLE MODAL ─────────────────────────────────────────────
+function abrirUSMControle() {
+  var modal = document.getElementById('modal-usm-controle');
+  var iframe = document.getElementById('usm-iframe');
+  if (iframe && !iframe.src.includes('USM_controle')) {
+    iframe.src = 'USM_controle.html';
+    // Tenta atualizar o badge de status via mensagens do iframe
+    iframe.onload = function() {
+      document.getElementById('usm-fb-badge').textContent = '🟢 Carregado';
+    };
+  }
+  if (modal) modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function fecharUSMControle() {
+  var modal = document.getElementById('modal-usm-controle');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharUSMControle();
+});
 </script>
 </body>
 </html>
