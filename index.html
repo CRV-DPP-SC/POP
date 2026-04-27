@@ -2516,6 +2516,15 @@
         <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Respostas, compilados e filtros</div>
       </div>
 
+      <!-- Caixinha do Setor -->
+      <div onclick="abrirCaixinha()"
+        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
+        <div style="font-size:2rem;margin-bottom:.6rem;">☕</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Caixinha do Setor</div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Controle de depósitos, compras e prestação de contas</div>
+      </div>
+
       <!-- SEEU -->
       <div onclick="window.open('https://seeu.pje.jus.br/seeu/','_blank')"
         style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
@@ -2770,6 +2779,74 @@
     <div id="detalhe-corpo" style="padding:1.25rem;font-size:.84rem;"></div>
   </div>
 </div>
+
+<!-- ========== MODAL CAIXINHA DO SETOR ========== -->
+<div id="modal-caixinha" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,.7);z-index:9990;align-items:flex-start;justify-content:center;overflow-y:auto;padding:0;" onclick="if(event.target===this)fecharCaixinha()">
+  <div id="modal-caixinha-inner" style="width:100%;min-height:100vh;background:#eef0f4;font-family:'Inter',system-ui,sans-serif;">
+
+    <!-- HEADER CAIXINHA -->
+    <div style="background:linear-gradient(135deg,#0a1628 0%,#0d2040 70%,#152550 100%);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 4px 20px rgba(0,0,0,.3);position:sticky;top:0;z-index:200;">
+      <div style="display:flex;align-items:center;gap:.85rem;">
+        <span style="font-size:2rem;line-height:1;filter:drop-shadow(0 2px 8px rgba(240,180,41,.5));">☕</span>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:1.5rem;font-weight:700;letter-spacing:.04em;line-height:1;">CAIXINHA DO SETOR</div>
+          <div style="color:#f0b429;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:.15rem;">CRV — Coordenadoria Regional de Vagas</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <span id="cxk-nome-usuario" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;padding:.3rem .85rem;border-radius:20px;font-size:.8rem;font-weight:500;"></span>
+        <button onclick="fecharCaixinha()" style="background:transparent;border:1.5px solid rgba(220,38,38,.6);color:#fca5a5;padding:.35rem .9rem;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:inherit;transition:all .2s;" onmouseover="this.style.background='rgba(220,38,38,.15)'" onmouseout="this.style.background='transparent'">✕ Fechar</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div style="max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem 0;">
+      <div id="cxk-tabs" style="display:flex;gap:.5rem;background:#fff;padding:.4rem;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.08);flex-wrap:wrap;margin-bottom:1.75rem;">
+        <button class="cxk-tab cxk-tab-ativo" onclick="cxkTab('painel')" style="flex:1;min-width:90px;text-align:center;padding:.55rem .75rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;background:#0d2040;color:#fff;box-shadow:0 2px 8px rgba(13,32,64,.3);transition:all .2s;">📊 Painel</button>
+        <button class="cxk-tab" onclick="cxkTab('deposito')" style="flex:1;min-width:90px;text-align:center;padding:.55rem .75rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;background:transparent;color:#6b7280;transition:all .2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.color==='#6b7280'&&(this.style.background='transparent')">💰 Depósito</button>
+        <button class="cxk-tab" onclick="cxkTab('compra')" style="flex:1;min-width:90px;text-align:center;padding:.55rem .75rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;background:transparent;color:#6b7280;transition:all .2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.color==='#6b7280'&&(this.style.background='transparent')">🛒 Compra</button>
+        <button class="cxk-tab" onclick="cxkTab('historico')" style="flex:1;min-width:90px;text-align:center;padding:.55rem .75rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;background:transparent;color:#6b7280;transition:all .2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.color==='#6b7280'&&(this.style.background='transparent')">📋 Histórico</button>
+        <button class="cxk-tab" onclick="cxkTab('relatorio')" style="flex:1;min-width:90px;text-align:center;padding:.55rem .75rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;background:transparent;color:#6b7280;transition:all .2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.color==='#6b7280'&&(this.style.background='transparent')">🖨️ Relatório</button>
+        <button class="cxk-tab" onclick="cxkTab('config')" style="flex:1;min-width:90px;text-align:center;padding:.55rem .75rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;background:transparent;color:#6b7280;transition:all .2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.color==='#6b7280'&&(this.style.background='transparent')">⚙️ Config.</button>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO DAS TABS (injetado por JS) -->
+    <div style="max-width:1100px;margin:0 auto;padding:0 1.5rem 3rem;" id="cxk-content"></div>
+
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO CAIXINHA -->
+<div id="cxk-modal-confirm" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,.65);backdrop-filter:blur(3px);z-index:10000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;padding:2rem;max-width:500px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.25);">
+    <div id="cxk-confirm-titulo" style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:#0d2040;margin-bottom:1.25rem;"></div>
+    <div id="cxk-confirm-resumo" style="background:#f9fafb;border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;"></div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <button onclick="cxkConfirmar()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.5rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;background:#16a34a;color:#fff;transition:all .2s;" onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">✅ Confirmar</button>
+      <button onclick="cxkRevisar()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.5rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;background:#d97706;color:#fff;transition:all .2s;" onmouseover="this.style.background='#b45309'" onmouseout="this.style.background='#d97706'">✏️ Revisar</button>
+      <button onclick="cxkCancelar()" style="display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.5rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;background:#dc2626;color:#fff;transition:all .2s;" onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#dc2626'">❌ Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING CAIXINHA -->
+<div id="cxk-loading" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,.5);z-index:10001;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:#fff;font-weight:500;font-family:'Inter',sans-serif;">
+  <div style="width:36px;height:36px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:cxk-spin .7s linear infinite;"></div>
+  <span>Salvando...</span>
+</div>
+
+<!-- TOAST CAIXINHA -->
+<div id="cxk-toasts" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:11000;display:flex;flex-direction:column;gap:.5rem;"></div>
+
+<style>
+@keyframes cxk-spin { to { transform:rotate(360deg); } }
+@keyframes cxk-fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+.cxk-panel-ativo { animation: cxk-fadeIn .25s ease; }
+@media print {
+  #modal-caixinha [id^="cxk-tabs"], #modal-caixinha button { display:none !important; }
+}
+</style>
 
 <!-- ========== MODAL CALCULADORA ========== -->
 <div id="modal-calculadora" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9990;flex-direction:column;" onclick="if(event.target===this)this.style.display='none'">
@@ -5714,6 +5791,551 @@ function fecharUSMControle() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') fecharUSMControle();
 });
+</script>
+
+<!-- ========== CAIXINHA DO SETOR — SCRIPT ========== -->
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, addDoc, collection,
+         query, orderBy, onSnapshot, serverTimestamp }
+         from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL }
+         from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
+  authDomain:"crv-dpp-sc.firebaseapp.com",
+  projectId:"crv-dpp-sc",
+  storageBucket:"crv-dpp-sc.firebasestorage.app",
+  messagingSenderId:"707080008192",
+  appId:"1:707080008192:web:64f44c65629c0fc5941ee5"
+};
+
+const app     = initializeApp(firebaseConfig, 'caixinha');
+const auth    = getAuth(app);
+const db      = getFirestore(app);
+const storage = getStorage(app);
+
+// ── Estado global ──────────────────────────────────────────
+let cxkUser = null, cxkTabAtual = 'painel', cxkPendente = null;
+let cxkAnexoFile = { dep:null, cmp:null };
+let cxkLancamentos = [], cxkConfig = { valorMensal:0, responsavel:'' };
+let cxkListenerUnsub = null;
+const MEMBROS = ['Rodrigo','Bruna','Ricardo','Day','Juliana','Jessica','Ivana'];
+const CORES   = ['#1a3a6e','#16a34a','#b8860b','#7c3aed','#db2777','#0d9488','#c2410c'];
+const fmt = v => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+
+// ── Auth ───────────────────────────────────────────────────
+onAuthStateChanged(auth, u => { cxkUser = u; });
+
+// ── Abrir / Fechar ─────────────────────────────────────────
+window.abrirCaixinha = async function() {
+  const m = document.getElementById('modal-caixinha');
+  m.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  if (cxkUser) {
+    document.getElementById('cxk-nome-usuario').textContent = '👤 ' + cxkUser.email.split('@')[0];
+    await cxkCarregarConfig();
+    if (!cxkListenerUnsub) cxkIniciarListener();
+    cxkInicializarDatas();
+    cxkRenderTab('painel');
+  } else {
+    cxkToast('Você precisa estar logado.','aviso');
+  }
+};
+
+window.fecharCaixinha = function() {
+  document.getElementById('modal-caixinha').style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+// ── Config ─────────────────────────────────────────────────
+async function cxkCarregarConfig() {
+  try {
+    const snap = await getDoc(doc(db,'caixinha_config','principal'));
+    if (snap.exists()) { cxkConfig = snap.data(); }
+  } catch(e) {}
+}
+
+window.cxkSalvarConfig = async function() {
+  const val  = parseFloat(document.getElementById('cxk-cfg-valor').value);
+  const resp = document.getElementById('cxk-cfg-resp').value;
+  if (!val||val<=0) { cxkToast('Informe um valor válido.','aviso'); return; }
+  try {
+    await setDoc(doc(db,'caixinha_config','principal'),{
+      valorMensal:val, responsavel:resp,
+      atualizadoPor:cxkUser.email, atualizadoEm:serverTimestamp()
+    });
+    cxkConfig={valorMensal:val,responsavel:resp};
+    cxkRenderTab('painel');
+    cxkToast('✅ Configurações salvas!','sucesso');
+  } catch(e){ cxkToast('Erro: '+e.message,'erro'); }
+};
+
+// ── Listener Firestore ─────────────────────────────────────
+function cxkIniciarListener() {
+  const q = query(collection(db,'caixinha_lancamentos'),orderBy('criadoEm','desc'));
+  cxkListenerUnsub = onSnapshot(q, snap => {
+    cxkLancamentos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    cxkRenderTab(cxkTabAtual);
+  });
+}
+
+// ── Tabs ───────────────────────────────────────────────────
+window.cxkTab = function(nome) {
+  cxkTabAtual = nome;
+  document.querySelectorAll('.cxk-tab').forEach(b => {
+    const isAtivo = b.onclick.toString().includes("'"+nome+"'");
+    b.style.background = isAtivo ? '#0d2040' : 'transparent';
+    b.style.color      = isAtivo ? '#fff'    : '#6b7280';
+    b.style.boxShadow  = isAtivo ? '0 2px 8px rgba(13,32,64,.3)' : 'none';
+  });
+  cxkRenderTab(nome);
+};
+
+function cxkRenderTab(nome) {
+  const el = document.getElementById('cxk-content');
+  if (!el) return;
+  if (nome==='painel')    { el.innerHTML = cxkHtmlPainel();    cxkPopularPainel(); }
+  if (nome==='deposito')  { el.innerHTML = cxkHtmlDeposito();  cxkInicializarDatas(); }
+  if (nome==='compra')    { el.innerHTML = cxkHtmlCompra();    cxkInicializarDatas(); }
+  if (nome==='historico') { el.innerHTML = cxkHtmlHistorico(); cxkRenderHistorico(cxkLancamentos,'cxk-hist-tbody'); }
+  if (nome==='relatorio') { el.innerHTML = cxkHtmlRelatorio(); cxkGerarRelatorio(); }
+  if (nome==='config')    { el.innerHTML = cxkHtmlConfig(); }
+}
+
+// ── HTML PAINEL ────────────────────────────────────────────
+function cxkHtmlPainel() {
+  return `
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.75rem;" id="cxk-resumo-grid"></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:.04em;color:#0d2040;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+    <span style="display:inline-block;width:4px;height:1.2em;background:#d4a017;border-radius:2px;"></span>Status dos Membros — Mês Atual
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem;" id="cxk-membros-grid"></div>`;
+}
+
+function cxkPopularPainel() {
+  const conf = cxkLancamentos.filter(l=>l.status==='confirmado');
+  const ent  = conf.filter(l=>l.tipo==='deposito').reduce((a,l)=>a+l.valor,0);
+  const sai  = conf.filter(l=>l.tipo==='compra').reduce((a,l)=>a+l.valor,0);
+  const sal  = ent - sai;
+
+  const rg = document.getElementById('cxk-resumo-grid');
+  if (!rg) return;
+  rg.innerHTML = cxkCard('💰 Saldo Atual',fmt(sal),'#16a34a')+
+    cxkCard('📥 Total Arrecadado',fmt(ent),'#2563eb')+
+    cxkCard('📤 Total Gasto',fmt(sai),'#dc2626')+
+    cxkCard('👥 Valor Mensal',cxkConfig.valorMensal?fmt(cxkConfig.valorMensal):'R$ —','#b8860b');
+
+  const agora = new Date();
+  const mesAtual = agora.getFullYear()+'-'+String(agora.getMonth()+1).padStart(2,'0');
+  const mg = document.getElementById('cxk-membros-grid');
+  if (!mg) return;
+  mg.innerHTML = MEMBROS.map((nome,i) => {
+    const deps = conf.filter(l=>l.tipo==='deposito'&&l.membro===nome&&l.mesRef===mesAtual);
+    const pago = deps.reduce((a,l)=>a+l.valor,0);
+    const meta = cxkConfig.valorMensal||0;
+    let st,cls;
+    if (!meta)        { st='Sem meta ⚪'; cls='background:#f3f4f6;color:#6b7280;'; }
+    else if(pago>=meta){ st='Em dia ✓';   cls='background:#dcfce7;color:#166534;'; }
+    else if(pago>0)   { st='Parcial ⚠';  cls='background:#fef3c7;color:#92400e;'; }
+    else              { st='Pendente ✗'; cls='background:#fee2e2;color:#991b1b;'; }
+    return `<div style="background:#fff;border-radius:12px;padding:1rem;box-shadow:0 4px 16px rgba(0,0,0,.08);text-align:center;">
+      <div style="width:48px;height:48px;border-radius:50%;background:${CORES[i]};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;color:#fff;margin:0 auto .6rem;">${nome.charAt(0)}</div>
+      <div style="font-size:.82rem;font-weight:600;color:#111827;margin-bottom:.3rem;">${nome}</div>
+      <span style="font-size:.7rem;font-weight:600;padding:.2rem .6rem;border-radius:20px;display:inline-block;${cls}">${st}</span>
+      ${meta?`<div style="font-size:.72rem;color:#9ca3af;margin-top:.25rem;">${fmt(pago)} / ${fmt(meta)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function cxkCard(label,valor,cor) {
+  return `<div style="background:#fff;border-radius:16px;padding:1.25rem 1.5rem;box-shadow:0 4px 16px rgba(0,0,0,.08);border-top:3px solid ${cor};">
+    <div style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.5rem;">${label}</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;line-height:1;color:${cor};">${valor}</div>
+  </div>`;
+}
+
+// ── HTML DEPÓSITO ──────────────────────────────────────────
+function cxkHtmlDeposito() {
+  return `<div style="background:#fff;border-radius:16px;padding:1.75rem;box-shadow:0 4px 16px rgba(0,0,0,.08);max-width:700px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:.04em;color:#0d2040;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;"><span style="display:inline-block;width:4px;height:1.2em;background:#d4a017;border-radius:2px;"></span>Registrar Depósito</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Membro *</label>
+        <select id="cxk-dep-membro" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;">${MEMBROS.map(m=>`<option>${m}</option>`).join('')}</select>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Mês de Referência *</label>
+        <input type="month" id="cxk-dep-mes" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Valor (R$) *</label>
+        <input type="number" id="cxk-dep-valor" placeholder="0,00" step="0.01" min="0" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Observação</label>
+        <input type="text" id="cxk-dep-obs" placeholder="Ex: pagamento do mês de junho" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+      </div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Comprovante (opcional)</label>
+      <div id="cxk-dep-upload-area" style="border:2px dashed #d1d5db;border-radius:8px;padding:1.25rem;text-align:center;cursor:pointer;position:relative;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#d1d5db'">
+        <input type="file" id="cxk-dep-anexo" accept="image/*,application/pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;background:none;padding:0;" onchange="cxkHandleUpload(this,'dep')" />
+        <div style="font-size:1.75rem;margin-bottom:.4rem;">📎</div>
+        <div style="font-size:.82rem;color:#6b7280;">Arraste ou <strong style="color:#2563eb;">clique para selecionar</strong><br><small>JPG, PNG ou PDF · máx. 5 MB</small></div>
+      </div>
+      <div id="cxk-dep-preview" style="display:none;align-items:center;gap:.75rem;background:#f3f4f6;padding:.6rem .9rem;border-radius:8px;margin-top:.75rem;font-size:.82rem;">
+        <span>📄</span><span id="cxk-dep-preview-nome" style="flex:1;font-weight:500;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <a id="cxk-dep-ver" href="#" target="_blank" style="padding:.3rem .7rem;background:#0d2040;color:#fff;border-radius:6px;font-size:.75rem;font-weight:600;text-decoration:none;">Ver</a>
+        <button onclick="cxkRemoverAnexo('dep')" style="padding:.3rem .5rem;background:rgba(220,38,38,.1);color:#dc2626;border:none;border-radius:6px;font-size:.75rem;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="border-top:1px solid #e5e7eb;padding-top:1.25rem;margin-top:.5rem;">
+      <button onclick="cxkSalvarLancamento('deposito')" style="display:inline-flex;align-items:center;gap:.45rem;padding:.65rem 1.5rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;background:#0d2040;color:#fff;transition:all .2s;" onmouseover="this.style.background='#1a3a6e'" onmouseout="this.style.background='#0d2040'">💾 Salvar Depósito</button>
+    </div>
+  </div>`;
+}
+
+// ── HTML COMPRA ────────────────────────────────────────────
+function cxkHtmlCompra() {
+  return `<div style="background:#fff;border-radius:16px;padding:1.75rem;box-shadow:0 4px 16px rgba(0,0,0,.08);max-width:700px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:.04em;color:#0d2040;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;"><span style="display:inline-block;width:4px;height:1.2em;background:#d4a017;border-radius:2px;"></span>Registrar Compra</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Responsável pela compra *</label>
+        <select id="cxk-cmp-membro" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;">${MEMBROS.map(m=>`<option>${m}</option>`).join('')}</select>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Data da Compra *</label>
+        <input type="date" id="cxk-cmp-data" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+      </div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">O que foi comprado? *</label>
+      <textarea id="cxk-cmp-desc" placeholder="Ex: 1kg café Pelé, 2 pacotes erva mate Barão, 1 cx açúcar..." style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;resize:vertical;min-height:80px;"></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Valor Total (R$) *</label>
+        <input type="number" id="cxk-cmp-valor" placeholder="0,00" step="0.01" min="0" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Local da compra</label>
+        <input type="text" id="cxk-cmp-local" placeholder="Ex: Supermercado, Atacado..." style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+      </div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Nota Fiscal / Comprovante (opcional)</label>
+      <div id="cxk-cmp-upload-area" style="border:2px dashed #d1d5db;border-radius:8px;padding:1.25rem;text-align:center;cursor:pointer;position:relative;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#d1d5db'">
+        <input type="file" id="cxk-cmp-anexo" accept="image/*,application/pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;background:none;padding:0;" onchange="cxkHandleUpload(this,'cmp')" />
+        <div style="font-size:1.75rem;margin-bottom:.4rem;">🧾</div>
+        <div style="font-size:.82rem;color:#6b7280;">Arraste ou <strong style="color:#2563eb;">clique para selecionar</strong><br><small>JPG, PNG ou PDF · máx. 5 MB</small></div>
+      </div>
+      <div id="cxk-cmp-preview" style="display:none;align-items:center;gap:.75rem;background:#f3f4f6;padding:.6rem .9rem;border-radius:8px;margin-top:.75rem;font-size:.82rem;">
+        <span>📄</span><span id="cxk-cmp-preview-nome" style="flex:1;font-weight:500;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <a id="cxk-cmp-ver" href="#" target="_blank" style="padding:.3rem .7rem;background:#0d2040;color:#fff;border-radius:6px;font-size:.75rem;font-weight:600;text-decoration:none;">Ver</a>
+        <button onclick="cxkRemoverAnexo('cmp')" style="padding:.3rem .5rem;background:rgba(220,38,38,.1);color:#dc2626;border:none;border-radius:6px;font-size:.75rem;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="border-top:1px solid #e5e7eb;padding-top:1.25rem;margin-top:.5rem;">
+      <button onclick="cxkSalvarLancamento('compra')" style="display:inline-flex;align-items:center;gap:.45rem;padding:.65rem 1.5rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;background:#0d2040;color:#fff;transition:all .2s;" onmouseover="this.style.background='#1a3a6e'" onmouseout="this.style.background='#0d2040'">💾 Salvar Compra</button>
+    </div>
+  </div>`;
+}
+
+// ── HTML HISTÓRICO ─────────────────────────────────────────
+function cxkHtmlHistorico() {
+  return `
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center;">
+    <select id="cxk-ftipo" onchange="cxkFiltrar()" style="padding:.5rem .85rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;background:#fff;outline:none;">
+      <option value="">Todos os tipos</option><option value="deposito">Depósitos</option><option value="compra">Compras</option>
+    </select>
+    <select id="cxk-fmembro" onchange="cxkFiltrar()" style="padding:.5rem .85rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;background:#fff;outline:none;">
+      <option value="">Todos os membros</option>${MEMBROS.map(m=>`<option>${m}</option>`).join('')}
+    </select>
+    <input type="month" id="cxk-fmes" onchange="cxkFiltrar()" style="padding:.5rem .85rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;background:#fff;outline:none;" />
+    <button onclick="cxkLimparFiltros()" style="padding:.5rem .9rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;border:2px solid #0d2040;background:transparent;color:#0d2040;letter-spacing:.04em;">✕ Limpar</button>
+  </div>
+  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,.08);overflow:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+      <thead style="background:#0d2040;color:#fff;">
+        <tr>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;white-space:nowrap;">Tipo</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Membro</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Descrição</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Valor</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Anexo</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Registrado por</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;white-space:nowrap;">Data/Hora</th>
+        </tr>
+      </thead>
+      <tbody id="cxk-hist-tbody"></tbody>
+    </table>
+  </div>`;
+}
+
+// ── HTML RELATÓRIO ─────────────────────────────────────────
+function cxkHtmlRelatorio() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:.04em;color:#0d2040;display:flex;align-items:center;gap:.5rem;"><span style="display:inline-block;width:4px;height:1.2em;background:#d4a017;border-radius:2px;"></span>Relatório de Prestação de Contas</div>
+    <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+      <input type="month" id="cxk-rel-mes" style="padding:.5rem .85rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;background:#fff;outline:none;" />
+      <button onclick="cxkGerarRelatorio()" style="padding:.5rem .9rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;border:2px solid #0d2040;background:transparent;color:#0d2040;letter-spacing:.04em;">🔄 Atualizar</button>
+      <button onclick="window.print()" style="padding:.5rem 1.2rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:#0d2040;color:#fff;letter-spacing:.04em;">🖨️ Imprimir</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;" id="cxk-rel-cards"></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.04em;color:#0d2040;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;"><span style="display:inline-block;width:4px;height:1.1em;background:#d4a017;border-radius:2px;"></span>Movimentações</div>
+  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,.08);overflow:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+      <thead style="background:#0d2040;color:#fff;">
+        <tr>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Data</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Tipo</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Membro</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Descrição</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Valor</th>
+          <th style="padding:.85rem 1rem;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.06em;">Registrado por</th>
+        </tr>
+      </thead>
+      <tbody id="cxk-rel-tbody"></tbody>
+    </table>
+  </div>`;
+}
+
+// ── HTML CONFIG ────────────────────────────────────────────
+function cxkHtmlConfig() {
+  return `<div style="background:#fff;border-radius:16px;padding:1.75rem;box-shadow:0 4px 16px rgba(0,0,0,.08);max-width:500px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:.04em;color:#0d2040;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;"><span style="display:inline-block;width:4px;height:1.2em;background:#d4a017;border-radius:2px;"></span>Configurações do Caixinha</div>
+    <div style="background:#eff6ff;border-left:4px solid #2563eb;border-radius:0 8px 8px 0;padding:.75rem 1rem;font-size:.84rem;color:#1a3a6e;margin-bottom:1.5rem;line-height:1.5;">ℹ️ Defina aqui o valor mensal de contribuição de cada membro.</div>
+    <div style="margin-bottom:1rem;">
+      <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Valor Mensal por Membro (R$)</label>
+      <input type="number" id="cxk-cfg-valor" value="${cxkConfig.valorMensal||''}" placeholder="Ex: 30.00" step="0.01" min="0" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;" />
+    </div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.4rem;">Responsável pelo Caixa</label>
+      <select id="cxk-cfg-resp" style="width:100%;padding:.65rem .9rem;border:1.5px solid #d1d5db;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:#111827;background:#f9fafb;outline:none;">
+        <option value="">Selecione</option>${MEMBROS.map(m=>`<option${cxkConfig.responsavel===m?' selected':''}>${m}</option>`).join('')}
+      </select>
+    </div>
+    <button onclick="cxkSalvarConfig()" style="display:inline-flex;align-items:center;gap:.45rem;padding:.65rem 1.5rem;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;background:#16a34a;color:#fff;transition:all .2s;" onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">💾 Salvar Configurações</button>
+  </div>`;
+}
+
+// ── Upload ─────────────────────────────────────────────────
+window.cxkHandleUpload = function(input, p) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5*1024*1024) { cxkToast('Arquivo muito grande. Máx. 5 MB.','aviso'); input.value=''; return; }
+  cxkAnexoFile[p] = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('cxk-'+p+'-preview-nome').textContent = file.name;
+  document.getElementById('cxk-'+p+'-ver').href = url;
+  document.getElementById('cxk-'+p+'-preview').style.display = 'flex';
+};
+
+window.cxkRemoverAnexo = function(p) {
+  cxkAnexoFile[p] = null;
+  const inp = document.getElementById('cxk-'+p+'-anexo');
+  if (inp) inp.value = '';
+  const prev = document.getElementById('cxk-'+p+'-preview');
+  if (prev) prev.style.display = 'none';
+};
+
+// ── Salvar Lançamento (abre modal) ─────────────────────────
+window.cxkSalvarLancamento = function(tipo) {
+  let dados = {};
+  if (tipo==='deposito') {
+    const membro = document.getElementById('cxk-dep-membro').value;
+    const mesRef = document.getElementById('cxk-dep-mes').value;
+    const valor  = parseFloat(document.getElementById('cxk-dep-valor').value);
+    const obs    = document.getElementById('cxk-dep-obs').value.trim();
+    if (!membro) { cxkToast('Selecione o membro.','aviso'); return; }
+    if (!mesRef) { cxkToast('Selecione o mês de referência.','aviso'); return; }
+    if (!valor||valor<=0) { cxkToast('Informe um valor válido.','aviso'); return; }
+    dados = { tipo, membro, mesRef, valor, descricao: obs||'Depósito mensal' };
+  }
+  if (tipo==='compra') {
+    const membro = document.getElementById('cxk-cmp-membro').value;
+    const data   = document.getElementById('cxk-cmp-data').value;
+    const desc   = document.getElementById('cxk-cmp-desc').value.trim();
+    const valor  = parseFloat(document.getElementById('cxk-cmp-valor').value);
+    const local  = document.getElementById('cxk-cmp-local').value.trim();
+    if (!membro) { cxkToast('Selecione o responsável.','aviso'); return; }
+    if (!data)   { cxkToast('Informe a data da compra.','aviso'); return; }
+    if (!desc)   { cxkToast('Descreva o que foi comprado.','aviso'); return; }
+    if (!valor||valor<=0) { cxkToast('Informe um valor válido.','aviso'); return; }
+    dados = { tipo, membro, mesRef: data.substring(0,7), data, descricao:desc, valor, local };
+  }
+  cxkPendente = dados;
+  cxkAbrirModalConfirm(dados);
+};
+
+function cxkAbrirModalConfirm(d) {
+  const p = d.tipo==='deposito' ? 'dep' : 'cmp';
+  const temAnexo = !!cxkAnexoFile[p];
+  document.getElementById('cxk-confirm-titulo').textContent =
+    d.tipo==='deposito' ? '💰 Confirmar Depósito' : '🛒 Confirmar Compra';
+
+  let html = '';
+  const row = (l,v) => `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:.4rem 0;font-size:.88rem;border-bottom:1px solid #e5e7eb;"><span style="color:#6b7280;font-weight:500;">${l}</span><span style="color:#111827;font-weight:600;text-align:right;max-width:60%;word-break:break-word;">${v}</span></div>`;
+
+  if (d.tipo==='deposito') {
+    const [a,m] = d.mesRef.split('-');
+    const mn = new Date(a,m-1).toLocaleString('pt-BR',{month:'long',year:'numeric'});
+    html = row('Membro',d.membro)+row('Referência',mn)+
+      `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:.4rem 0;font-size:.88rem;border-bottom:1px solid #e5e7eb;"><span style="color:#6b7280;font-weight:500;">Valor</span><span style="color:#2563eb;font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;">${fmt(d.valor)}</span></div>`+
+      row('Descrição',d.descricao);
+  } else {
+    const [a,m,dia] = d.data.split('-');
+    html = row('Responsável',d.membro)+row('Data',`${dia}/${m}/${a}`)+row('O que foi comprado',d.descricao)+
+      (d.local?row('Local',d.local):'')+
+      `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:.4rem 0;font-size:.88rem;border-bottom:1px solid #e5e7eb;"><span style="color:#6b7280;font-weight:500;">Valor</span><span style="color:#2563eb;font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;">${fmt(d.valor)}</span></div>`;
+  }
+  html += row('Anexo', temAnexo ? '✅ '+cxkAnexoFile[p].name : '—');
+  html += row('Registrado por', cxkUser?.email||'—');
+
+  document.getElementById('cxk-confirm-resumo').innerHTML = html;
+  document.getElementById('cxk-modal-confirm').style.display = 'flex';
+}
+
+window.cxkConfirmar = async function() {
+  if (!cxkPendente) return;
+  const p = cxkPendente.tipo==='deposito' ? 'dep' : 'cmp';
+  document.getElementById('cxk-modal-confirm').style.display = 'none';
+  const ld = document.getElementById('cxk-loading');
+  ld.style.display = 'flex';
+  try {
+    let urlAnexo = null;
+    if (cxkAnexoFile[p]) {
+      const storRef = ref(storage, `caixinha_anexos/${Date.now()}_${cxkAnexoFile[p].name}`);
+      await uploadBytes(storRef, cxkAnexoFile[p]);
+      urlAnexo = await getDownloadURL(storRef);
+    }
+    await addDoc(collection(db,'caixinha_lancamentos'), {
+      ...cxkPendente, urlAnexo, status:'confirmado',
+      registradoPor: cxkUser.email, criadoEm: serverTimestamp()
+    });
+    cxkToast('✅ Lançamento confirmado!','sucesso');
+    cxkAnexoFile[p] = null;
+    cxkPendente = null;
+    cxkTab('painel');
+  } catch(e) { cxkToast('Erro ao salvar: '+e.message,'erro'); }
+  finally { ld.style.display = 'none'; }
+};
+
+window.cxkRevisar = function() {
+  document.getElementById('cxk-modal-confirm').style.display = 'none';
+};
+
+window.cxkCancelar = function() {
+  document.getElementById('cxk-modal-confirm').style.display = 'none';
+  const p = cxkPendente?.tipo==='deposito' ? 'dep' : 'cmp';
+  cxkRemoverAnexo(p);
+  cxkPendente = null;
+  cxkToast('Lançamento cancelado.','aviso');
+  cxkTab(cxkPendente?.tipo==='deposito'?'deposito':'compra');
+};
+
+// ── Filtros Histórico ──────────────────────────────────────
+window.cxkFiltrar = function() {
+  const tipo   = document.getElementById('cxk-ftipo')?.value;
+  const membro = document.getElementById('cxk-fmembro')?.value;
+  const mes    = document.getElementById('cxk-fmes')?.value;
+  let lista = [...cxkLancamentos];
+  if (tipo)   lista = lista.filter(l=>l.tipo===tipo);
+  if (membro) lista = lista.filter(l=>l.membro===membro);
+  if (mes)    lista = lista.filter(l=>l.mesRef&&l.mesRef.startsWith(mes));
+  cxkRenderHistorico(lista,'cxk-hist-tbody');
+};
+
+window.cxkLimparFiltros = function() {
+  const ft=document.getElementById('cxk-ftipo'), fm=document.getElementById('cxk-fmembro'), fmes=document.getElementById('cxk-fmes');
+  if(ft) ft.value=''; if(fm) fm.value=''; if(fmes) fmes.value='';
+  cxkRenderHistorico(cxkLancamentos,'cxk-hist-tbody');
+};
+
+function cxkRenderHistorico(lista, tbId) {
+  const tb = document.getElementById(tbId);
+  if (!tb) return;
+  if (!lista.length) {
+    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:3rem;color:#9ca3af;"><div style="font-size:2.5rem;margin-bottom:.75rem;">📂</div><div style="font-size:.9rem;">Nenhum lançamento encontrado.</div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = lista.map(l => {
+    const isE = l.tipo==='deposito';
+    const dt  = l.criadoEm?.toDate ? l.criadoEm.toDate().toLocaleString('pt-BR') : '—';
+    return `<tr style="border-bottom:1px solid #e5e7eb;">
+      <td style="padding:.8rem 1rem;"><span style="font-size:.78rem;font-weight:600;padding:.2rem .6rem;border-radius:20px;${isE?'background:#dcfce7;color:#166534;':'background:#fee2e2;color:#991b1b;'}">${isE?'💰 Depósito':'🛒 Compra'}</span></td>
+      <td style="padding:.8rem 1rem;font-weight:600;color:#374151;">${l.membro||'—'}</td>
+      <td style="padding:.8rem 1rem;color:#374151;max-width:200px;word-break:break-word;">${l.descricao||'—'}</td>
+      <td style="padding:.8rem 1rem;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:${isE?'#16a34a':'#dc2626'};">${isE?'+':'−'}${fmt(l.valor)}</span></td>
+      <td style="padding:.8rem 1rem;">${l.urlAnexo?`<a href="${l.urlAnexo}" target="_blank" style="padding:.3rem .7rem;background:#0d2040;color:#fff;border-radius:6px;font-size:.75rem;font-weight:600;text-decoration:none;">Ver 📎</a>`:'<span style="color:#9ca3af;font-size:.8rem;">—</span>'}</td>
+      <td style="padding:.8rem 1rem;font-size:.75rem;color:#9ca3af;white-space:nowrap;">${l.registradoPor||'—'}</td>
+      <td style="padding:.8rem 1rem;font-size:.75rem;color:#9ca3af;white-space:nowrap;">${dt}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Relatório ──────────────────────────────────────────────
+window.cxkGerarRelatorio = function() {
+  const mes = document.getElementById('cxk-rel-mes')?.value;
+  let lista = cxkLancamentos.filter(l=>l.status==='confirmado');
+  if (mes) lista = lista.filter(l=>l.mesRef&&l.mesRef.startsWith(mes));
+  const ent = lista.filter(l=>l.tipo==='deposito').reduce((a,l)=>a+l.valor,0);
+  const sai = lista.filter(l=>l.tipo==='compra').reduce((a,l)=>a+l.valor,0);
+
+  const rc = document.getElementById('cxk-rel-cards');
+  if (rc) rc.innerHTML =
+    cxkCard('💰 Saldo',fmt(ent-sai),'#16a34a')+
+    cxkCard('📥 Entradas',fmt(ent),'#2563eb')+
+    cxkCard('📤 Saídas',fmt(sai),'#dc2626');
+
+  const sorted = [...lista].sort((a,b)=>{
+    const da=a.criadoEm?.toDate?a.criadoEm.toDate():new Date(0);
+    const db2=b.criadoEm?.toDate?b.criadoEm.toDate():new Date(0);
+    return da-db2;
+  });
+  const tb = document.getElementById('cxk-rel-tbody');
+  if (!tb) return;
+  if (!sorted.length) {
+    tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:3rem;color:#9ca3af;"><div style="font-size:2.5rem;margin-bottom:.75rem;">📂</div><div style="font-size:.9rem;">Sem movimentações no período.</div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = sorted.map(l => {
+    const isE = l.tipo==='deposito';
+    const dt  = l.criadoEm?.toDate ? l.criadoEm.toDate().toLocaleDateString('pt-BR') : '—';
+    return `<tr style="border-bottom:1px solid #e5e7eb;">
+      <td style="padding:.8rem 1rem;color:#374151;">${dt}</td>
+      <td style="padding:.8rem 1rem;"><span style="font-size:.78rem;font-weight:600;padding:.2rem .6rem;border-radius:20px;${isE?'background:#dcfce7;color:#166534;':'background:#fee2e2;color:#991b1b;'}">${isE?'💰 Dep.':'🛒 Compra'}</span></td>
+      <td style="padding:.8rem 1rem;font-weight:600;color:#374151;">${l.membro||'—'}</td>
+      <td style="padding:.8rem 1rem;color:#374151;max-width:200px;word-break:break-word;">${l.descricao||'—'}</td>
+      <td style="padding:.8rem 1rem;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:${isE?'#16a34a':'#dc2626'};">${isE?'+':'−'}${fmt(l.valor)}</span></td>
+      <td style="padding:.8rem 1rem;font-size:.75rem;color:#9ca3af;">${l.registradoPor||'—'}</td>
+    </tr>`;
+  }).join('');
+};
+
+// ── Datas padrão ───────────────────────────────────────────
+function cxkInicializarDatas() {
+  const hoje = new Date();
+  const mes = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  const data = hoje.toISOString().split('T')[0];
+  const dm=document.getElementById('cxk-dep-mes'), dc=document.getElementById('cxk-cmp-data'), dr=document.getElementById('cxk-rel-mes');
+  if(dm) dm.value=mes; if(dc) dc.value=data; if(dr) dr.value=mes;
+}
+
+// ── Toast ──────────────────────────────────────────────────
+function cxkToast(msg, tipo='sucesso') {
+  const d = document.createElement('div');
+  d.style.cssText=`background:#0a1628;color:#fff;padding:.85rem 1.25rem;border-radius:10px;font-size:.86rem;font-weight:500;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;align-items:center;gap:.75rem;max-width:340px;font-family:'Inter',sans-serif;border-left:4px solid ${tipo==='sucesso'?'#16a34a':tipo==='erro'?'#dc2626':'#f0b429'};`;
+  d.textContent = msg;
+  document.getElementById('cxk-toasts').appendChild(d);
+  setTimeout(()=>d.remove(),4000);
+}
 </script>
 </body>
 </html>
