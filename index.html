@@ -5795,24 +5795,16 @@ document.addEventListener('keydown', function(e) {
 
 <!-- ========== CAIXINHA DO SETOR — SCRIPT ========== -->
 <script type="module">
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getApp }           from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getAuth }          from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, collection,
          query, orderBy, onSnapshot, serverTimestamp }
          from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL }
          from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
-const firebaseConfig = {
-  apiKey:"AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
-  authDomain:"crv-dpp-sc.firebaseapp.com",
-  projectId:"crv-dpp-sc",
-  storageBucket:"crv-dpp-sc.firebasestorage.app",
-  messagingSenderId:"707080008192",
-  appId:"1:707080008192:web:64f44c65629c0fc5941ee5"
-};
-
-const app     = initializeApp(firebaseConfig, 'caixinha');
+// Reutiliza a instância Firebase ja inicializada pelo site
+const app     = getApp();
 const auth    = getAuth(app);
 const db      = getFirestore(app);
 const storage = getStorage(app);
@@ -5826,11 +5818,13 @@ const MEMBROS = ['Rodrigo','Bruna','Ricardo','Day','Juliana','Jessica','Ivana'];
 const CORES   = ['#1a3a6e','#16a34a','#b8860b','#7c3aed','#db2777','#0d9488','#c2410c'];
 const fmt = v => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
-// ── Auth ───────────────────────────────────────────────────
-onAuthStateChanged(auth, u => { cxkUser = u; });
+// ── Auth: pega o usuario ja logado pelo site ───────────────
+cxkUser = auth.currentUser;
 
 // ── Abrir / Fechar ─────────────────────────────────────────
 window.abrirCaixinha = async function() {
+  // Sempre atualiza o usuario no momento da abertura
+  cxkUser = auth.currentUser;
   const m = document.getElementById('modal-caixinha');
   m.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -5841,7 +5835,9 @@ window.abrirCaixinha = async function() {
     cxkInicializarDatas();
     cxkRenderTab('painel');
   } else {
-    cxkToast('Você precisa estar logado.','aviso');
+    cxkToast('Voce precisa estar logado para usar a Caixinha.','aviso');
+    document.getElementById('modal-caixinha').style.display = 'none';
+    document.body.style.overflow = '';
   }
 };
 
