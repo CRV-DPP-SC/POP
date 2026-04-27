@@ -6324,7 +6324,7 @@ function cxkRenderHistorico(lista, tbId) {
       <td style="padding:.8rem 1rem;font-size:.82rem;color:#374151;white-space:nowrap;">${mesRefFmt}</td>
       <td style="padding:.8rem 1rem;color:#374151;max-width:200px;word-break:break-word;">${l.descricao||'—'}</td>
       <td style="padding:.8rem 1rem;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:${isE?'#16a34a':'#dc2626'};">${isE?'+':'−'}${fmt(l.valor)}</span></td>
-      <td style="padding:.8rem 1rem;">${l.anexoBase64?`<a href="${l.anexoBase64}" download="${l.anexoNome||'anexo'}" target="_blank" style="padding:.3rem .7rem;background:#0d2040;color:#fff;border-radius:6px;font-size:.75rem;font-weight:600;text-decoration:none;">Ver 📎</a>`:'<span style="color:#9ca3af;font-size:.8rem;">—</span>'}</td>
+      <td style="padding:.8rem 1rem;">${(l.anexoBase64||l.urlAnexo)?`<a href="${l.anexoBase64||l.urlAnexo}" ${l.anexoBase64?`download="${l.anexoNome||'anexo'}"`:''} target="_blank" style="display:inline-block;padding:.3rem .8rem;background:#0d2040;color:#fff;border-radius:6px;font-size:.75rem;font-weight:600;text-decoration:none;white-space:nowrap;">👁 Ver</a>`:'<span style="color:#9ca3af;font-size:.8rem;">—</span>'}</td>
       <td style="padding:.8rem 1rem;font-size:.75rem;color:#9ca3af;white-space:nowrap;">${l.registradoPor||'—'}</td>
       <td style="padding:.8rem 1rem;font-size:.75rem;color:#9ca3af;white-space:nowrap;">${dt}</td>
     </tr>`;
@@ -6382,28 +6382,130 @@ window.cxkGerarRelatorio = function() {
   }).join('');
 };
 
-// ── Imprimir — paisagem compacto ─────────────────────────
+// ── Imprimir — abre janela nova limpa com o relatório ────
 window.cxkImprimir = function() {
-  const styleId = 'cxk-print-style';
-  let s = document.getElementById(styleId);
-  if (!s) { s = document.createElement('style'); s.id = styleId; document.head.appendChild(s); }
-  s.innerHTML = `
-    @media print {
-      @page { size: A4 landscape; margin: .8cm 1cm; }
-      body > *:not(#modal-caixinha) { display: none !important; }
-      #modal-caixinha { display: block !important; position: static !important; background: white !important; }
-      #modal-caixinha-inner { min-height: auto !important; }
-      .cab-header, #cxk-tabs, [onclick*="cxkTab"], [onclick*="cxkImprimir"], [onclick*="cxkGerarRelatorio"],
-      button, .cxk-tab { display: none !important; }
-      #cxk-content { padding: 0 !important; }
-      #cxk-rel-cards > div { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
-      table { font-size: .72rem !important; }
-      th, td { padding: .3rem .5rem !important; }
-      thead { background: #0d2040 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .cab-header { display: none !important; }
-      #cxk-nome-usuario, #modal-caixinha > div:first-child { display: none !important; }
-    }`;
-  window.print();
+  // Coleta os filtros atuais
+  const tipo   = document.getElementById('cxk-rel-tipo')?.value || '';
+  const mesSel = document.getElementById('cxk-rel-mes-sel')?.value || '';
+  const membro = document.getElementById('cxk-rel-membro')?.value || '';
+
+  // Filtra e ordena os lançamentos
+  let lista = cxkLancamentos.filter(l=>l.status==='confirmado');
+  if (tipo)   lista = lista.filter(l=>l.tipo===tipo);
+  if (mesSel) lista = lista.filter(l=>l.mesRef===mesSel);
+  if (membro) lista = lista.filter(l=>l.membro===membro);
+  lista = [...lista].sort((a,b)=>{
+    const da=a.criadoEm?.toDate?a.criadoEm.toDate():new Date(0);
+    const db2=b.criadoEm?.toDate?b.criadoEm.toDate():new Date(0);
+    return da-db2;
+  });
+
+  const ent = lista.filter(l=>l.tipo==='deposito').reduce((a,l)=>a+l.valor,0);
+  const sai = lista.filter(l=>l.tipo==='compra').reduce((a,l)=>a+l.valor,0);
+  const sal = ent - sai;
+
+  // Descrição dos filtros para o cabeçalho
+  const tipoLabel   = tipo==='deposito'?'Depósitos':tipo==='compra'?'Compras':'Depósitos e Compras';
+  const mesLabel    = mesSel ? (()=>{const[a,m]=mesSel.split('-');return new Date(a,m-1).toLocaleString('pt-BR',{month:'long',year:'numeric'});})() : 'Todos os meses';
+  const membroLabel = membro||'Todos os membros';
+  const agora       = new Date().toLocaleString('pt-BR');
+  const usuario     = cxkUser?.email||'—';
+
+  // Monta as linhas da tabela
+  const linhas = lista.length === 0
+    ? '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#888;">Nenhum lançamento encontrado.</td></tr>'
+    : lista.map(l => {
+        const isE = l.tipo==='deposito';
+        const dt  = l.criadoEm?.toDate ? l.criadoEm.toDate().toLocaleDateString('pt-BR') : '—';
+        const mr  = l.mesRef ? (()=>{const[a,m]=l.mesRef.split('-');return new Date(a,m-1).toLocaleString('pt-BR',{month:'short',year:'numeric'});})() : '—';
+        return `<tr>
+          <td>${dt}</td>
+          <td>${mr}</td>
+          <td><span class="${isE?'dep':'cmp'}">${isE?'Depósito':'Compra'}</span></td>
+          <td>${l.membro||'—'}</td>
+          <td>${l.descricao||'—'}</td>
+          <td style="font-weight:700;color:${isE?'#16a34a':'#dc2626'};">${isE?'+':'−'}${fmt(l.valor)}</td>
+        </tr>`;
+      }).join('');
+
+  // HTML completo da janela de impressão
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <title>Relatório Caixinha — ${agora}</title>
+    <style>
+      @page { size: A4 landscape; margin: 1cm; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: Arial, sans-serif; font-size: 11px; color: #111; }
+      .cab { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 2px solid #0d2040; padding-bottom: 8px; }
+      .cab-titulo { font-size: 15px; font-weight: 700; color: #0d2040; }
+      .cab-sub { font-size: 9px; color: #666; margin-top: 2px; }
+      .cab-info { text-align: right; font-size: 9px; color: #666; line-height: 1.6; }
+      .filtros { display: flex; gap: 16px; margin-bottom: 10px; background: #f9fafb; padding: 6px 10px; border-radius: 6px; }
+      .filtro { font-size: 9px; color: #555; }
+      .filtro strong { color: #0d2040; }
+      .cards { display: flex; gap: 10px; margin-bottom: 12px; }
+      .card { flex: 1; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; }
+      .card-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; margin-bottom: 3px; }
+      .card-valor { font-size: 16px; font-weight: 700; }
+      .verde { color: #16a34a; } .azul { color: #2563eb; } .vermelho { color: #dc2626; }
+      table { width: 100%; border-collapse: collapse; }
+      thead { background: #0d2040; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      th { padding: 5px 8px; text-align: left; font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+      td { padding: 4px 8px; border-bottom: 1px solid #f3f4f6; font-size: 10px; }
+      tr:nth-child(even) td { background: #f9fafb; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .dep { background: #dcfce7; color: #166534; padding: 1px 6px; border-radius: 10px; font-size: 9px; font-weight: 700; }
+      .cmp { background: #fee2e2; color: #991b1b; padding: 1px 6px; border-radius: 10px; font-size: 9px; font-weight: 700; }
+      .rodape { margin-top: 10px; text-align: right; font-size: 8px; color: #aaa; }
+    </style>
+  </head><body>
+    <div class="cab">
+      <div>
+        <div class="cab-titulo">☕ CAIXINHA DO SETOR — CRV/DPP-SC</div>
+        <div class="cab-sub">Coordenadoria Regional de Vagas — Polícia Penal de Santa Catarina</div>
+      </div>
+      <div class="cab-info">
+        Emitido em: ${agora}<br>
+        Por: ${usuario}<br>
+        Total de lançamentos: ${lista.length}
+      </div>
+    </div>
+
+    <div class="filtros">
+      <div class="filtro"><strong>Tipo:</strong> ${tipoLabel}</div>
+      <div class="filtro"><strong>Período:</strong> ${mesLabel}</div>
+      <div class="filtro"><strong>Membro:</strong> ${membroLabel}</div>
+    </div>
+
+    <div class="cards">
+      ${!tipo||tipo===''?`<div class="card"><div class="card-label">💰 Saldo</div><div class="card-valor ${sal>=0?'verde':'vermelho'}">${fmt(sal)}</div></div>`:''}
+      ${!tipo||tipo==='deposito'?`<div class="card"><div class="card-label">📥 Total Entradas</div><div class="card-valor azul">${fmt(ent)}</div></div>`:''}
+      ${!tipo||tipo==='compra'?`<div class="card"><div class="card-label">📤 Total Saídas</div><div class="card-valor vermelho">${fmt(sai)}</div></div>`:''}
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Mês Ref.</th>
+          <th>Tipo</th>
+          <th>Membro</th>
+          <th>Descrição</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>${linhas}</tbody>
+    </table>
+
+    <div class="rodape">Procedimentos Operacionais CRV — Polícia Penal SC — ${agora}</div>
+  </body></html>`;
+
+  // Abre janela nova e imprime
+  const w = window.open('','_blank','width=1100,height=700');
+  if (!w) { cxkToast('Permita pop-ups para imprimir.','aviso'); return; }
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 400);
 };
 
 // ── Datas padrão ───────────────────────────────────────────
