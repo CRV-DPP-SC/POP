@@ -3,788 +3,371 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>USM — Controle de Presos</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>USM — Unidade de Segurança Máxima</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:        #0d1117;
-    --surface:   #161b22;
-    --surface2:  #1f2937;
-    --border:    #2d3748;
-    --border2:   #374151;
-    --accent:    #3b82f6;
-    --accent2:   #1d4ed8;
-    --text:      #e2e8f0;
-    --text2:     #94a3b8;
-    --text3:     #64748b;
-    --ok:        #22c55e;
-    --ok-bg:     #052e16;
-    --ok-border: #166534;
-    --warn:      #f59e0b;
-    --warn-bg:   #1c1107;
-    --warn-border:#92400e;
-    --danger:    #ef4444;
-    --danger-bg: #1c0505;
-    --danger-border:#991b1b;
-    --excl:      #6b7280;
-    --excl-bg:   #111827;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
-  }
+:root{
+  --bg:#f0f2f5;--surface:#fff;--surface2:#f5f6f8;--border:#dde1e9;
+  --accent:#1a56a0;--accent2:#1e6abf;--accent-light:#e8f0fb;
+  --red:#c0392b;--red-light:#fdecea;--yellow:#b7770d;--yellow-light:#fef6e4;
+  --green:#1e7e4b;--green-light:#e6f6ed;
+  --text:#1a1f2e;--text-dim:#4a5568;--text-muted:#8896b0;
+  --hdr-bg:#0d0f14;--hdr-border:#c8922a;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;min-height:100vh}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── HEADER PRETO ── */
+header{background:var(--hdr-bg);border-bottom:2px solid var(--hdr-border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.logo-shield{width:38px;height:38px;background:var(--hdr-border);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;color:#0d0f14;flex-shrink:0}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:3px;color:#fff}
+.header-sub{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-left:2px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.stat-pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:5px 14px;font-family:'Barlow Condensed',sans-serif;font-size:13px;display:flex;align-items:center;gap:6px;color:#fff}
+.stat-pill span{opacity:.55;font-size:11px;letter-spacing:.5px}
+.stat-pill.red strong{color:#ff8a80}
+.stat-pill.yellow strong{color:#ffd54f}
+.stat-pill.gold strong{color:var(--hdr-border)}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 13px;
-    min-height: 100vh;
-  }
+/* ── TABS ── */
+.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;gap:2px;box-shadow:var(--shadow)}
+.tab-btn{background:none;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:14px 20px 12px;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:8px}
+.tab-btn:hover{color:var(--text-dim)}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--text)}
+.tab-count{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1px 7px;font-size:11px;color:var(--text-muted)}
+.tab-btn.active .tab-count{background:#e8e8e8;color:var(--text);border-color:#d0d0d0}
 
-  /* ── HEADER ─────────────────────────────────────────────────────── */
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .logo span { color: var(--text3); font-weight: 400; }
-  .header-divider { width: 1px; height: 28px; background: var(--border); }
-  .header-title {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text2);
-    letter-spacing: 0.02em;
-  }
-  .header-spacer { flex: 1; }
-  .header-stats {
-    display: flex;
-    gap: 20px;
-    font-family: var(--mono);
-    font-size: 11px;
-  }
-  .stat-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-  .stat-num { font-size: 16px; font-weight: 600; line-height: 1; }
-  .stat-label { color: var(--text3); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
-  .stat-item.danger .stat-num { color: var(--danger); }
-  .stat-item.warn .stat-num   { color: var(--warn); }
-  .stat-item.ok .stat-num     { color: var(--ok); }
-  .stat-item.neutral .stat-num{ color: var(--text2); }
+/* ── MAIN ── */
+main{padding:24px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
-  /* ── TABS ────────────────────────────────────────────────────────── */
-  .tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    padding: 0 24px;
-  }
-  .tab {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 12px 20px;
-    cursor: pointer;
-    color: var(--text3);
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: -1px;
-    white-space: nowrap;
-  }
-  .tab:hover { color: var(--text2); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab .badge {
-    background: var(--surface2);
-    color: var(--text2);
-    font-size: 9px;
-    padding: 1px 5px;
-    border-radius: 10px;
-    border: 1px solid var(--border2);
-    min-width: 20px;
-    text-align: center;
-  }
-  .tab.active .badge { background: var(--accent2); color: #fff; border-color: var(--accent); }
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px;max-width:340px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px 8px 34px;outline:none;transition:border .2s,box-shadow .2s;box-shadow:var(--shadow)}
+.search-input:focus{border-color:#888;box-shadow:0 0 0 3px rgba(0,0,0,.07)}
+.search-input::placeholder{color:var(--text-muted)}
+.filter-select{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;cursor:pointer;box-shadow:var(--shadow)}
+.filter-select:focus{border-color:#888}
 
-  /* ── TOOLBAR ─────────────────────────────────────────────────────── */
-  .toolbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    flex-wrap: wrap;
-  }
-  .search-wrap {
-    position: relative;
-    flex: 1;
-    min-width: 200px;
-    max-width: 360px;
-  }
-  .search-wrap svg {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text3);
-    pointer-events: none;
-  }
-  input[type="text"], select, input[type="date"] {
-    background: var(--bg);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 12px;
-    padding: 7px 10px;
-    border-radius: 5px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  input[type="text"]:focus, select:focus, input[type="date"]:focus {
-    border-color: var(--accent);
-  }
-  .search-input { padding-left: 32px; width: 100%; }
-  select { cursor: pointer; }
-  select option { background: var(--surface2); }
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:6px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:8px 16px;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-primary{background:#1a1f2e;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.btn-primary:hover{background:#333}
+.btn-ghost{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--text-muted);color:var(--text)}
+.btn-edit{background:#e8e8e8;color:#1a1f2e;border:1px solid #ccc}
+.btn-edit:hover{background:#d4d4d4}
+.btn-del{background:var(--red-light);color:var(--red);border:1px solid #f5c6c2}
+.btn-del:hover{background:#fbd5d2}
+.btn-back{background:var(--green-light);color:var(--green);border:1px solid #b2dfc7}
+.btn-back:hover{background:#cdf0dd}
+.btn-sm{padding:4px 9px;font-size:11px}
 
-  .btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 7px 14px;
-    border-radius: 5px;
-    border: 1px solid var(--border2);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .btn-primary:hover { background: var(--accent2); }
-  .btn-ghost { background: transparent; color: var(--text2); }
-  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
-  .btn-danger { background: transparent; color: var(--danger); border-color: var(--danger-border); }
-  .btn-danger:hover { background: var(--danger-bg); }
-  .btn-ok { background: transparent; color: var(--ok); border-color: var(--ok-border); }
-  .btn-ok:hover { background: var(--ok-bg); }
+/* ── TABLE ── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--surface2)}
+thead th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:10px 13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--text-dim)}
+thead th.sort-asc::after{content:' ↑';color:var(--text)}
+thead th.sort-desc::after{content:' ↓';color:var(--text)}
+thead th.no-sort{cursor:default}
+thead th.no-sort:hover{color:var(--text-muted)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f7f9ff}
+tbody td{padding:10px 13px;color:var(--text);font-size:13px;vertical-align:middle}
+.td-name{font-weight:600;color:var(--text);min-width:180px}
+.td-ipen{font-family:'Barlow Condensed',sans-serif;color:var(--text-dim);font-size:13px}
+.td-ata{font-family:'Barlow Condensed',sans-serif;color:var(--text);font-size:13px;font-weight:700;white-space:nowrap}
+.td-date{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text-dim);white-space:nowrap}
+.td-obs{font-size:12px;color:var(--text-muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-act{white-space:nowrap}
 
-  .toolbar-sep { width: 1px; height: 24px; background: var(--border); }
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:3px 8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.badge-ok{background:var(--green-light);color:var(--green);border:1px solid #b2dfc7}.badge-ok::before{background:var(--green)}
+.badge-soon{background:var(--yellow-light);color:var(--yellow);border:1px solid #f0d08a}.badge-soon::before{background:var(--yellow)}
+.badge-expired{background:var(--red-light);color:var(--red);border:1px solid #f5c6c2}.badge-expired::before{background:var(--red)}
+.badge-inc{background:var(--green-light);color:var(--green);border:1px solid #b2dfc7}.badge-inc::before{background:var(--green)}
+.badge-perm{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe}.badge-perm::before{background:#3730a3}
+.badge-exc{background:var(--red-light);color:var(--red);border:1px solid #f5c6c2}.badge-exc::before{background:var(--red)}
 
-  /* ── MAIN ────────────────────────────────────────────────────────── */
-  .main { padding: 0; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+.dias-ok{color:var(--green);font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:14px}
+.dias-soon{color:var(--yellow);font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:14px}
+.dias-expired{color:var(--red);font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:14px}
 
-  /* ── TABLE ───────────────────────────────────────────────────────── */
-  .table-wrap { overflow-x: auto; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-  thead th {
-    background: var(--surface2);
-    color: var(--text3);
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-    cursor: pointer;
-    user-select: none;
-    position: sticky;
-    top: 0;
-  }
-  thead th:hover { color: var(--text2); }
-  thead th.sort-asc::after  { content: ' ↑'; color: var(--accent); }
-  thead th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+.actions{display:flex;gap:5px;align-items:center}
+.empty{text-align:center;padding:60px 20px;color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px}
+.section-info{margin-bottom:12px}
+.section-info-text{font-size:13px;color:var(--text-muted)}
+.section-info-count{font-weight:700;color:var(--text)}
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  tbody tr:hover { background: var(--surface2); }
-  tbody td {
-    padding: 9px 12px;
-    color: var(--text);
-    vertical-align: middle;
-  }
-  td.mono { font-family: var(--mono); font-size: 11px; }
-  td.center { text-align: center; }
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(10,15,30,.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md);animation:slideUp .22s ease}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:17px 22px;border-bottom:1px solid var(--border);background:var(--hdr-bg);border-radius:10px 10px 0 0}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;color:var(--hdr-border)}
+.modal-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);font-size:18px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s}
+.modal-close:hover{background:rgba(255,255,255,.1);color:#fff}
+.modal-body{padding:20px 22px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid var(--border);background:var(--surface2);border-radius:0 0 10px 10px}
 
-  /* Status badges */
-  .badge-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .badge-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
-  .s-ok      { background: var(--ok-bg);     color: var(--ok);     border: 1px solid var(--ok-border); }
-  .s-ok::before      { background: var(--ok); }
-  .s-warn    { background: var(--warn-bg);   color: var(--warn);   border: 1px solid var(--warn-border); }
-  .s-warn::before    { background: var(--warn); }
-  .s-danger  { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
-  .s-danger::before  { background: var(--danger); }
-  .s-nodata  { background: var(--surface2);  color: var(--text3);  border: 1px solid var(--border2); }
-  .s-nodata::before  { background: var(--text3); }
+/* ── CONFIRM MODAL ── */
+.confirm-modal{max-width:400px}
+.confirm-msg{font-size:14px;color:var(--text-dim);line-height:1.6;padding:4px 0}
+.confirm-name{font-weight:700;color:var(--text)}
 
-  .badge-dec {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    padding: 2px 7px;
-    border-radius: 3px;
-    text-transform: uppercase;
-  }
-  .d-inclusao  { background: #1e3a5f; color: #60a5fa; border: 1px solid #1d4ed8; }
-  .d-exclusao  { background: #1f2937; color: #9ca3af; border: 1px solid #374151; }
-  .d-permanencia { background: #052e16; color: #4ade80; border: 1px solid #166534; }
-  .d-indeferimento { background: #1c1107; color: #fbbf24; border: 1px solid #92400e; }
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.form-col{grid-column:span 2}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted)}
+.form-input,.form-select,.form-textarea{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:8px 11px;outline:none;width:100%;transition:border .2s,box-shadow .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#888;box-shadow:0 0 0 3px rgba(0,0,0,.07)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted)}
+.form-textarea{resize:vertical;min-height:65px}
 
-  .dias-num {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-  }
-  .dias-neg { color: var(--danger); }
-  .dias-warn { color: var(--warn); }
-  .dias-ok { color: var(--ok); }
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--hdr-bg);border:1px solid #333;border-radius:8px;padding:12px 18px;font-size:13px;color:#fff;box-shadow:var(--shadow-md);display:none;align-items:center;gap:10px;max-width:300px}
+#toast.show{display:flex}
+#toast.success{border-left:3px solid #4caf7d}
+#toast.error{border-left:3px solid var(--red)}
+#toast.info{border-left:3px solid #555}
 
-  /* Row status highlight */
-  tr.row-danger td { background: rgba(239,68,68,0.05); }
-  tr.row-warn td   { background: rgba(245,158,11,0.05); }
-  tr.row-danger:hover td { background: rgba(239,68,68,0.1); }
-  tr.row-warn:hover td   { background: rgba(245,158,11,0.1); }
-
-  /* ── MODAL ───────────────────────────────────────────────────────── */
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    width: 100%;
-    max-width: 720px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
-  }
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border);
-  }
-  .modal-title {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .modal-close {
-    background: none;
-    border: none;
-    color: var(--text3);
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    padding: 4px;
-  }
-  .modal-close:hover { color: var(--text); }
-  .modal-body { padding: 24px; }
-  .modal-footer {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ── FORM ────────────────────────────────────────────────────────── */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-grid .span2 { grid-column: 1 / -1; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-group label {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-  }
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-  }
-  textarea {
-    background: var(--bg);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 12px;
-    padding: 7px 10px;
-    border-radius: 5px;
-    outline: none;
-    resize: vertical;
-    min-height: 60px;
-  }
-  textarea:focus { border-color: var(--accent); }
-  .form-hint {
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 2px;
-  }
-
-  /* ── EMPTY STATE ─────────────────────────────────────────────────── */
-  .empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 64px 24px;
-    color: var(--text3);
-    gap: 12px;
-    text-align: center;
-  }
-  .empty svg { opacity: 0.3; }
-  .empty h3 { font-family: var(--mono); font-size: 13px; color: var(--text2); }
-  .empty p  { font-size: 12px; max-width: 320px; line-height: 1.6; }
-
-  /* ── TOAST ───────────────────────────────────────────────────────── */
-  #toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 10px 16px;
-    border-radius: 6px;
-    z-index: 300;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all 0.25s ease;
-    max-width: 320px;
-  }
-  #toast.show { transform: translateY(0); opacity: 1; }
-  #toast.toast-ok     { border-color: var(--ok-border); color: var(--ok); }
-  #toast.toast-danger { border-color: var(--danger-border); color: var(--danger); }
-
-  /* ── ACTIONS COL ─────────────────────────────────────────────────── */
-  .actions { display: flex; gap: 6px; }
-  .act-btn {
-    background: none;
-    border: 1px solid var(--border2);
-    color: var(--text3);
-    cursor: pointer;
-    padding: 3px 7px;
-    border-radius: 4px;
-    font-size: 11px;
-    transition: all 0.12s;
-  }
-  .act-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .act-btn.del:hover { border-color: var(--danger-border); color: var(--danger); background: var(--danger-bg); }
-
-
-  /* ── COPY BUTTONS ────────────────────────────────────────────── */
-  .copy-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text3);
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-size: 11px;
-    line-height: 1;
-    transition: color 0.15s, background 0.15s;
-    vertical-align: middle;
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  .copy-btn:hover { color: var(--accent); background: var(--surface2); }
-  .copy-btn.copied { color: var(--ok); }
-  .copy-cell {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-  }
-  /* ── SCROLLBAR ───────────────────────────────────────────────────── */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-  /* ── SECTION LABEL ───────────────────────────────────────────────── */
-  .section-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text3);
-    padding: 8px 24px 6px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-  }
-
-  .no-results {
-    padding: 32px;
-    text-align: center;
-    color: var(--text3);
-    font-family: var(--mono);
-    font-size: 11px;
-  }
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr}.form-col{grid-column:span 1}main{padding:12px}.header-right{display:none}.tabs{padding:0 8px}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ══ HEADER PRETO ══ -->
 <header>
-  <div class="logo">USM <span>/ SC</span></div>
-  <div class="header-divider"></div>
-  <div class="header-title">Controle de Presos — Unidade de Segurança Máxima</div>
-  <div class="header-spacer"></div>
-  <div id="fb-status" style="font-size:10px;font-family:var(--mono);color:var(--text3);white-space:nowrap;padding:0 16px;">🔄 Conectando…</div>
-  <div id="permissao-badge" style="font-size:10px;font-family:var(--mono);padding:2px 10px;border-radius:20px;white-space:nowrap;background:rgba(239,68,68,.12);color:var(--danger);border:1px solid var(--danger-border);">👁 Somente leitura</div>
-  <div class="header-stats">
-    <div class="stat-item neutral"><span class="stat-num" id="st-total">0</span><span class="stat-label">Ativos</span></div>
-    <div class="stat-item danger"><span class="stat-num" id="st-vencido">0</span><span class="stat-label">Vencidos</span></div>
-    <div class="stat-item warn"><span class="stat-num" id="st-alerta">0</span><span class="stat-label">Alertas</span></div>
-    <div class="stat-item ok"><span class="stat-num" id="st-ok">0</span><span class="stat-label">OK</span></div>
+  <div class="logo-shield">USM</div>
+  <div>
+    <div class="header-title">SISTEMA USM</div>
+    <div class="header-sub">Unidade de Segurança Máxima · SC</div>
+  </div>
+  <div class="header-right">
+    <div class="stat-pill gold"><span>Ativos</span><strong id="hdr-ativos">—</strong></div>
+    <div class="stat-pill red"><span>Vencidos</span><strong id="hdr-vencidos">—</strong></div>
+    <div class="stat-pill yellow"><span>Vence em Breve</span><strong id="hdr-breve">—</strong></div>
+    <div class="stat-pill"><span>Excluídos</span><strong id="hdr-excluidos">—</strong></div>
   </div>
 </header>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" data-tab="historico">
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8zm7.5-3.5a.5.5 0 011 0v2.793l1.854 1.853a.5.5 0 01-.708.708l-2-2A.5.5 0 017.5 7.5V4.5z"/></svg>
-    Histórico <span class="badge" id="badge-hist">0</span>
-  </div>
-  <div class="tab" data-tab="ativos">
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 100-6 3 3 0 000 6z"/></svg>
-    Ativos <span class="badge" id="badge-atv">0</span>
-  </div>
-  <div class="tab" data-tab="excluidos">
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.506a.58.58 0 00-.01 0H1.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 004.885 16h6.23a2 2 0 001.994-1.84l.853-10.66h.538a.5.5 0 000-1h-.995a.59.59 0 00-.01 0H11z"/></svg>
-    Excluídos <span class="badge" id="badge-exc">0</span>
-  </div>
-</div>
+<!-- ══ TABS ══ -->
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('ativos',this)">Ativos <span class="tab-count" id="cnt-ativos">0</span></button>
+  <button class="tab-btn" onclick="switchTab('historico',this)">Histórico <span class="tab-count" id="cnt-historico">0</span></button>
+  <button class="tab-btn" onclick="switchTab('excluidos',this)">Excluídos <span class="tab-count" id="cnt-excluidos">0</span></button>
+</nav>
 
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- HISTÓRICO -->
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel active" id="panel-historico">
+<main>
+
+<!-- ════ ABA ATIVOS ════ -->
+<div id="tab-ativos" class="tab-panel active">
   <div class="toolbar">
     <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.099zm-5.242 1.656a5.5 5.5 0 110-11 5.5 5.5 0 010 11z"/></svg>
-      <input type="text" class="search-input" id="search-hist" placeholder="Buscar por nome, IPEN ou nº processo…">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="search-ativos" placeholder="Buscar nome, IPEN, ATA…" oninput="renderAtivos()">
     </div>
-    <select id="filter-dec">
-      <option value="">Todas as decisões</option>
-      <option>INCLUSÃO</option>
-      <option>INCLUSÃO PROVISÓRIA</option>
-      <option>EXCLUSÃO</option>
-      <option>PERMANÊNCIA</option>
-      <option>INDEFERIMENTO</option>
-    </select>
-    <select id="filter-ano">
-      <option value="">Todos os anos</option>
-      <option>2025</option>
-      <option>2026</option>
-    </select>
-    <div class="toolbar-sep"></div>
-    <button class="btn btn-primary" onclick="openModal()">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/></svg>
-      Novo Registro
-    </button>
-    <button class="btn btn-ghost" onclick="exportCSV('historico')">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5zM7.646 11.854a.5.5 0 00.708 0l3-3a.5.5 0 00-.708-.708L8.5 10.293V1.5a.5.5 0 00-1 0v8.793L5.354 8.146a.5.5 0 10-.708.708l3 3z"/></svg>
-      Exportar CSV
-    </button>
-    <div class="toolbar-sep"></div>
-    <button class="btn btn-ok" onclick="exportarBackup()" title="Salva todos os dados em JSON — use para backup ou para enviar ao desenvolvedor">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5zM7.646 11.854a.5.5 0 00.708 0l3-3a.5.5 0 00-.708-.708L8.5 10.293V1.5a.5.5 0 00-1 0v8.793L5.354 8.146a.5.5 0 10-.708.708l3 3z"/></svg>
-      💾 Backup JSON
-    </button>
-    <label class="btn btn-ghost" title="Restaura dados de um arquivo de backup JSON" style="cursor:pointer">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5zM7.646 1.146a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L8.5 2.707V11.5a.5.5 0 01-1 0V2.707L5.354 4.854a.5.5 0 11-.708-.708l3-3z"/></svg>
-      Importar JSON
-      <input type="file" accept=".json" onchange="importarBackup(event)" style="display:none">
-    </label>
-    <div class="toolbar-sep"></div>
-    <button class="btn btn-danger" onclick="resetarDados()" title="Apaga dados salvos e recarrega os dados iniciais com IPEN e datas preenchidos">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
-      Resetar dados iniciais
-    </button>
-  </div>
-  <div class="table-wrap">
-    <table id="table-hist">
-      <thead>
-        <tr>
-          <th onclick="sortTable('historico','ata')">Nº ATA</th>
-          <th onclick="sortTable('historico','decisao')">Decisão</th>
-          <th onclick="sortTable('historico','motivo')">Motivo / Regime</th>
-          <th onclick="sortTable('historico','nome')">Nome</th>
-          <th onclick="sortTable('historico','ipen')">IPEN</th>
-          <th onclick="sortTable('historico','processo')">Nº Processo (SAP/SEJURI)</th>
-          <th onclick="sortTable('historico','unidade')">Unidade</th>
-          <th onclick="sortTable('historico','dataDecisao')">Data Decisão</th>
-          <th onclick="sortTable('historico','dataEntrada')">Data Entrada USM</th>
-          <th onclick="sortTable('historico','dataVencimento')">Data Vencimento</th>
-          <th>Obs.</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody-hist"></tbody>
-    </table>
-    <div id="empty-hist" class="empty" style="display:none">
-      <svg width="40" height="40" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8zm7.5-3.5a.5.5 0 011 0v2.793l1.854 1.853a.5.5 0 01-.708.708l-2-2A.5.5 0 017.5 7.5V4.5z"/></svg>
-      <h3>Nenhum registro encontrado</h3>
-      <p>Adicione o primeiro registro clicando em "Novo Registro".</p>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- ATIVOS -->
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="panel-ativos">
-  <div class="toolbar">
-    <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.099zm-5.242 1.656a5.5 5.5 0 110-11 5.5 5.5 0 010 11z"/></svg>
-      <input type="text" class="search-input" id="search-atv" placeholder="Buscar por nome, IPEN…">
-    </div>
-    <select id="filter-status">
+    <select class="filter-select" id="filter-status-ativos" onchange="renderAtivos()">
       <option value="">Todos os status</option>
-      <option value="VENCIDO">Vencidos</option>
-      <option value="VENCE EM BREVE">Vence em breve</option>
+      <option value="VENCIDO">Vencido</option>
+      <option value="VENCE EM BREVE">Vence em Breve</option>
       <option value="OK">OK</option>
-      <option value="SEM DATA">Sem data</option>
     </select>
-    <select id="filter-regime">
-      <option value="">Todos os regimes</option>
-      <option>RDD</option>
-      <option>ALTA PERICULOSIDADE</option>
-      <option>PROTEÇÃO DO PRESO</option>
-      <option>MANUTENÇÃO DA ORDEM</option>
-      <option>FUGA - INCISO IV</option>
+    <select class="filter-select" id="filter-motivo-ativos" onchange="renderAtivos()">
+      <option value="">Todos os motivos</option>
+      <option value="ALTA PERICULOSIDADE">Alta Periculosidade</option>
+      <option value="RDD">RDD</option>
+      <option value="FUGA - INCISO IV">Fuga</option>
     </select>
-    <div class="toolbar-sep"></div>
-    <button class="btn btn-ghost" onclick="exportCSV('ativos')">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5zM7.646 11.854a.5.5 0 00.708 0l3-3a.5.5 0 00-.708-.708L8.5 10.293V1.5a.5.5 0 00-1 0v8.793L5.354 8.146a.5.5 0 10-.708.708l3 3z"/></svg>
-      Exportar
-    </button>
   </div>
-  <div class="section-label">Ordenado por vencimento — mais próximos primeiro</div>
-  <div class="table-wrap">
-    <table id="table-atv">
-      <thead>
-        <tr>
-          <th>Nº ATA</th>
-          <th>Nome</th>
-          <th>IPEN</th>
-          <th>Nº Processo</th>
-          <th>Motivo / Regime</th>
-          <th>Unidade</th>
-          <th>Data Entrada USM</th>
-          <th>Data Vencimento</th>
-          <th>Dias Rest.</th>
-          <th>Status</th>
-          <th>Obs.</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody-atv"></tbody>
+  <div class="section-info"><span class="section-info-text">Exibindo <span class="section-info-count" id="count-ativos-shown">—</span> presos ativos</span></div>
+  <div class="table-wrap"><div class="table-scroll">
+    <table>
+      <thead><tr>
+        <th onclick="sortTable('ativos','ata')">Nº ATA</th>
+        <th onclick="sortTable('ativos','nome')">Nome</th>
+        <th onclick="sortTable('ativos','ipen')">IPEN</th>
+        <th onclick="sortTable('ativos','processo')">Processo</th>
+        <th onclick="sortTable('ativos','motivo')">Motivo</th>
+        <th onclick="sortTable('ativos','vencimento')">Vencimento</th>
+        <th onclick="sortTable('ativos','dias')">Dias Rest.</th>
+        <th class="no-sort">Status</th>
+        <th class="no-sort">Observações</th>
+        <th class="no-sort" style="text-align:center">Ações</th>
+      </tr></thead>
+      <tbody id="tbody-ativos"></tbody>
     </table>
-    <div id="empty-atv" class="empty" style="display:none">
-      <svg width="40" height="40" viewBox="0 0 16 16" fill="currentColor"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 100-6 3 3 0 000 6z"/></svg>
-      <h3>Nenhum preso ativo</h3>
-      <p>Adicione registros de INCLUSÃO ou PERMANÊNCIA no Histórico.</p>
-    </div>
-  </div>
+    <div class="empty" id="empty-ativos" style="display:none">Nenhum registro encontrado.</div>
+  </div></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- EXCLUÍDOS -->
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="panel-excluidos">
+<!-- ════ ABA HISTÓRICO ════ -->
+<div id="tab-historico" class="tab-panel">
   <div class="toolbar">
     <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.099zm-5.242 1.656a5.5 5.5 0 110-11 5.5 5.5 0 010 11z"/></svg>
-      <input type="text" class="search-input" id="search-exc" placeholder="Buscar por nome, IPEN…">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="search-historico" placeholder="Buscar nome, IPEN, ATA…" oninput="renderHistorico()">
     </div>
-    <div class="toolbar-sep"></div>
-    <button class="btn btn-ghost" onclick="exportCSV('excluidos')">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5zM7.646 11.854a.5.5 0 00.708 0l3-3a.5.5 0 00-.708-.708L8.5 10.293V1.5a.5.5 0 00-1 0v8.793L5.354 8.146a.5.5 0 10-.708.708l3 3z"/></svg>
-      Exportar
+    <select class="filter-select" id="filter-decisao-historico" onchange="renderHistorico()">
+      <option value="">Todas as decisões</option>
+      <option value="INCLUSÃO">Inclusão</option>
+      <option value="PERMANÊNCIA">Permanência</option>
+      <option value="EXCLUSÃO">Exclusão</option>
+    </select>
+    <button class="btn btn-primary" onclick="openModalHistorico()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Inserir Novo Preso
     </button>
   </div>
-  <div class="table-wrap">
-    <table id="table-exc">
-      <thead>
-        <tr>
-          <th>Nº ATA</th>
-          <th>Nome</th>
-          <th>IPEN</th>
-          <th>Nº Processo</th>
-          <th>Decisão</th>
-          <th>Motivo / Regime</th>
-          <th>Unidade</th>
-          <th>Data Decisão</th>
-          <th>Data Entrada USM</th>
-          <th>Data Vencimento</th>
-          <th>Obs.</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody-exc"></tbody>
+  <div class="section-info"><span class="section-info-text">Exibindo <span class="section-info-count" id="count-historico-shown">—</span> registros históricos</span></div>
+  <div class="table-wrap"><div class="table-scroll">
+    <table>
+      <thead><tr>
+        <th onclick="sortTable('historico','ata')">Nº ATA</th>
+        <th class="no-sort">Decisão</th>
+        <th onclick="sortTable('historico','motivo')">Motivo</th>
+        <th onclick="sortTable('historico','nome')">Nome</th>
+        <th onclick="sortTable('historico','ipen')">IPEN</th>
+        <th onclick="sortTable('historico','processo')">Processo</th>
+        <th onclick="sortTable('historico','unidade')">Unidade</th>
+        <th onclick="sortTable('historico','entrada')">Data Entrada</th>
+        <th onclick="sortTable('historico','vencimento')">Data Vencimento</th>
+        <th class="no-sort">Observações</th>
+        <th class="no-sort" style="text-align:center">Ações</th>
+      </tr></thead>
+      <tbody id="tbody-historico"></tbody>
     </table>
-    <div id="empty-exc" class="empty" style="display:none">
-      <svg width="40" height="40" viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5z"/></svg>
-      <h3>Nenhum preso excluído</h3>
-      <p>Registros com decisão EXCLUSÃO aparecerão aqui automaticamente.</p>
-    </div>
-  </div>
+    <div class="empty" id="empty-historico" style="display:none">Nenhum registro encontrado.</div>
+  </div></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- MODAL NOVO / EDITAR REGISTRO -->
-<!-- ═══════════════════════════════════════════════════════════════════ -->
-<div class="overlay" id="overlay" onclick="closeModalOutside(event)">
+<!-- ════ ABA EXCLUÍDOS ════ -->
+<div id="tab-excluidos" class="tab-panel">
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="search-excluidos" placeholder="Buscar nome, IPEN, ATA…" oninput="renderExcluidos()">
+    </div>
+    <select class="filter-select" id="filter-motivo-excluidos" onchange="renderExcluidos()">
+      <option value="">Todos os motivos</option>
+      <option value="ALTA PERICULOSIDADE">Alta Periculosidade</option>
+      <option value="RDD">RDD</option>
+      <option value="TÉRMINO DE MD (30 dias)">Término MD</option>
+    </select>
+  </div>
+  <div class="section-info"><span class="section-info-text">Exibindo <span class="section-info-count" id="count-excluidos-shown">—</span> registros de excluídos</span></div>
+  <div class="table-wrap"><div class="table-scroll">
+    <table>
+      <thead><tr>
+        <th onclick="sortTable('excluidos','ata')">Nº ATA</th>
+        <th onclick="sortTable('excluidos','nome')">Nome</th>
+        <th onclick="sortTable('excluidos','ipen')">IPEN</th>
+        <th onclick="sortTable('excluidos','processo')">Processo</th>
+        <th class="no-sort">Decisão</th>
+        <th onclick="sortTable('excluidos','motivo')">Motivo</th>
+        <th onclick="sortTable('excluidos','entrada')">Data Entrada</th>
+        <th onclick="sortTable('excluidos','vencimento')">Data Vencimento</th>
+        <th class="no-sort">Observações</th>
+        <th class="no-sort" style="text-align:center">Ações</th>
+      </tr></thead>
+      <tbody id="tbody-excluidos"></tbody>
+    </table>
+    <div class="empty" id="empty-excluidos" style="display:none">Nenhum registro encontrado.</div>
+  </div></div>
+</div>
+
+</main>
+
+<!-- ══ MODAL EDITAR ATIVO ══ -->
+<div class="modal-overlay" id="modal-edit-ativo">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title" id="modal-title">Novo Registro</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-title">✏ EDITAR ATIVO</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-ativo')">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group">
-          <label>Nº da Ata *</label>
-          <input type="text" id="f-ata" placeholder="ex: 001/2026">
-        </div>
-        <div class="form-group">
-          <label>Decisão *</label>
-          <select id="f-decisao">
-            <option value="">Selecione…</option>
-            <option>INCLUSÃO</option>
-            <option>INCLUSÃO PROVISÓRIA</option>
-            <option>EXCLUSÃO</option>
-            <option>PERMANÊNCIA</option>
-            <option>INDEFERIMENTO</option>
-          </select>
-        </div>
-        <div class="form-group span2">
-          <label>Nome Completo *</label>
-          <input type="text" id="f-nome" placeholder="Nome do preso">
-        </div>
-        <div class="form-group">
-          <label>IPEN</label>
-          <input type="text" id="f-ipen" placeholder="ex: 816089">
-        </div>
-        <div class="form-group">
-          <label>Nº Processo (SAP / SEJURI)</label>
-          <input type="text" id="f-processo" placeholder="ex: SAP 00043009/2023">
-        </div>
-        <div class="form-group span2">
-          <label>Motivo / Regime</label>
-          <select id="f-motivo">
-            <option value="">Selecione ou digite abaixo…</option>
-            <option>ALTA PERICULOSIDADE</option>
-            <option>RDD</option>
-            <option>PROTEÇÃO DO PRESO</option>
-            <option>FUGA - INCISO IV</option>
-            <option>MANUTENÇÃO DA ORDEM</option>
-            <option>INTEGRIDADE FÍSICA - INCISO II E VI</option>
-            <option>TÉRMINO DE MD (30 dias)</option>
-            <option>FIM DO RDD</option>
-            <option>PARECER DINF</option>
-          </select>
-        </div>
-        <div class="form-group span2">
-          <label>Motivo personalizado (deixe em branco se selecionou acima)</label>
-          <input type="text" id="f-motivo-custom" placeholder="Motivo específico…">
-        </div>
-        <div class="form-group">
-          <label>Unidade / Estabelecimento</label>
-          <input type="text" id="f-unidade" placeholder="ex: PED Florianópolis">
-        </div>
-        <div class="form-group">
-          <label>Data da Decisão (Ata)</label>
-          <input type="date" id="f-dataDecisao">
-        </div>
-        <div class="form-group">
-          <label>Data de Entrada na USM</label>
-          <input type="date" id="f-dataEntrada">
-          <span class="form-hint">Vencimento = entrada + 6 meses (calculado automaticamente)</span>
-        </div>
-        <div class="form-group">
-          <label>Data de Vencimento</label>
-          <input type="date" id="f-dataVencimento">
-          <span class="form-hint">Preencha se conhecido; caso contrário, deixe em branco.</span>
-        </div>
-        <div class="form-group span2">
-          <label>Observações</label>
-          <textarea id="f-obs" placeholder="Anotações, pendências, informações adicionais…"></textarea>
-        </div>
+        <div class="form-group"><label class="form-label">Nº ATA</label><input class="form-input" id="ea-ata" placeholder="Ex: 001/2026"></div>
+        <div class="form-group"><label class="form-label">IPEN</label><input class="form-input" id="ea-ipen"></div>
+        <div class="form-group form-col"><label class="form-label">Nome Completo</label><input class="form-input" id="ea-nome"></div>
+        <div class="form-group"><label class="form-label">Nº Processo</label><input class="form-input" id="ea-processo"></div>
+        <div class="form-group"><label class="form-label">Motivo</label>
+          <select class="form-select" id="ea-motivo"><option value="">—</option><option>ALTA PERICULOSIDADE</option><option>RDD</option><option>FUGA - INCISO IV</option><option>PROTEÇÃO DO PRESO</option><option>TÉRMINO DE MD (30 dias)</option><option>OUTRO</option></select></div>
+        <div class="form-group"><label class="form-label">Unidade</label><input class="form-input" id="ea-unidade"></div>
+        <div class="form-group"><label class="form-label">Data Entrada USM</label><input class="form-input" id="ea-entrada" placeholder="dd/mm/aaaa"></div>
+        <div class="form-group"><label class="form-label">Data Vencimento</label><input class="form-input" id="ea-vencimento" placeholder="dd/mm/aaaa"></div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-select" id="ea-status"><option value="OK">OK</option><option value="VENCE EM BREVE">Vence em Breve</option><option value="VENCIDO">Vencido</option></select></div>
+        <div class="form-group"><label class="form-label">Dias Restantes</label><input class="form-input" id="ea-dias" type="number"></div>
+        <div class="form-group form-col"><label class="form-label">Observações</label><textarea class="form-textarea" id="ea-obs"></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveRecord()">Salvar Registro</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-ativo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoAtivo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL INSERIR / EDITAR HISTÓRICO ══ -->
+<div class="modal-overlay" id="modal-historico">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-hist-title">＋ INSERIR NOVO PRESO</div>
+      <button class="modal-close" onclick="closeModal('modal-historico')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nº ATA</label><input class="form-input" id="h-ata" placeholder="Ex: 030/2026"></div>
+        <div class="form-group"><label class="form-label">Decisão *</label>
+          <select class="form-select" id="h-decisao"><option value="">— Selecione —</option><option>INCLUSÃO</option><option>PERMANÊNCIA</option><option>EXCLUSÃO</option></select></div>
+        <div class="form-group"><label class="form-label">Motivo</label>
+          <select class="form-select" id="h-motivo"><option value="">—</option><option>ALTA PERICULOSIDADE</option><option>RDD</option><option>FUGA - INCISO IV</option><option>PROTEÇÃO DO PRESO</option><option>TÉRMINO DE MD (30 dias)</option><option>OUTRO</option></select></div>
+        <div class="form-group"><label class="form-label">IPEN</label><input class="form-input" id="h-ipen"></div>
+        <div class="form-group form-col"><label class="form-label">Nome Completo *</label><input class="form-input" id="h-nome" placeholder="Nome completo do preso"></div>
+        <div class="form-group"><label class="form-label">Nº Processo</label><input class="form-input" id="h-processo"></div>
+        <div class="form-group"><label class="form-label">Unidade</label><input class="form-input" id="h-unidade"></div>
+        <div class="form-group"><label class="form-label">Data Entrada USM</label><input class="form-input" id="h-entrada" placeholder="dd/mm/aaaa"></div>
+        <div class="form-group"><label class="form-label">Data Vencimento</label><input class="form-input" id="h-vencimento" placeholder="dd/mm/aaaa"></div>
+        <div class="form-group form-col"><label class="form-label">Observações</label><textarea class="form-textarea" id="h-obs"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-historico')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-hist" onclick="salvarHistorico()">Inserir Registro</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR EXCLUSÃO ══ -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal confirm-modal">
+    <div class="modal-header">
+      <div class="modal-title" id="confirm-title">CONFIRMAR EXCLUSÃO</div>
+      <button class="modal-close" onclick="closeModal('modal-confirm')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg" id="confirm-msg">Tem certeza?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Cancelar</button>
+      <button class="btn btn-del" id="confirm-btn-ok" onclick="">Confirmar</button>
     </div>
   </div>
 </div>
@@ -792,709 +375,381 @@
 <div id="toast"></div>
 
 <script>
+// ══════════════════════════════════════════
+//  DADOS INICIAIS
+// ══════════════════════════════════════════
+const ATIVOS_INIT=[{ata:"01/04/2026",nome:"RHUAN PRÁ LUCAS",ipen:"743212",processo:"SAP 60070",motivo:"",unidade:"",entrada:"—",vencimento:"01/04/2026",dias:"-26",status:"VENCIDO",obs:"AGUARDANDO DECISÃO VEP CURITIBANOS"},{ata:"058/2025",nome:"JEAN MICHEL PEREIRA STROMMER",ipen:"779066",processo:"SAP 117382",motivo:"",unidade:"",entrada:"—",vencimento:"04/05/2026",dias:"7",status:"VENCE EM BREVE",obs:""},{ata:"059/2025",nome:"JOSUÉ WAISS",ipen:"617681",processo:"",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"10/11/2023",vencimento:"10/05/2026",dias:"13",status:"VENCE EM BREVE",obs:""},{ata:"047/2025",nome:"ALEXSANDRO SERENA",ipen:"678171",processo:"SAP 106076/2025",motivo:"RDD",unidade:"",entrada:"13/11/2025",vencimento:"13/05/2026",dias:"16",status:"VENCE EM BREVE",obs:""},{ata:"065/2025",nome:"EDMILSON DE OLIVEIRA ZALDGUER",ipen:"548141",processo:"SAP 108250",motivo:"",unidade:"",entrada:"—",vencimento:"17/05/2026",dias:"20",status:"VENCE EM BREVE",obs:""},{ata:"056/2025",nome:"ANDRÉ LUIZ MEZA COSTA",ipen:"773035",processo:"SAP 65621/2020",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"04/06/2022",vencimento:"04/06/2026",dias:"38",status:"OK",obs:""},{ata:"067/2025",nome:"ALESSANDRO MAGNO DIAS",ipen:"874464",processo:"SAP 1333376",motivo:"",unidade:"",entrada:"—",vencimento:"08/06/2026",dias:"42",status:"OK",obs:""},{ata:"069/2025",nome:"DARLISSON LUCAS MONTEIRO",ipen:"859293",processo:"SAP145615",motivo:"",unidade:"",entrada:"—",vencimento:"08/06/2026",dias:"42",status:"OK",obs:""},{ata:"068/2025",nome:"MICHAEL JACKSON PASSOS RODRIGUES",ipen:"860201",processo:"SAP 145646/2025",motivo:"",unidade:"",entrada:"—",vencimento:"08/06/2026",dias:"42",status:"OK",obs:""},{ata:"057/2025",nome:"REGINALDO DE ARAUJO",ipen:"773068",processo:"",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"15/12/2022",vencimento:"15/06/2026",dias:"49",status:"OK",obs:""},{ata:"070/2025",nome:"RUAN LIRA DIAS",ipen:"874404",processo:"",motivo:"RDD",unidade:"",entrada:"01/11/2025",vencimento:"15/06/2026",dias:"49",status:"OK",obs:""},{ata:"075/2025",nome:"VITOR ISAQUE TAVARES PERES",ipen:"772531",processo:"SEJURI 7505/2025",motivo:"RDD",unidade:"",entrada:"18/12/2025",vencimento:"18/06/2026",dias:"52",status:"OK",obs:""},{ata:"073/2025",nome:"LUIZ HENRIQUE APOLINÁRIO",ipen:"776883",processo:"",motivo:"RDD",unidade:"",entrada:"19/12/2025",vencimento:"19/06/2026",dias:"53",status:"OK",obs:""},{ata:"074/2025",nome:"WELTON MARINHO DA SILVA",ipen:"792953",processo:"SEJURI 4327/2025",motivo:"RDD",unidade:"",entrada:"20/12/2025",vencimento:"20/06/2026",dias:"54",status:"OK",obs:""},{ata:"076/2025",nome:"LUCAS DA SILVA NUNES",ipen:"852900",processo:"SEJURI 7984/2025",motivo:"RDD",unidade:"",entrada:"20/12/2025",vencimento:"20/06/2026",dias:"54",status:"OK",obs:""},{ata:"001/2026",nome:"BRUNO TOMACZUN SOARES",ipen:"567709",processo:"SEJURI 00002814/2026",motivo:"FUGA - INCISO IV",unidade:"",entrada:"09/01/2026",vencimento:"09/07/2026",dias:"73",status:"OK",obs:""},{ata:"006/2026",nome:"FELIPE DA ROSA DIAS",ipen:"738139",processo:"SAP 00054809/2023",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"15/07/2023",vencimento:"15/07/2026",dias:"79",status:"OK",obs:""},{ata:"005/2026",nome:"RUAN ROSA",ipen:"855286",processo:"SAP 00000786/2025",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"03/10/2025",vencimento:"16/07/2026",dias:"80",status:"OK",obs:""},{ata:"040/2025",nome:"JAIR ANTONIO DE LIMA RIBEIRO",ipen:"646710",processo:"SAP 105549/2025",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"20/01/2026",vencimento:"20/07/2026",dias:"84",status:"OK",obs:""},{ata:"007/2026",nome:"FABRICIO SANTOS DO NASCIMENTO",ipen:"876088",processo:"SEJURI 00004686/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"23/01/2026",vencimento:"23/07/2026",dias:"87",status:"OK",obs:""},{ata:"008/2026",nome:"FELIPE DO NASCIMENTO COSTA",ipen:"876401",processo:"SEJURI 10520/2026",motivo:"RDD",unidade:"",entrada:"30/01/2026",vencimento:"30/07/2026",dias:"94",status:"OK",obs:""},{ata:"009/2026",nome:"JEFFERSON RODRIGO SALDANHA DOS SANTOS",ipen:"879984",processo:"SEJURI 00015430/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/02/2026",vencimento:"08/08/2026",dias:"103",status:"OK",obs:""},{ata:"009/2026",nome:"PAULO RICARDO ROSÁRIO DA COSTA DOS SANTOS",ipen:"879986",processo:"SEJURI 00015430/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/02/2026",vencimento:"08/08/2026",dias:"103",status:"OK",obs:""},{ata:"009/2026",nome:"ROCIVALDO MORAIS DE OLIVEIRA",ipen:"879987",processo:"SEJURI 00015430/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/02/2026",vencimento:"08/08/2026",dias:"103",status:"OK",obs:""},{ata:"009/2026",nome:"PATRICK DE OLIVEIRA CARDOSO",ipen:"880017",processo:"SEJURI 00015430/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/02/2026",vencimento:"08/08/2026",dias:"103",status:"OK",obs:""},{ata:"010/2026",nome:"LUÍS EDUARDO GOULART BLANCO",ipen:"879976",processo:"SEJURI 00015018/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/02/2026",vencimento:"08/08/2026",dias:"103",status:"OK",obs:""},{ata:"010/2026",nome:"WALLACE GLEIDSON MONTEIRO DE OLIVEIRA",ipen:"879977",processo:"SEJURI 00015018/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/02/2026",vencimento:"08/08/2026",dias:"103",status:"OK",obs:""},{ata:"004/2026",nome:"ALAN JESUS RODRIGUES DA CONCEIÇÃO",ipen:"664440",processo:"SAP 00078363/2024",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"12/02/2025",vencimento:"12/08/2026",dias:"107",status:"OK",obs:""},{ata:"003/2026",nome:"MAICON DA CUNHA NENES",ipen:"610330",processo:"SAP 00009878/2025",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"12/02/2025",vencimento:"12/08/2026",dias:"107",status:"OK",obs:""},{ata:"018/2026",nome:"LUIZ HENRIQUE DE LIMA",ipen:"816089",processo:"SAP 43009/2023",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"30/08/2024",vencimento:"02/09/2026",dias:"128",status:"OK",obs:""},{ata:"048/2025",nome:"GEZIEL VARGAS",ipen:"621046",processo:"SAP 00098766/2024",motivo:"RDD",unidade:"",entrada:"31/08/2024",vencimento:"03/09/2026",dias:"129",status:"OK",obs:""},{ata:"049/2025",nome:"GABRIEL JOSE CUSTODIO",ipen:"734004",processo:"SAP 106129/2025",motivo:"RDD",unidade:"PENITENCIÁRIA INDUSTRIAL DE CHAPECÓ",entrada:"10/09/2025",vencimento:"10/09/2026",dias:"136",status:"OK",obs:""},{ata:"046/2025",nome:"KLEBER FREITAS",ipen:"684680",processo:"",motivo:"RDD",unidade:"",entrada:"13/09/2025",vencimento:"13/09/2026",dias:"139",status:"OK",obs:""},{ata:"015/2026",nome:"BRUNO SILVEIRA DA SILVA",ipen:"594075",processo:"SEJURI 33106/2026",motivo:"RDD",unidade:"",entrada:"24/03/2026",vencimento:"24/09/2026",dias:"150",status:"OK",obs:""},{ata:"013/2026",nome:"VALDINEI MIRANDA DO NASCIMENTO",ipen:"882826",processo:"SEJURI 32462/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"24/03/2026",vencimento:"24/09/2026",dias:"150",status:"OK",obs:""},{ata:"014/2026",nome:"JOÃO VICTOR CORDEIRO MACEDO",ipen:"877029",processo:"SEJURI 32575/2026",motivo:"RDD",unidade:"",entrada:"24/03/2026",vencimento:"24/09/2026",dias:"150",status:"OK",obs:""},{ata:"012/2026",nome:"JOÃO ALVARO ROSSI JUNIOR",ipen:"517807",processo:"SAP 21305/2025",motivo:"RDD",unidade:"",entrada:"01/04/2025",vencimento:"02/10/2026",dias:"158",status:"OK",obs:""},{ata:"017/2026",nome:"JACKSON LUIZ DOS SANTOS",ipen:"668885",processo:"SEJURI 37664/2026",motivo:"RDD",unidade:"",entrada:"02/04/2026",vencimento:"02/10/2026",dias:"158",status:"OK",obs:""},{ata:"023/2026",nome:"HUGO AGENOR DOS SANTOS DIAS",ipen:"",processo:"SEJURI 40481/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"13/10/2026",dias:"169",status:"OK",obs:""},{ata:"055/2025",nome:"LEANDRO DA ROSA",ipen:"719316",processo:"",motivo:"RDD",unidade:"",entrada:"14/10/2025",vencimento:"14/10/2026",dias:"170",status:"OK",obs:""},{ata:"022/2026",nome:"WILLIAN PEREIRA BARROS",ipen:"692278",processo:"SAP 95246/2025",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"16/10/2025",vencimento:"16/10/2026",dias:"172",status:"OK",obs:""},{ata:"020/2026",nome:"MARCELO STOCO",ipen:"767010",processo:"SAP 56439/2023",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"17/10/2023",vencimento:"17/10/2026",dias:"173",status:"OK",obs:""},{ata:"026/2026",nome:"JEAN DIAS DA ROSA",ipen:"724839",processo:"SEJURI 20308/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"17/04/2026",vencimento:"17/10/2026",dias:"173",status:"OK",obs:""},{ata:"028/2026",nome:"MARCOS ROGÉRIO FERREIRA DOS SANTOS",ipen:"884782",processo:"SEJURI 44182/2026",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"21/04/2026",vencimento:"21/10/2026",dias:"177",status:"OK",obs:""},{ata:"025/2026",nome:"RAFAEL BRUNO RODRIGUES",ipen:"843899",processo:"SAP 130500/2025",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"29/10/2025",vencimento:"29/10/2026",dias:"185",status:"OK",obs:""},{ata:"024/2026",nome:"LUAN HENRIQUE CORREA PIMENTEL",ipen:"858057",processo:"SAP 129844/2025",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"29/10/2025",vencimento:"29/10/2026",dias:"185",status:"OK",obs:""},{ata:"060/2025",nome:"NEUDI MARTINS",ipen:"523573",processo:"SAP 46097/2023",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"03/05/2023",vencimento:"03/11/2026",dias:"190",status:"OK",obs:""},{ata:"061/2025",nome:"DJONNY RAULINO",ipen:"526215",processo:"",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"08/05/2024",vencimento:"08/11/2026",dias:"195",status:"OK",obs:""},{ata:"022/2025",nome:"MAICON CESAR ORLANDINI PUJONI",ipen:"842993",processo:"",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"29/05/2025",vencimento:"29/11/2026",dias:"216",status:"OK",obs:""},{ata:"071/2025",nome:"ROMARIO FERREIRA DA SILVA",ipen:"866061",processo:"",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"13/06/2025",vencimento:"13/12/2026",dias:"230",status:"OK",obs:""},{ata:"032/2025",nome:"RONALDO PICKLER",ipen:"814782",processo:"SAP 68272/2025",motivo:"RDD",unidade:"",entrada:"20/06/2025",vencimento:"20/12/2026",dias:"237",status:"OK",obs:""},{ata:"072/2025",nome:"FABIANO KIPPER MAI",ipen:"780616",processo:"",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"27/06/2025",vencimento:"27/12/2026",dias:"244",status:"OK",obs:""},{ata:"043/2025",nome:"HIAGO MACHADO GUIMARÃES",ipen:"689224",processo:"SAP 85700/2024",motivo:"RDD",unidade:"",entrada:"18/07/2025",vencimento:"18/01/2027",dias:"266",status:"OK",obs:""},{ata:"044/2025",nome:"THIAGO SIQUEIRA",ipen:"774443",processo:"",motivo:"RDD",unidade:"",entrada:"18/07/2025",vencimento:"18/01/2027",dias:"266",status:"OK",obs:""},{ata:"045/2025",nome:"VANDERSON MIRANDA",ipen:"621239",processo:"",motivo:"RDD",unidade:"",entrada:"18/07/2025",vencimento:"18/01/2027",dias:"266",status:"OK",obs:""},{ata:"027/2026",nome:"EDUARDO RAFAEL FERREIRA DE LIMA",ipen:"861588",processo:"SEJURI 43936/2026",motivo:"RDD",unidade:"",entrada:"21/04/2026",vencimento:"15/04/2027",dias:"353",status:"OK",obs:""}];
+const HISTORICO_INIT=[{ata:"002/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"RUAN ROSA",ipen:"855286",processo:"",unidade:"",entrada:"03/10/2025",vencimento:"—",obs:""},{ata:"003/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"ALAN JESUS RODRIGUES DA CONCEIÇÃO",ipen:"664440",processo:"",unidade:"",entrada:"12/02/2025",vencimento:"—",obs:""},{ata:"004/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"MAICON DA CUNHA NENES",ipen:"610330",processo:"",unidade:"",entrada:"12/02/2025",vencimento:"—",obs:""},{ata:"005/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"ANDRE LUIZ MIRANDA DO NASCIMENTO",ipen:"496027",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"006/2025",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",nome:"MATEUS ROBERTO RONSANI DA SILVA",ipen:"",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"007/2025",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",nome:"DANILO SILVEIRA",ipen:"609193",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"008/2025",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",nome:"IGOR FELIPE DA SILVA",ipen:"",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"009/2025",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",nome:"ANDRÉ LUIS DE SOUZA DA ROSA",ipen:"",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"010/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"JOAO ALVARO ROSSI JUNIOR",ipen:"517807",processo:"",unidade:"",entrada:"01/04/2025",vencimento:"02/10/2026",obs:""},{ata:"011/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"LUIZ HENRIQUE DE LIMA",ipen:"816089",processo:"",unidade:"",entrada:"30/08/2024",vencimento:"—",obs:""},{ata:"012/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"HUGO CEZAR DE PAIVA",ipen:"568577",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"013/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"MARCELO STOCO",ipen:"767010",processo:"SAP 56439/2023",unidade:"",entrada:"17/10/2023",vencimento:"—",obs:""},{ata:"014/2025",decisao:"EXCLUSÃO",motivo:"",nome:"GELVANI HASKEL",ipen:"",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"015/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"DJONNY RAULINO",ipen:"526215",processo:"",unidade:"",entrada:"08/05/2024",vencimento:"—",obs:""},{ata:"016/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"ANDRE LUIZ MEZA COSTA",ipen:"773035",processo:"SAP 65621/2020",unidade:"",entrada:"04/06/2022",vencimento:"04/06/2026",obs:""},{ata:"017/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"REGINALDO DE ARAUJO",ipen:"773068",processo:"",unidade:"",entrada:"15/12/2022",vencimento:"—",obs:""},{ata:"018/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"JUAN MANUEL GOMEZ",ipen:"834120",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"019/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"JEAN MICHEL PEREIRA STROMMER",ipen:"779066",processo:"",unidade:"",entrada:"23/11/2023",vencimento:"—",obs:""},{ata:"020/2025",decisao:"PERMANÊNCIA",motivo:"RDD",nome:"NEUDI MARTINS",ipen:"523573",processo:"",unidade:"",entrada:"03/05/2023",vencimento:"—",obs:""},{ata:"021/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"MICHAEL PATRICK SANCHES",ipen:"",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"022/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"MAICON CESAR ORLANDINI PUJONI",ipen:"842993",processo:"",unidade:"",entrada:"29/05/2025",vencimento:"29/11/2026",obs:""},{ata:"023/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"DIOGO CORREA TEIXEIRA",ipen:"527298",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"024/2025",decisao:"PERMANÊNCIA",motivo:"ALTA PERICULOSIDADE",nome:"RODRIGO DIAS DA ROSA",ipen:"544126",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"025/2025",decisao:"EXCLUSÃO",motivo:"RDD",nome:"GABRIEL JOSE CUSTODIO",ipen:"734004",processo:"",unidade:"",entrada:"10/09/2025",vencimento:"—",obs:""},{ata:"026/2025",decisao:"EXCLUSÃO",motivo:"RDD",nome:"MURILO AUGUSTO BENEDET",ipen:"696778",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"027/2025",decisao:"EXCLUSÃO",motivo:"RDD",nome:"RUDINEI ANTONIO DOS SANTOS",ipen:"530442",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"028/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"RHUAN PRÁ LUCAS",ipen:"743212",processo:"SAP 00060070/2025",unidade:"",entrada:"02/06/2025",vencimento:"—",obs:""},{ata:"029/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"THIAGO FAVORETO CANGUSSU GOMES",ipen:"",processo:"SAP 00062103/2025",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"030/2025",decisao:"INCLUSÃO",motivo:"PROTEÇÃO DO PRESO",nome:"FABIANO KIPPER MAI",ipen:"780616",processo:"SAP 00061504/2025",unidade:"",entrada:"27/06/2025",vencimento:"—",obs:""},{ata:"031/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"ROMARIO FERREIRA DA SILVA",ipen:"866061",processo:"SAP 00062700/2025",unidade:"",entrada:"13/06/2025",vencimento:"—",obs:""},{ata:"032/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"RONALDO PICKLER",ipen:"814782",processo:"SAP 68272/2025",unidade:"",entrada:"20/06/2025",vencimento:"—",obs:""},{ata:"033/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"GEZIEL VARGAS",ipen:"621046",processo:"SAP 00098766/2024",unidade:"",entrada:"31/08/2024",vencimento:"—",obs:""},{ata:"034/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"GABRIEL JOSE CUSTODIO",ipen:"734004",processo:"SAP 106129/2025",unidade:"PENITENCIÁRIA INDUSTRIAL DE CHAPECÓ",entrada:"10/09/2025",vencimento:"10/09/2026",obs:""},{ata:"035/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"KLEBER FREITAS",ipen:"684680",processo:"",unidade:"",entrada:"13/09/2025",vencimento:"13/09/2026",obs:""},{ata:"036/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"JOSUÉ WAISS",ipen:"617681",processo:"",unidade:"",entrada:"10/11/2023",vencimento:"—",obs:""},{ata:"037/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"ALEXSANDRO SERENA",ipen:"678171",processo:"SAP 106076/2025",unidade:"",entrada:"13/11/2025",vencimento:"13/05/2026",obs:""},{ata:"038/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"WILLIAN NAZÁRIO BERNARDES DE OLIVEIRA",ipen:"557009",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"039/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"ANDRE LUIZ MIRANDA DO NASCIMENTO",ipen:"496027",processo:"SAP 14148/2023",unidade:"",entrada:"—",vencimento:"12/07/2026",obs:""},{ata:"040/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"JAIR ANTONIO DE LIMA RIBEIRO",ipen:"646710",processo:"SAP 105549/2025",unidade:"",entrada:"20/01/2026",vencimento:"20/07/2026",obs:""},{ata:"041/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"GREGORY EDUARDO DOLZAN",ipen:"",processo:"SAP 95609/2023",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"042/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"MOISES PASSOS",ipen:"",processo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"043/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"HIAGO MACHADO GUIMARÃES",ipen:"689224",processo:"SAP 85700/2024",unidade:"",entrada:"18/07/2025",vencimento:"18/01/2027",obs:""},{ata:"044/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"THIAGO SIQUEIRA",ipen:"774443",processo:"",unidade:"",entrada:"18/07/2025",vencimento:"18/01/2027",obs:""},{ata:"045/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"VANDERSON MIRANDA",ipen:"621239",processo:"",unidade:"",entrada:"18/07/2025",vencimento:"18/01/2027",obs:""},{ata:"046/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"KLEBER FREITAS",ipen:"684680",processo:"",unidade:"",entrada:"13/09/2025",vencimento:"13/09/2026",obs:""},{ata:"047/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"ALEXSANDRO SERENA",ipen:"678171",processo:"SAP 106076/2025",unidade:"",entrada:"13/11/2025",vencimento:"13/05/2026",obs:""},{ata:"048/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"GEZIEL VARGAS",ipen:"621046",processo:"SAP 00098766/2024",unidade:"",entrada:"31/08/2024",vencimento:"03/09/2026",obs:""},{ata:"049/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"GABRIEL JOSE CUSTODIO",ipen:"734004",processo:"SAP 106129/2025",unidade:"PENITENCIÁRIA INDUSTRIAL DE CHAPECÓ",entrada:"10/09/2025",vencimento:"10/09/2026",obs:""},{ata:"050/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"MATHEUS FAGUNDES MARCOLINO",ipen:"",processo:"SAP 00114572/2025",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"050/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"JACIR DOS SANTOS JUNIOR",ipen:"",processo:"SAP 00114572/2025",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"055/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"LEANDRO DA ROSA",ipen:"719316",processo:"",unidade:"",entrada:"14/10/2025",vencimento:"14/10/2026",obs:""},{ata:"056/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"ANDRÉ LUIZ MEZA COSTA",ipen:"773035",processo:"SAP 65621/2020",unidade:"",entrada:"04/06/2022",vencimento:"04/06/2026",obs:""},{ata:"057/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"REGINALDO DE ARAUJO",ipen:"773068",processo:"",unidade:"",entrada:"15/12/2022",vencimento:"15/06/2026",obs:""},{ata:"058/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"JEAN MICHEL PEREIRA STROMMER",ipen:"779066",processo:"SAP 117382",unidade:"",entrada:"—",vencimento:"04/05/2026",obs:""},{ata:"059/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"JOSUÉ WAISS",ipen:"617681",processo:"",unidade:"",entrada:"10/11/2023",vencimento:"10/05/2026",obs:""},{ata:"060/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"NEUDI MARTINS",ipen:"523573",processo:"SAP 46097/2023",unidade:"",entrada:"03/05/2023",vencimento:"03/11/2026",obs:""},{ata:"061/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"DJONNY RAULINO",ipen:"526215",processo:"",unidade:"",entrada:"08/05/2024",vencimento:"08/11/2026",obs:""},{ata:"065/2025",decisao:"INCLUSÃO",motivo:"",nome:"EDMILSON DE OLIVEIRA ZALDGUER",ipen:"548141",processo:"SAP 108250",unidade:"",entrada:"—",vencimento:"17/05/2026",obs:""},{ata:"067/2025",decisao:"INCLUSÃO",motivo:"",nome:"ALESSANDRO MAGNO DIAS",ipen:"874464",processo:"SAP 1333376",unidade:"",entrada:"—",vencimento:"08/06/2026",obs:""},{ata:"068/2025",decisao:"INCLUSÃO",motivo:"",nome:"MICHAEL JACKSON PASSOS RODRIGUES",ipen:"860201",processo:"SAP 145646/2025",unidade:"",entrada:"—",vencimento:"08/06/2026",obs:""},{ata:"069/2025",decisao:"INCLUSÃO",motivo:"",nome:"DARLISSON LUCAS MONTEIRO",ipen:"859293",processo:"SAP145615",unidade:"",entrada:"—",vencimento:"08/06/2026",obs:""},{ata:"070/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"RUAN LIRA DIAS",ipen:"874404",processo:"",unidade:"",entrada:"01/11/2025",vencimento:"15/06/2026",obs:""},{ata:"071/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"ROMARIO FERREIRA DA SILVA",ipen:"866061",processo:"",unidade:"",entrada:"13/06/2025",vencimento:"13/12/2026",obs:""},{ata:"072/2025",decisao:"INCLUSÃO",motivo:"ALTA PERICULOSIDADE",nome:"FABIANO KIPPER MAI",ipen:"780616",processo:"",unidade:"",entrada:"27/06/2025",vencimento:"27/12/2026",obs:""},{ata:"073/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"LUIZ HENRIQUE APOLINÁRIO",ipen:"776883",processo:"",unidade:"",entrada:"19/12/2025",vencimento:"19/06/2026",obs:""},{ata:"074/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"WELTON MARINHO DA SILVA",ipen:"792953",processo:"SEJURI 4327/2025",unidade:"",entrada:"20/12/2025",vencimento:"20/06/2026",obs:""},{ata:"075/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"VITOR ISAQUE TAVARES PERES",ipen:"772531",processo:"SEJURI 7505/2025",unidade:"",entrada:"18/12/2025",vencimento:"18/06/2026",obs:""},{ata:"076/2025",decisao:"INCLUSÃO",motivo:"RDD",nome:"LUCAS DA SILVA NUNES",ipen:"852900",processo:"SEJURI 7984/2025",unidade:"",entrada:"20/12/2025",vencimento:"20/06/2026",obs:""}];
+const EXCLUIDOS_INIT=[{ata:"039/2025",nome:"ANDRE LUIZ MIRANDA DO NASCIMENTO",ipen:"496027",processo:"SAP 14148/2023",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"12/07/2026",obs:"[excluído via sistema]"},{ata:"006/2025",nome:"MATEUS ROBERTO RONSANI DA SILVA",ipen:"",processo:"",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"007/2025",nome:"DANILO SILVEIRA",ipen:"609193",processo:"",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"008/2025",nome:"IGOR FELIPE DA SILVA",ipen:"",processo:"",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"009/2025",nome:"ANDRÉ LUIS DE SOUZA DA ROSA",ipen:"",processo:"",decisao:"EXCLUSÃO",motivo:"TÉRMINO DE MD (30 dias)",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"010/2025",nome:"JOAO ALVARO ROSSI JUNIOR",ipen:"517807",processo:"",decisao:"EXCLUSÃO",motivo:"RDD",unidade:"",entrada:"01/04/2025",vencimento:"02/10/2026",obs:"[excluído via sistema]"},{ata:"019/2026",nome:"HUGO CEZAR DE PAIVA",ipen:"568577",processo:"SAP 30345/2023",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"014/2025",nome:"GELVANI HASKEL",ipen:"",processo:"",decisao:"EXCLUSÃO",motivo:"",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"016/2025",nome:"ANDRE LUIZ MEZA COSTA",ipen:"773035",processo:"SAP 65621/2020",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"04/06/2022",vencimento:"04/06/2026",obs:"[excluído via sistema]"},{ata:"021/2026",nome:"JUAN MANUEL GOMEZ",ipen:"834120",processo:"SAP 154158/2023",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"021/2025",nome:"MICHAEL PATRICK SANCHES",ipen:"",processo:"",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"},{ata:"023/2025",nome:"DIOGO CORREA TEIXEIRA",ipen:"527298",processo:"",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"024/2025",nome:"RODRIGO DIAS DA ROSA",ipen:"544126",processo:"",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"},{ata:"026/2025",nome:"MURILO AUGUSTO BENEDET",ipen:"696778",processo:"",decisao:"EXCLUSÃO",motivo:"RDD",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"027/2025",nome:"RUDINEI ANTONIO DOS SANTOS",ipen:"530442",processo:"",decisao:"EXCLUSÃO",motivo:"RDD",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"029/2025",nome:"THIAGO FAVORETO CANGUSSU GOMES",ipen:"",processo:"SAP 00062103/2025",decisao:"EXCLUSÃO",motivo:"RDD",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"},{ata:"038/2025",nome:"WILLIAN NAZÁRIO BERNARDES DE OLIVEIRA",ipen:"557009",processo:"",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"},{ata:"041/2025",nome:"GREGORY EDUARDO DOLZAN",ipen:"",processo:"SAP 95609/2023",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"042/2025",nome:"MOISES PASSOS",ipen:"",processo:"",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:""},{ata:"050/2025",nome:"MATHEUS FAGUNDES MARCOLINO",ipen:"",processo:"SAP 00114572/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"},{ata:"050/2025",nome:"JACIR DOS SANTOS JUNIOR",ipen:"",processo:"SAP 00114572/2025",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"},{ata:"002/2026",nome:"ANDRÉ LUIZ MIRANDA DO NASCIMENTO",ipen:"496027",processo:"SAP 00141548/2023",decisao:"EXCLUSÃO",motivo:"ALTA PERICULOSIDADE",unidade:"",entrada:"—",vencimento:"—",obs:"[excluído via sistema]"}];
 
-// ═══════════════════════════════════════════════════════════════════════
-// COPY TO CLIPBOARD
-// ═══════════════════════════════════════════════════════════════════════
-function copyText(text, btn) {
-  if (!text || text === '—') return;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.classList.add('copied');
-    btn.textContent = '✓';
-    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = copyIcon(); }, 1500);
-  });
-}
-function copyIcon() {
-  return '<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1H2z"/></svg>';
-}
-function mkCopy(text) {
-  if (!text || text === '—') return '';
-  return `<button class="copy-btn" onclick="copyText('${text.replace(/'/g,"\'")}',this)" title="Copiar">${copyIcon()}</button>`;
-}
+// ══ STATE ══
+let ativos    = JSON.parse(localStorage.getItem('usm_ativos')   ||'null') || ATIVOS_INIT.map((r,i)=>({...r,_id:i}));
+let historico = JSON.parse(localStorage.getItem('usm_hist')     ||'null') || HISTORICO_INIT.map((r,i)=>({...r,_id:i}));
+let excluidos = JSON.parse(localStorage.getItem('usm_excl')     ||'null') || EXCLUIDOS_INIT.map((r,i)=>({...r,_id:i}));
 
-// ═══════════════════════════════════════════════════════════════════════
-// ESTADO
-// ═══════════════════════════════════════════════════════════════════════
-const STORAGE_KEY = 'usm_registros_v5';
-let registros = [];
-let editingId = null;
-let sortState = { field: null, dir: 1 };
-
-// ── Dados iniciais (2025 e 2026) ──────────────────────────────────────
-const DADOS_INICIAIS = [{"ata":"002/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"RUAN ROSA","ipen":"855286","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-10-03","dataVencimento":"","obs":"","id":2},{"ata":"003/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"ALAN JESUS RODRIGUES DA CONCEIÇÃO","ipen":"664440","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-02-12","dataVencimento":"","obs":"","id":3},{"ata":"004/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MAICON DA CUNHA NENES","ipen":"610330","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-02-12","dataVencimento":"","obs":"","id":4},{"ata":"005/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"ANDRE LUIZ MIRANDA DO NASCIMENTO","ipen":"496027","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":5},{"ata":"006/2025","decisao":"EXCLUSÃO","motivo":"TÉRMINO DE MD (30 dias)","nome":"MATEUS ROBERTO RONSANI DA SILVA","ipen":"","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":6},{"ata":"007/2025","decisao":"EXCLUSÃO","motivo":"TÉRMINO DE MD (30 dias)","nome":"DANILO SILVEIRA","ipen":"609193","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":7},{"ata":"008/2025","decisao":"EXCLUSÃO","motivo":"TÉRMINO DE MD (30 dias)","nome":"IGOR FELIPE DA SILVA","ipen":"","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":8},{"ata":"009/2025","decisao":"EXCLUSÃO","motivo":"TÉRMINO DE MD (30 dias)","nome":"ANDRÉ LUIS DE SOUZA DA ROSA","ipen":"","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":9},{"ata":"010/2025","decisao":"INCLUSÃO","nome":"JOAO ALVARO ROSSI JUNIOR","ipen":"517807","processo":"","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-04-01","dataVencimento":"2026-10-02","obs":"","id":10},{"ata":"011/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"LUIZ HENRIQUE DE LIMA","ipen":"816089","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2024-08-30","dataVencimento":"","obs":"","id":11},{"ata":"012/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"HUGO CEZAR DE PAIVA","ipen":"568577","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":12},{"ata":"013/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"MARCELO STOCO","ipen":"767010","processo":"SAP 56439/2023","unidade":"","dataDecisao":"","dataEntrada":"2023-10-17","dataVencimento":"","obs":"","id":13},{"ata":"014/2025","decisao":"EXCLUSÃO","motivo":"","nome":"GELVANI HASKEL","ipen":"","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":14},{"ata":"015/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"DJONNY RAULINO","ipen":"526215","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2024-05-08","dataVencimento":"","obs":"","id":15},{"ata":"016/2025","decisao":"PERMANÊNCIA","nome":"ANDRE LUIZ MEZA COSTA","ipen":"773035","processo":"SAP 65621/2020","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2022-06-04","dataVencimento":"2026-06-04","obs":"","id":16},{"ata":"017/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"REGINALDO DE ARAUJO","ipen":"773068","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2022-12-15","dataVencimento":"","obs":"","id":17},{"ata":"018/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"JUAN MANUEL GOMEZ","ipen":"834120","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":18},{"ata":"019/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"JEAN MICHEL PEREIRA STROMMER","ipen":"779066","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2023-11-23","dataVencimento":"","obs":"","id":19},{"ata":"020/2025","decisao":"PERMANÊNCIA","motivo":"RDD","nome":"NEUDI MARTINS","ipen":"523573","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2023-05-03","dataVencimento":"","obs":"","id":20},{"ata":"021/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MICHAEL PATRICK SANCHES","ipen":"","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":21},{"ata":"022/2025","decisao":"INCLUSÃO","nome":"MAICON CESAR ORLANDINI PUJONI","ipen":"842993","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-05-29","dataVencimento":"2026-11-29","obs":"","id":22},{"ata":"023/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"DIOGO CORREA TEIXEIRA","ipen":"527298","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":23},{"ata":"024/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"RODRIGO DIAS DA ROSA","ipen":"544126","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":24},{"ata":"025/2025","decisao":"EXCLUSÃO","motivo":"RDD","nome":"GABRIEL JOSE CUSTODIO","ipen":"734004","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-09-10","dataVencimento":"","obs":"","id":25},{"ata":"026/2025","decisao":"EXCLUSÃO","motivo":"RDD","nome":"MURILO AUGUSTO BENEDET","ipen":"696778","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":26},{"ata":"027/2025","decisao":"EXCLUSÃO","motivo":"RDD","nome":"RUDINEI ANTONIO DOS SANTOS","ipen":"530442","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":27},{"ata":"028/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"RHUAN PRÁ LUCAS","ipen":"743212","processo":"SAP 00060070/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-06-02","dataVencimento":"","obs":"","id":28},{"ata":"029/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"THIAGO FAVORETO CANGUSSU GOMES","ipen":"","processo":"SAP 00062103/2025","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":29},{"ata":"030/2025","decisao":"INCLUSÃO","motivo":"PROTEÇÃO DO PRESO","nome":"FABIANO KIPPER MAI","ipen":"780616","processo":"SAP 00061504/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-06-27","dataVencimento":"","obs":"","id":30},{"ata":"031/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"ROMARIO FERREIRA DA SILVA","ipen":"866061","processo":"SAP 00068551/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-06-13","dataVencimento":"","obs":"","id":31},{"ata":"032/2025","decisao":"INCLUSÃO","nome":"RONALDO PICKLER","ipen":"814782","processo":"SAP 68272/2025","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-06-20","dataVencimento":"2026-12-20","obs":"","id":32},{"ata":"033/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"FABIANO KIPPER MAI","ipen":"780616","processo":"SAP 00061504/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-06-27","dataVencimento":"","obs":"","id":33},{"ata":"034/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"FELIPE DA ROSA DIAS","ipen":"738139","processo":"SAP 00054809/2023","unidade":"","dataDecisao":"","dataEntrada":"2023-07-15","dataVencimento":"","obs":"","id":34},{"ata":"035/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"RUAN ROSA","ipen":"855286","processo":"SAP 786/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-10-03","dataVencimento":"","obs":"","id":35},{"ata":"036/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"ALAN JESUS RODRIGUES DA CONCEIÇÃO","ipen":"664440","processo":"SAP 78363/2024","unidade":"","dataDecisao":"","dataEntrada":"2025-02-12","dataVencimento":"","obs":"","id":36},{"ata":"037/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"MAICON DA CUNHA NENES","ipen":"610330","processo":"SAP 9878/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-02-12","dataVencimento":"","obs":"","id":37},{"ata":"038/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"WILLIAN NAZÁRIO BERNARDES DE OLIVEIRA","ipen":"557009","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":38},{"ata":"039/2025","decisao":"PERMANÊNCIA","nome":"ANDRE LUIZ MIRANDA DO NASCIMENTO","ipen":"496027","processo":"SAP 14148/2023","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-07-12","obs":"","id":39},{"ata":"040/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JAIR ANTONIO DE LIMA RIBEIRO","ipen":"646710","processo":"SAP 105549/2025","unidade":"","dataDecisao":"","dataEntrada":"2026-01-20","dataVencimento":"","obs":"","id":40},{"ata":"041/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"GREGORY EDUARDO DOLZAN","ipen":"","processo":"SAP 95609/2023","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":41},{"ata":"042/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MOISES PASSOS","ipen":"","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":42},{"ata":"043/2025","decisao":"PERMANÊNCIA","nome":"HIAGO MACHADO GUIMARÃES","ipen":"689224","processo":"SAP 85700/2024","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-07-18","dataVencimento":"2027-01-18","obs":"","id":43},{"ata":"044/2025","decisao":"PERMANÊNCIA","nome":"THIAGO SIQUEIRA","ipen":"774443","processo":"","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-07-18","dataVencimento":"2027-01-18","obs":"","id":44},{"ata":"045/2025","decisao":"PERMANÊNCIA","nome":"VANDERSON MIRANDA","ipen":"621239","processo":"","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-07-18","dataVencimento":"2027-01-18","obs":"","id":45},{"ata":"046/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"KLEBER FREITAS","ipen":"684680","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-09-13","dataVencimento":"","obs":"","id":46},{"ata":"047/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"ALEXSANDRO SERENA","ipen":"678171","processo":"SAP 106076/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-11-13","dataVencimento":"","obs":"","id":47},{"ata":"048/2025","decisao":"INCLUSÃO","nome":"GEZIEL VARGAS","ipen":"621046","processo":"SAP 00098766/2024","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2024-08-31","dataVencimento":"2026-09-03","obs":"","id":48},{"ata":"049/2025","decisao":"INCLUSÃO","nome":"GABRIEL JOSE CUSTODIO","ipen":"734004","processo":"SAP 106129/2025","motivo":"RDD","unidade":"PENITENCIÁRIA INDUSTRIAL DE CHAPECÓ","dataDecisao":"","dataEntrada":"2025-09-10","dataVencimento":"","obs":"","id":49},{"ata":"050/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MATHEUS FAGUNDES MARCOLINO","ipen":"","processo":"SAP 00114572/2025","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":50},{"ata":"050/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JACIR DOS SANTOS JUNIOR","ipen":"","processo":"SAP 00114572/2025","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":51},{"ata":"051/2025","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"WILLIAN PEREIRA BARROS","ipen":"692278","processo":"SAP 00095246/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-10-16","dataVencimento":"","obs":"","id":52},{"ata":"052/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"MARCELO STOCO","ipen":"767010","processo":"SAP 56439/2023","unidade":"","dataDecisao":"","dataEntrada":"2023-10-17","dataVencimento":"","obs":"","id":53},{"ata":"053/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"LUIZ HENRIQUE DE LIMA","ipen":"816089","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2024-08-30","dataVencimento":"","obs":"","id":54},{"ata":"054/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"HUGO CEZAR DE PAIVA","ipen":"568577","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":55},{"ata":"055/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"LEANDRO DA ROSA","ipen":"719316","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-10-14","dataVencimento":"","obs":"","id":56},{"ata":"056/2025","decisao":"PERMANÊNCIA","nome":"ANDRÉ LUIZ MEZA COSTA","ipen":"773035","processo":"SAP 65621/2020","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2022-06-04","dataVencimento":"2026-06-04","obs":"","id":57},{"ata":"057/2025","decisao":"PERMANÊNCIA","nome":"REGINALDO DE ARAUJO","ipen":"773068","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2022-12-15","dataVencimento":"2026-06-15","obs":"","id":58},{"ata":"058/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JEAN MICHEL PEREIRA STROMMER","ipen":"779066","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2023-11-23","dataVencimento":"","obs":"","id":59},{"ata":"059/2025","decisao":"PERMANÊNCIA","nome":"JOSUÉ WAISS","ipen":"617681","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2023-11-10","dataVencimento":"2026-05-10","obs":"","id":60},{"ata":"060/2025","decisao":"PERMANÊNCIA","nome":"NEUDI MARTINS","ipen":"523573","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2023-05-03","dataVencimento":"2026-05-03","obs":"","id":61},{"ata":"061/2025","decisao":"PERMANÊNCIA","nome":"DJONNY RAULINO","ipen":"526215","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2024-05-08","dataVencimento":"2026-11-08","obs":"","id":62},{"ata":"062/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"RAFAEL BRUNO RODRIGUES","ipen":"843899","processo":"SAP 130500/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-10-29","dataVencimento":"","obs":"","id":63},{"ata":"063/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"LUAN HENRIQUE CORREA PIMENTEL","ipen":"858057","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-10-29","dataVencimento":"","obs":"","id":64},{"ata":"064/2025","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"JUAN MANUEL GOMEZ","ipen":"834120","processo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":65},{"ata":"070/2025","decisao":"INCLUSÃO","nome":"RUAN LIRA DIAS","ipen":"874404","processo":"","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-11-01","dataVencimento":"2026-06-15","obs":"","id":66},{"ata":"071/2025","decisao":"PERMANÊNCIA","nome":"ROMARIO FERREIRA DA SILVA","ipen":"866061","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-06-13","dataVencimento":"2026-12-13","obs":"","id":67},{"ata":"072/2025","decisao":"PERMANÊNCIA","nome":"FABIANO KIPPER MAI","ipen":"780616","processo":"","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-06-27","dataVencimento":"2026-12-27","obs":"","id":68},{"ata":"073/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"LUIZ HENRIQUE APOLINÁRIO","ipen":"776883","processo":"","unidade":"","dataDecisao":"","dataEntrada":"2025-12-19","dataVencimento":"","obs":"","id":69},{"ata":"074/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"WELTON MARINHO DA SILVA","ipen":"792953","processo":"SEJURI 4327/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-12-20","dataVencimento":"","obs":"","id":70},{"ata":"075/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"VITOR ISAQUE TAVARES PERES","ipen":"772531","processo":"SEJURI 7505/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-12-18","dataVencimento":"","obs":"","id":71},{"ata":"076/2025","decisao":"INCLUSÃO","motivo":"RDD","nome":"LUCAS DA SILVA NUNES","ipen":"852900","processo":"SEJURI 7984/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-12-20","dataVencimento":"","obs":"","id":72},{"ata":"077/2025","decisao":"INCLUSÃO PROVISÓRIA","motivo":"MANUTENÇÃO DA ORDEM","nome":"BRUNO SILVEIRA DA SILVA","ipen":"594075","processo":"SEJURI 6054/2025","unidade":"","dataDecisao":"","dataEntrada":"2026-03-24","dataVencimento":"","obs":"VERIFICAR SE É 30 DIAS SOMENTE","id":73},{"ata":"001/2026","decisao":"INCLUSÃO","motivo":"FUGA - INCISO IV","nome":"BRUNO TOMACZUN SOARES","ipen":"567709","processo":"SEJURI 00002814/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-01-09","dataVencimento":"","obs":"","id":74},{"ata":"002/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"ANDRÉ LUIZ MIRANDA DO NASCIMENTO","ipen":"496027","processo":"SAP 00141548/2023","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":75},{"ata":"003/2026","decisao":"PERMANÊNCIA","nome":"MAICON DA CUNHA NENES","ipen":"610330","processo":"SAP 00009878/2025","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-02-12","dataVencimento":"2026-08-12","obs":"","id":76},{"ata":"004/2026","decisao":"PERMANÊNCIA","nome":"ALAN JESUS RODRIGUES DA CONCEIÇÃO","ipen":"664440","processo":"SAP 00078363/2024","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-02-12","dataVencimento":"2026-08-12","obs":"","id":77},{"ata":"005/2026","decisao":"PERMANÊNCIA","nome":"RUAN ROSA","ipen":"855286","processo":"SAP 00000786/2025","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-10-03","dataVencimento":"2026-07-16","obs":"","id":78},{"ata":"006/2026","decisao":"PERMANÊNCIA","nome":"FELIPE DA ROSA DIAS","ipen":"738139","processo":"SAP 00054809/2023","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2023-07-15","dataVencimento":"2026-07-15","obs":"","id":79},{"ata":"007/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"FABRICIO SANTOS DO NASCIMENTO","ipen":"876088","processo":"SEJURI 00004686/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-01-23","dataVencimento":"","obs":"","id":80},{"ata":"008/2026","decisao":"INCLUSÃO","motivo":"RDD","nome":"FELIPE DO NASCIMENTO COSTA","ipen":"876401","processo":"SEJURI 10520/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-01-30","dataVencimento":"","obs":"","id":81},{"ata":"009/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JEFFERSON RODRIGO SALDANHA DOS SANTOS","ipen":"879984","processo":"SEJURI 00015430/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-02-08","dataVencimento":"","obs":"","id":82},{"ata":"009/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"PAULO RICARDO ROSÁRIO DA COSTA DOS SANTOS","ipen":"879986","processo":"SEJURI 00015430/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-02-08","dataVencimento":"","obs":"","id":83},{"ata":"009/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"ROCIVALDO MORAIS DE OLIVEIRA","ipen":"879987","processo":"SEJURI 00015430/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-02-08","dataVencimento":"","obs":"","id":84},{"ata":"009/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"PATRICK DE OLIVEIRA CARDOSO","ipen":"880017","processo":"SEJURI 00015430/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-02-08","dataVencimento":"","obs":"","id":85},{"ata":"010/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"LUÍS EDUARDO GOULART BLANCO","ipen":"879976","processo":"SEJURI 00015018/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-02-08","dataVencimento":"","obs":"","id":86},{"ata":"010/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"WALLACE GLEIDSON MONTEIRO DE OLIVEIRA","ipen":"879977","processo":"SEJURI 00015018/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-02-08","dataVencimento":"","obs":"","id":87},{"ata":"011/2026","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"RHUAN PRÁ LUCAS","ipen":"743212","processo":"SAP 60070/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-06-02","dataVencimento":"","obs":"","id":88},{"ata":"012/2026","decisao":"PERMANÊNCIA","nome":"JOÃO ALVARO ROSSI JUNIOR","ipen":"517807","processo":"SAP 21305/2025","motivo":"RDD","unidade":"","dataDecisao":"","dataEntrada":"2025-04-01","dataVencimento":"2026-10-02","obs":"","id":89},{"ata":"013/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"VALDINEI MIRANDA DO NASCIMENTO","ipen":"882826","processo":"SEJURI 32462/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-03-24","dataVencimento":"","obs":"","id":90},{"ata":"014/2026","decisao":"INCLUSÃO","motivo":"RDD","nome":"JOÃO VICTOR CORDEIRO MACEDO","ipen":"877029","processo":"SEJURI 32575/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-03-24","dataVencimento":"","obs":"","id":91},{"ata":"015/2026","decisao":"INCLUSÃO","motivo":"RDD","nome":"BRUNO SILVEIRA DA SILVA","ipen":"594075","processo":"SEJURI 33106/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-03-24","dataVencimento":"","obs":"","id":92},{"ata":"016/2026","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"RHUAN PRÁ LUCAS","ipen":"743212","processo":"SAP 60070/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-06-02","dataVencimento":"","obs":"","id":93},{"ata":"017/2026","decisao":"INCLUSÃO","motivo":"RDD","nome":"JACKSON LUIZ DOS SANTOS","ipen":"668885","processo":"SEJURI 37664/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-04-02","dataVencimento":"","obs":"","id":94},{"ata":"018/2026","decisao":"PERMANÊNCIA","nome":"LUIZ HENRIQUE DE LIMA","ipen":"816089","processo":"SAP 43009/2023","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2024-08-30","dataVencimento":"2026-09-02","obs":"","id":95},{"ata":"019/2026","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"HUGO CEZAR DE PAIVA","ipen":"568577","processo":"SAP 30345/2023","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":96},{"ata":"020/2026","decisao":"PERMANÊNCIA","nome":"MARCELO STOCO","ipen":"767010","processo":"SAP 56439/2023","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2023-10-17","dataVencimento":"2026-10-17","obs":"","id":97},{"ata":"021/2026","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JUAN MANUEL GOMEZ","ipen":"834120","processo":"SAP 154158/2023","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"","obs":"","id":98},{"ata":"022/2026","decisao":"PERMANÊNCIA","nome":"WILLIAN PEREIRA BARROS","ipen":"692278","processo":"SAP 95246/2025","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"","dataEntrada":"2025-10-16","dataVencimento":"2026-10-16","obs":"","id":99},{"ata":"023/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"HUGO AGENOR DOS SANTOS DIAS","ipen":"","processo":"SEJURI 40481/2026","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-10-13","obs":"","id":100},{"ata":"024/2026","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"LUAN HENRIQUE CORREA PIMENTEL","ipen":"858057","processo":"SAP 129844/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-10-29","dataVencimento":"2026-10-29","obs":"","id":101},{"ata":"025/2026","decisao":"PERMANÊNCIA","motivo":"ALTA PERICULOSIDADE","nome":"RAFAEL BRUNO RODRIGUES","ipen":"843899","processo":"SAP 130500/2025","unidade":"","dataDecisao":"","dataEntrada":"2025-10-29","dataVencimento":"2026-10-29","obs":"","id":102},{"ata":"026/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JEAN DIAS DA ROSA","ipen":"724839","processo":"SEJURI 20308/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-04-17","dataVencimento":"2026-10-17","obs":"","id":103},{"ata":"027/2026","decisao":"INCLUSÃO","motivo":"RDD","nome":"EDUARDO RAFAEL FERREIRA DE LIMA","ipen":"861588","processo":"SEJURI 43936/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-04-21","dataVencimento":"2026-10-21","obs":"","id":104},{"ata":"028/2026","decisao":"INCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MARCOS ROGÉRIO FERREIRA DOS SANTOS","ipen":"884782","processo":"SEJURI 44182/2026","unidade":"","dataDecisao":"","dataEntrada":"2026-04-21","dataVencimento":"2026-10-21","obs":"","id":105},{"ata":"016/2025","decisao":"EXCLUSÃO","nome":"ANDRE LUIZ MEZA COSTA","ipen":"773035","processo":"SAP 65621/2020","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"2022-06-04","dataVencimento":"2026-06-04","obs":"[excluído via sistema]","id":106},{"ata":"039/2025","decisao":"EXCLUSÃO","nome":"ANDRE LUIZ MIRANDA DO NASCIMENTO","ipen":"496027","processo":"SAP 14148/2023","motivo":"ALTA PERICULOSIDADE","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"2026-07-12","obs":"[excluído via sistema]","id":107},{"ata":"010/2025","decisao":"EXCLUSÃO","nome":"JOAO ALVARO ROSSI JUNIOR","ipen":"517807","processo":"","motivo":"RDD","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"2025-04-01","dataVencimento":"2026-10-02","obs":"[excluído via sistema]","id":108},{"ata":"021/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MICHAEL PATRICK SANCHES","ipen":"","processo":"","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":109},{"ata":"024/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"RODRIGO DIAS DA ROSA","ipen":"544126","processo":"","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":110},{"ata":"029/2025","decisao":"EXCLUSÃO","motivo":"RDD","nome":"THIAGO FAVORETO CANGUSSU GOMES","ipen":"","processo":"SAP 00062103/2025","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":111},{"ata":"038/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"WILLIAN NAZÁRIO BERNARDES DE OLIVEIRA","ipen":"557009","processo":"","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":112},{"ata":"050/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"MATHEUS FAGUNDES MARCOLINO","ipen":"","processo":"SAP 00114572/2025","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":113},{"ata":"050/2025","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"JACIR DOS SANTOS JUNIOR","ipen":"","processo":"SAP 00114572/2025","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":114},{"ata":"002/2026","decisao":"EXCLUSÃO","motivo":"ALTA PERICULOSIDADE","nome":"ANDRÉ LUIZ MIRANDA DO NASCIMENTO","ipen":"496027","processo":"SAP 00141548/2023","unidade":"","dataDecisao":"2026-04-24","dataEntrada":"","dataVencimento":"","obs":"[excluído via sistema]","id":115},{"ata":"058/2025","decisao":"PERMANÊNCIA","nome":"JEAN MICHEL PEREIRA STROMMER","ipen":"779066","processo":"SAP 117382","motivo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-05-04","obs":"","id":116},{"ata":"01/04/2026","decisao":"INCLUSÃO","nome":"RHUAN PRÁ LUCAS","ipen":"743212","processo":"SAP 60070","motivo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-04-01","obs":"AGUARDANDO DECISÃO VEP CURITIBANOS","id":117},{"ata":"067/2025","decisao":"INCLUSÃO","nome":"ALESSANDRO MAGNO DIAS","ipen":"874464","processo":"SAP 1333376","motivo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-06-08","obs":"","id":118},{"ata":"065/2025","decisao":"INCLUSÃO","nome":"EDMILSON DE OLIVEIRA ZALDGUER","ipen":"548141","processo":"SAP 108250","motivo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-05-17","obs":"","id":119},{"ata":"069/2025","decisao":"INCLUSÃO","nome":"DARLISSON LUCAS MONTEIRO","ipen":"859293","processo":"SAP145615","motivo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-06-08","obs":"","id":120},{"ata":"068/2025","decisao":"INCLUSÃO","nome":"MICHAEL JACKSON PASSOS RODRIGUES","ipen":"860201","processo":"SAP 145646/2025","motivo":"","unidade":"","dataDecisao":"","dataEntrada":"","dataVencimento":"2026-06-08","obs":"","id":121}];
-
-
-// ═══════════════════════════════════════════════════════════════════════
-// BACKUP / IMPORTAR JSON
-// ═══════════════════════════════════════════════════════════════════════
-function exportarBackup() {
-  const payload = {
-    versao: 'usm_v5',
-    exportadoEm: new Date().toISOString(),
-    totalRegistros: registros.length,
-    registros: registros
-  };
-  const json = JSON.stringify(payload, null, 2);
-  const hoje = new Date().toISOString().split('T')[0];
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-  a.download = `USM_backup_${hoje}.json`;
-  a.click();
-  toast(`Backup salvo: USM_backup_${hoje}.json`, 'ok');
-}
-
-function importarBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const payload = JSON.parse(e.target.result);
-      const dados = payload.registros || payload; // aceita array direto também
-      if (!Array.isArray(dados)) throw new Error('Formato inválido');
-      if (!confirm(`Importar ${dados.length} registros do backup "${file.name}"?\n\nOs dados atuais serão substituídos.`)) return;
-      registros = dados;
-      saveData();
-      renderAll();
-      toast(`${dados.length} registros importados com sucesso!`, 'ok');
-    } catch(err) {
-      alert('Erro ao importar: arquivo inválido ou corrompido.\n' + err.message);
-    }
-    event.target.value = ''; // reset input
-  };
-  reader.readAsText(file);
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// RESET
-// ═══════════════════════════════════════════════════════════════════════
-function resetarDados() {
-  if (!confirm('Isso vai apagar os dados salvos no Firestore e recarregar os dados iniciais.\n\nEsta ação afeta TODOS os usuários. Registros adicionados manualmente serão perdidos. Continuar?')) return;
-  registros = DADOS_INICIAIS.map((r, i) => ({ ...r, id: i + 1 }));
-  saveData();
-  renderAll();
-  toast('Dados reiniciados com sucesso!', 'ok');
-}
-
-
-// ═══════════════════════════════════════════════════════════════════════
-// FIREBASE FIRESTORE — PERSISTÊNCIA EM TEMPO REAL
-// ═══════════════════════════════════════════════════════════════════════
-const FB_CONFIG = {
-  apiKey:            "AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
-  authDomain:        "crv-dpp-sc.firebaseapp.com",
-  projectId:         "crv-dpp-sc",
-  storageBucket:     "crv-dpp-sc.firebasestorage.app",
-  messagingSenderId: "707080008192",
-  appId:             "1:707080008192:web:64f44c65629c0fc5941ee5"
+let editAtivoIdx  = null;
+let editHistIdx   = null;
+let histMode      = 'novo'; // 'novo' | 'editar'
+let confirmAction = null;
+let sortState = {
+  ativos:{col:null,dir:1},
+  historico:{col:null,dir:1},
+  excluidos:{col:null,dir:1}
 };
-const FB_COLECAO  = 'usm_controle';
-const FB_DOC_ID   = 'registros_v5';
-let   _fbDb       = null;
-let   _fbUnsubscribe = null;
-let   _saveTimer  = null;
 
-function atualizarStatus(txt) {
-  const el = document.getElementById('fb-status');
-  if (el) el.textContent = txt;
+function save(){
+  localStorage.setItem('usm_ativos', JSON.stringify(ativos));
+  localStorage.setItem('usm_hist',   JSON.stringify(historico));
+  localStorage.setItem('usm_excl',   JSON.stringify(excluidos));
 }
 
-async function getDb() {
-  if (_fbDb) return _fbDb;
-  const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js');
-  const { getFirestore } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
-  const app = getApps().length ? getApps()[0] : initializeApp(FB_CONFIG);
-  _fbDb = getFirestore(app);
-  return _fbDb;
+// ══ TABS ══
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
 }
 
-async function loadData() {
-  atualizarStatus('🔄 Carregando…');
-  try {
-    const { doc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
-    const db = await getDb();
-    const ref = doc(db, FB_COLECAO, FB_DOC_ID);
-    const snap = await getDoc(ref);
-    if (snap.exists() && snap.data().lista) {
-      registros = snap.data().lista;
-    } else {
-      registros = DADOS_INICIAIS.map((r, i) => ({ ...r, id: i + 1 }));
-      await saveData();
-    }
-    renderAll();
-    atualizarStatus('🟢 Sincronizado');
-    // Listener em tempo real
-    if (_fbUnsubscribe) _fbUnsubscribe();
-    _fbUnsubscribe = onSnapshot(ref, (s) => {
-      if (s.exists() && s.data().lista) {
-        registros = s.data().lista;
-        renderAll();
-        atualizarStatus('🟢 Atualizado — ' + new Date().toLocaleTimeString('pt-BR'));
-      }
-    });
-  } catch (err) {
-    console.error('Erro ao carregar:', err);
-    atualizarStatus('🔴 Erro ao conectar');
-    registros = DADOS_INICIAIS.map((r, i) => ({ ...r, id: i + 1 }));
-    renderAll();
-  }
+// ══ HELPERS ══
+function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function statusBadge(s){
+  if(s==='VENCIDO')        return'<span class="badge badge-expired">Vencido</span>';
+  if(s==='VENCE EM BREVE') return'<span class="badge badge-soon">Vence em Breve</span>';
+  if(s==='OK')             return'<span class="badge badge-ok">OK</span>';
+  return`<span style="color:var(--text-muted);font-size:12px">${e(s)||'—'}</span>`;
+}
+function decisaoBadge(d){
+  if(d==='INCLUSÃO')   return'<span class="badge badge-inc">Inclusão</span>';
+  if(d==='PERMANÊNCIA')return'<span class="badge badge-perm">Permanência</span>';
+  if(d==='EXCLUSÃO')   return'<span class="badge badge-exc">Exclusão</span>';
+  return`<span style="color:var(--text-muted);font-size:12px">${e(d)||'—'}</span>`;
+}
+function diasClass(s){
+  if(s==='VENCIDO')        return'dias-expired';
+  if(s==='VENCE EM BREVE') return'dias-soon';
+  return'dias-ok';
 }
 
-function saveData() {
-  atualizarStatus('💾 Salvando…');
-  if (_saveTimer) clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(async () => {
-    try {
-      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js');
-      const db = await getDb();
-      await setDoc(doc(db, FB_COLECAO, FB_DOC_ID), { lista: registros, atualizado: new Date().toISOString() });
-      atualizarStatus('🟢 Salvo — ' + new Date().toLocaleTimeString('pt-BR'));
-    } catch (err) {
-      console.error('Erro ao salvar:', err);
-      atualizarStatus('🔴 Erro ao salvar');
-    }
-  }, 600);
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// LÓGICA DE NEGÓCIO
-// ═══════════════════════════════════════════════════════════════════════
-function calcVencimento(r) {
-  if (r.dataVencimento) return r.dataVencimento;
-  if (r.dataEntrada) {
-    const d = new Date(r.dataEntrada);
-    d.setMonth(d.getMonth() + 6);
-    return d.toISOString().split('T')[0];
-  }
-  return null;
-}
-
-function calcStatus(vencISO) {
-  if (!vencISO) return 'SEM DATA';
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const venc = new Date(vencISO);
-  const diff = Math.round((venc - hoje) / 86400000);
-  if (diff < 0)  return 'VENCIDO';
-  if (diff <= 30) return 'VENCE EM BREVE';
-  return 'OK';
-}
-
-function calcDias(vencISO) {
-  if (!vencISO) return null;
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const venc = new Date(vencISO);
-  return Math.round((venc - hoje) / 86400000);
-}
-
-function fmtDate(iso) {
-  if (!iso) return '—';
-  const [y, m, d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
-
-// Último registro por nome
-function getAtivos() {
-  const porNome = {};
-  registros.forEach(r => {
-    const key = r.nome.trim().toUpperCase();
-    if (!porNome[key]) porNome[key] = [];
-    porNome[key].push(r);
+// ══ SORT ══
+function sortTable(tab,col){
+  const st=sortState[tab];
+  if(st.col===col)st.dir=-st.dir; else{st.col=col;st.dir=1;}
+  document.querySelectorAll(`#tab-${tab} thead th`).forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    const oc=th.getAttribute('onclick')||'';
+    if(oc.includes(`'${col}'`)) th.classList.add(st.dir===1?'sort-asc':'sort-desc');
   });
-  const ativos = [];
-  Object.values(porNome).forEach(regs => {
-    const ultima = regs[regs.length - 1];
-    if (['INCLUSÃO','INCLUSÃO PROVISÓRIA','PERMANÊNCIA'].includes(ultima.decisao)) {
-      ativos.push(ultima);
-    }
+  if(tab==='ativos')renderAtivos();
+  if(tab==='historico')renderHistorico();
+  if(tab==='excluidos')renderExcluidos();
+}
+function applySort(arr,tab){
+  const{col,dir}=sortState[tab];
+  if(!col)return arr;
+  return[...arr].sort((a,b)=>{
+    let av=a[col]||'',bv=b[col]||'';
+    if(tab==='ativos'&&col==='dias'){av=parseInt(av)||0;bv=parseInt(bv)||0;return(av-bv)*dir;}
+    return String(av).localeCompare(String(bv))*dir;
   });
-  // Ordena por vencimento: sem data vai pro fim, vencidos primeiro, depois por dias
-  ativos.sort((a, b) => {
-    const va = calcVencimento(a), vb = calcVencimento(b);
-    if (!va && !vb) return 0;
-    if (!va) return 1;
-    if (!vb) return -1;
-    return new Date(va) - new Date(vb);
+}
+
+// ══════════════════════
+//  RENDER ATIVOS
+// ══════════════════════
+function renderAtivos(){
+  const q =(document.getElementById('search-ativos').value||'').toLowerCase();
+  const fs= document.getElementById('filter-status-ativos').value;
+  const fm= document.getElementById('filter-motivo-ativos').value;
+  let rows=ativos.filter(r=>{
+    const m=!q||(r.nome||'').toLowerCase().includes(q)||(r.ipen||'').toLowerCase().includes(q)||(r.ata||'').toLowerCase().includes(q)||(r.processo||'').toLowerCase().includes(q);
+    return m&&(!fs||r.status===fs)&&(!fm||r.motivo===fm);
   });
-  return ativos;
-}
-
-function getExcluidos() {
-  const porNome = {};
-  registros.forEach(r => {
-    const key = r.nome.trim().toUpperCase();
-    if (!porNome[key]) porNome[key] = [];
-    porNome[key].push(r);
-  });
-  const excl = [];
-  Object.values(porNome).forEach(regs => {
-    const ultima = regs[regs.length - 1];
-    if (ultima.decisao === 'EXCLUSÃO') excl.push(ultima);
-  });
-  return excl;
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════════════════════════════
-function decBadge(dec) {
-  const cls = {
-    'INCLUSÃO':'d-inclusao','INCLUSÃO PROVISÓRIA':'d-inclusao',
-    'EXCLUSÃO':'d-exclusao','PERMANÊNCIA':'d-permanencia','INDEFERIMENTO':'d-indeferimento'
-  }[dec] || 'd-exclusao';
-  return `<span class="badge-dec ${cls}">${dec}</span>`;
-}
-
-function statusBadge(status) {
-  const map = {
-    'VENCIDO':       ['s-danger','VENCIDO'],
-    'VENCE EM BREVE':['s-warn','VENCE EM BREVE'],
-    'OK':            ['s-ok','OK'],
-    'SEM DATA':      ['s-nodata','SEM DATA'],
-  };
-  const [cls, label] = map[status] || ['s-nodata', status];
-  return `<span class="badge-status ${cls}">${label}</span>`;
-}
-
-function diasCell(dias) {
-  if (dias === null) return '<td class="mono center">—</td>';
-  const cls = dias < 0 ? 'dias-neg' : dias <= 30 ? 'dias-warn' : 'dias-ok';
-  return `<td class="mono center dias-num ${cls}">${dias}</td>`;
-}
-
-function rowClass(status) {
-  if (status === 'VENCIDO') return 'row-danger';
-  if (status === 'VENCE EM BREVE') return 'row-warn';
-  return '';
-}
-
-function renderHistorico() {
-  const q    = document.getElementById('search-hist').value.toLowerCase();
-  const fDec = document.getElementById('filter-dec').value;
-  const fAno = document.getElementById('filter-ano').value;
-
-  let lista = registros.filter(r => {
-    const match = !q || [r.nome,r.ipen,r.processo,r.ata,r.motivo].join(' ').toLowerCase().includes(q);
-    const mDec  = !fDec || r.decisao === fDec;
-    const mAno  = !fAno || r.ata.includes('/' + fAno);
-    return match && mDec && mAno;
-  });
-
-  const tbody = document.getElementById('tbody-hist');
-  const empty = document.getElementById('empty-hist');
-
-  if (lista.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'flex';
-    document.getElementById('badge-hist').textContent = registros.length;
-    return;
-  }
-  empty.style.display = 'none';
-  document.getElementById('badge-hist').textContent = registros.length;
-
-  tbody.innerHTML = lista.map(r => `
-    <tr>
-      <td class="mono">${r.ata}</td>
-      <td>${decBadge(r.decisao)}</td>
-      <td>${r.motivo || '—'}</td>
-      <td><span class="copy-cell"><strong>${r.nome}</strong>${mkCopy(r.nome)}</span></td>
-      <td class="mono center"><span class="copy-cell">${r.ipen || '—'}${mkCopy(r.ipen)}</span></td>
-      <td class="mono" style="font-size:11px"><span class="copy-cell">${r.processo || '—'}${mkCopy(r.processo)}</span></td>
-      <td>${r.unidade || '—'}</td>
-      <td class="mono center">${fmtDate(r.dataDecisao)}</td>
-      <td class="mono center">${fmtDate(r.dataEntrada)}</td>
-      <td class="mono center">${fmtDate(r.dataVencimento)}</td>
-      <td style="max-width:180px;font-size:11px;color:var(--text2)">${r.obs || ''}</td>
-      <td>
-        <div class="actions">
-          <button class="act-btn" onclick="editRecord(${r.id})" title="Editar">✎</button>
-          <button class="act-btn del" onclick="deleteRecord(${r.id})" title="Excluir">✕</button>
-        </div>
-      </td>
-    </tr>`).join('');
-}
-
-function renderAtivos() {
-  const q       = document.getElementById('search-atv').value.toLowerCase();
-  const fStatus = document.getElementById('filter-status').value;
-  const fRegime = document.getElementById('filter-regime').value;
-
-  let lista = getAtivos().filter(r => {
-    const venc   = calcVencimento(r);
-    const status = calcStatus(venc);
-    const match  = !q || [r.nome,r.ipen,r.processo].join(' ').toLowerCase().includes(q);
-    const mSt    = !fStatus || status === fStatus;
-    const mReg   = !fRegime || r.motivo.includes(fRegime);
-    return match && mSt && mReg;
-  });
-
-  const tbody = document.getElementById('tbody-atv');
-  const empty = document.getElementById('empty-atv');
-  document.getElementById('badge-atv').textContent = getAtivos().length;
-
-  if (lista.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'flex';
-    return;
-  }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = lista.map(r => {
-    const venc   = calcVencimento(r);
-    const status = calcStatus(venc);
-    const dias   = calcDias(venc);
-    const rc     = rowClass(status);
-    return `
-    <tr class="${rc}">
-      <td class="mono">${r.ata}</td>
-      <td><span class="copy-cell"><strong>${r.nome}</strong>${mkCopy(r.nome)}</span></td>
-      <td class="mono center"><span class="copy-cell">${r.ipen || '—'}${mkCopy(r.ipen)}</span></td>
-      <td class="mono" style="font-size:11px"><span class="copy-cell">${r.processo || '—'}${mkCopy(r.processo)}</span></td>
-      <td>${r.motivo || '—'}</td>
-      <td>${r.unidade || '—'}</td>
-      <td class="mono center">${fmtDate(r.dataEntrada)}</td>
-      <td class="mono center">${fmtDate(venc)}</td>
-      ${diasCell(dias)}
-      <td>${statusBadge(status)}</td>
-      <td style="font-size:11px;color:var(--text2)">${r.obs || ''}</td>
-      <td>
-        <div class="actions">
-          ${window._usmPodeEditar !== false ? `<button class="act-btn" onclick="editRecord(${r.id})" title="Editar">✎</button><button class="act-btn del" onclick="excluirAtivo(${r.id})" title="Excluir da USM">✕</button>` : '<span style="font-size:10px;color:var(--text3)">—</span>'}
-        </div>
-      </td>
+  rows=applySort(rows,'ativos');
+  document.getElementById('count-ativos-shown').textContent=rows.length;
+  document.getElementById('cnt-ativos').textContent=ativos.length;
+  document.getElementById('hdr-ativos').textContent=ativos.length;
+  document.getElementById('hdr-vencidos').textContent=ativos.filter(r=>r.status==='VENCIDO').length;
+  document.getElementById('hdr-breve').textContent=ativos.filter(r=>r.status==='VENCE EM BREVE').length;
+  document.getElementById('hdr-excluidos').textContent=excluidos.length;
+  const tbody=document.getElementById('tbody-ativos');
+  const empty=document.getElementById('empty-ativos');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=rows.map(r=>{
+    const idx=ativos.indexOf(r);
+    return`<tr>
+      <td class="td-ata">${e(r.ata)}</td>
+      <td class="td-name">${e(r.nome)}</td>
+      <td class="td-ipen">${e(r.ipen)||'—'}</td>
+      <td class="td-date">${e(r.processo)||'—'}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${e(r.motivo)||'—'}</td>
+      <td class="td-date">${e(r.vencimento)||'—'}</td>
+      <td class="${diasClass(r.status)}">${e(r.dias)}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td class="td-obs" title="${e(r.obs)}">${e(r.obs)||'—'}</td>
+      <td class="td-act"><div class="actions">
+        <button class="btn btn-edit btn-sm" onclick="openEditAtivo(${idx})">✏ Editar</button>
+        <button class="btn btn-del btn-sm"  onclick="confirmExcluirAtivo(${idx})">✕ Excluir</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
 
-function renderExcluidos() {
-  const q = document.getElementById('search-exc').value.toLowerCase();
-  let lista = getExcluidos().filter(r =>
-    !q || [r.nome,r.ipen,r.processo].join(' ').toLowerCase().includes(q)
+// ══════════════════════
+//  RENDER HISTÓRICO
+// ══════════════════════
+function renderHistorico(){
+  const q =(document.getElementById('search-historico').value||'').toLowerCase();
+  const fd= document.getElementById('filter-decisao-historico').value;
+  let rows=historico.filter(r=>{
+    const m=!q||(r.nome||'').toLowerCase().includes(q)||(r.ipen||'').toLowerCase().includes(q)||(r.ata||'').toLowerCase().includes(q);
+    return m&&(!fd||r.decisao===fd);
+  });
+  rows=applySort(rows,'historico');
+  document.getElementById('count-historico-shown').textContent=rows.length;
+  document.getElementById('cnt-historico').textContent=historico.length;
+  const tbody=document.getElementById('tbody-historico');
+  const empty=document.getElementById('empty-historico');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=rows.map(r=>{
+    const idx=historico.indexOf(r);
+    return`<tr>
+      <td class="td-ata">${e(r.ata)}</td>
+      <td>${decisaoBadge(r.decisao)}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${e(r.motivo)||'—'}</td>
+      <td class="td-name">${e(r.nome)}</td>
+      <td class="td-ipen">${e(r.ipen)||'—'}</td>
+      <td class="td-date">${e(r.processo)||'—'}</td>
+      <td style="font-size:12px;color:var(--text-muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e(r.unidade)||'—'}</td>
+      <td class="td-date">${e(r.entrada)||'—'}</td>
+      <td class="td-date">${e(r.vencimento)||'—'}</td>
+      <td class="td-obs" title="${e(r.obs)}">${e(r.obs)||'—'}</td>
+      <td class="td-act"><div class="actions">
+        <button class="btn btn-edit btn-sm" onclick="openEditHistorico(${idx})">✏</button>
+        <button class="btn btn-del  btn-sm" onclick="confirmExcluirHistorico(${idx})">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════
+//  RENDER EXCLUÍDOS
+// ══════════════════════
+function renderExcluidos(){
+  const q =(document.getElementById('search-excluidos').value||'').toLowerCase();
+  const fm= document.getElementById('filter-motivo-excluidos').value;
+  let rows=excluidos.filter(r=>{
+    const m=!q||(r.nome||'').toLowerCase().includes(q)||(r.ipen||'').toLowerCase().includes(q)||(r.ata||'').toLowerCase().includes(q);
+    return m&&(!fm||r.motivo===fm);
+  });
+  rows=applySort(rows,'excluidos');
+  document.getElementById('count-excluidos-shown').textContent=rows.length;
+  document.getElementById('cnt-excluidos').textContent=excluidos.length;
+  const tbody=document.getElementById('tbody-excluidos');
+  const empty=document.getElementById('empty-excluidos');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=rows.map(r=>{
+    const idx=excluidos.indexOf(r);
+    return`<tr>
+      <td class="td-ata">${e(r.ata)}</td>
+      <td class="td-name">${e(r.nome)}</td>
+      <td class="td-ipen">${e(r.ipen)||'—'}</td>
+      <td class="td-date">${e(r.processo)||'—'}</td>
+      <td>${decisaoBadge(r.decisao)}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${e(r.motivo)||'—'}</td>
+      <td class="td-date">${e(r.entrada)||'—'}</td>
+      <td class="td-date">${e(r.vencimento)||'—'}</td>
+      <td class="td-obs" title="${e(r.obs)}">${e(r.obs)||'—'}</td>
+      <td class="td-act"><div class="actions">
+        <button class="btn btn-back btn-sm" onclick="voltarParaAtivos(${idx})">↩ Voltar</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════
+//  EDITAR ATIVO
+// ══════════════════════
+function openEditAtivo(idx){
+  editAtivoIdx=idx;
+  const r=ativos[idx];
+  document.getElementById('ea-ata').value       =r.ata||'';
+  document.getElementById('ea-ipen').value      =r.ipen||'';
+  document.getElementById('ea-nome').value      =r.nome||'';
+  document.getElementById('ea-processo').value  =r.processo||'';
+  document.getElementById('ea-motivo').value    =r.motivo||'';
+  document.getElementById('ea-unidade').value   =r.unidade||'';
+  document.getElementById('ea-entrada').value   =r.entrada||'';
+  document.getElementById('ea-vencimento').value=r.vencimento||'';
+  document.getElementById('ea-status').value    =r.status||'OK';
+  document.getElementById('ea-dias').value      =r.dias||'';
+  document.getElementById('ea-obs').value       =r.obs||'';
+  document.getElementById('modal-edit-ativo').classList.add('open');
+}
+function salvarEdicaoAtivo(){
+  if(editAtivoIdx===null)return;
+  ativos[editAtivoIdx]={...ativos[editAtivoIdx],
+    ata:document.getElementById('ea-ata').value.trim(),
+    ipen:document.getElementById('ea-ipen').value.trim(),
+    nome:document.getElementById('ea-nome').value.trim(),
+    processo:document.getElementById('ea-processo').value.trim(),
+    motivo:document.getElementById('ea-motivo').value,
+    unidade:document.getElementById('ea-unidade').value.trim(),
+    entrada:document.getElementById('ea-entrada').value.trim()||'—',
+    vencimento:document.getElementById('ea-vencimento').value.trim()||'—',
+    status:document.getElementById('ea-status').value,
+    dias:document.getElementById('ea-dias').value.trim(),
+    obs:document.getElementById('ea-obs').value.trim(),
+  };
+  save();renderAtivos();closeModal('modal-edit-ativo');toast('Ativo atualizado!','success');
+}
+
+// ══════════════════════
+//  EXCLUIR ATIVO
+// ══════════════════════
+function confirmExcluirAtivo(idx){
+  const r=ativos[idx];
+  showConfirm(
+    'EXCLUIR ATIVO',
+    `Excluir <span class="confirm-name">${e(r.nome)}</span> dos registros ativos? O registro será movido para a aba Excluídos.`,
+    ()=>{
+      const reg={...r,decisao:'EXCLUSÃO',_id:Date.now()};
+      excluidos.unshift(reg);
+      ativos.splice(idx,1);
+      save();renderAtivos();renderExcluidos();
+      document.getElementById('hdr-excluidos').textContent=excluidos.length;
+      toast('Preso movido para Excluídos.','info');
+    }
   );
+}
 
-  const tbody = document.getElementById('tbody-exc');
-  const empty = document.getElementById('empty-exc');
-  document.getElementById('badge-exc').textContent = getExcluidos().length;
-
-  if (lista.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'flex';
-    return;
+// ══════════════════════
+//  HISTÓRICO NOVO / EDITAR
+// ══════════════════════
+function openModalHistorico(){
+  histMode='novo';
+  editHistIdx=null;
+  document.getElementById('modal-hist-title').textContent='＋ INSERIR NOVO PRESO';
+  document.getElementById('btn-salvar-hist').textContent='Inserir Registro';
+  ['h-ata','h-ipen','h-nome','h-processo','h-unidade','h-entrada','h-vencimento','h-obs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('h-decisao').value='';
+  document.getElementById('h-motivo').value='';
+  document.getElementById('modal-historico').classList.add('open');
+}
+function openEditHistorico(idx){
+  histMode='editar';
+  editHistIdx=idx;
+  const r=historico[idx];
+  document.getElementById('modal-hist-title').textContent='✏ EDITAR HISTÓRICO';
+  document.getElementById('btn-salvar-hist').textContent='Salvar Alterações';
+  document.getElementById('h-ata').value       =r.ata||'';
+  document.getElementById('h-decisao').value   =r.decisao||'';
+  document.getElementById('h-motivo').value    =r.motivo||'';
+  document.getElementById('h-ipen').value      =r.ipen||'';
+  document.getElementById('h-nome').value      =r.nome||'';
+  document.getElementById('h-processo').value  =r.processo||'';
+  document.getElementById('h-unidade').value   =r.unidade||'';
+  document.getElementById('h-entrada').value   =r.entrada||'';
+  document.getElementById('h-vencimento').value=r.vencimento||'';
+  document.getElementById('h-obs').value       =r.obs||'';
+  document.getElementById('modal-historico').classList.add('open');
+}
+function salvarHistorico(){
+  const nome   =document.getElementById('h-nome').value.trim();
+  const decisao=document.getElementById('h-decisao').value;
+  if(!nome)   {toast('Preencha o nome do preso.','error');return;}
+  if(!decisao){toast('Selecione a decisão.','error');return;}
+  const dados={
+    ata:       document.getElementById('h-ata').value.trim()||'—',
+    decisao,
+    motivo:    document.getElementById('h-motivo').value,
+    nome,
+    ipen:      document.getElementById('h-ipen').value.trim(),
+    processo:  document.getElementById('h-processo').value.trim(),
+    unidade:   document.getElementById('h-unidade').value.trim(),
+    entrada:   document.getElementById('h-entrada').value.trim()||'—',
+    vencimento:document.getElementById('h-vencimento').value.trim()||'—',
+    obs:       document.getElementById('h-obs').value.trim(),
+  };
+  if(histMode==='editar'&&editHistIdx!==null){
+    historico[editHistIdx]={...historico[editHistIdx],...dados};
+    toast('Histórico atualizado!','success');
+  } else {
+    historico.unshift({...dados,_id:Date.now()});
+    toast('Novo preso inserido!','success');
   }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = lista.map(r => `
-    <tr>
-      <td class="mono">${r.ata}</td>
-      <td><span class="copy-cell">${r.nome}${mkCopy(r.nome)}</span></td>
-      <td class="mono center"><span class="copy-cell">${r.ipen || '—'}${mkCopy(r.ipen)}</span></td>
-      <td class="mono" style="font-size:11px"><span class="copy-cell">${r.processo || '—'}${mkCopy(r.processo)}</span></td>
-      <td>${decBadge(r.decisao)}</td>
-      <td>${r.motivo || '—'}</td>
-      <td>${r.unidade || '—'}</td>
-      <td class="mono center">${fmtDate(r.dataDecisao)}</td>
-      <td class="mono center">${fmtDate(r.dataEntrada)}</td>
-      <td class="mono center">${fmtDate(r.dataVencimento)}</td>
-      <td style="font-size:11px;color:var(--text2)">${r.obs || ''}</td>
-      <td>
-        <button class="act-btn" onclick="reverterExclusao(${r.id})" title="Reverter — volta o preso para ATIVOS" style="color:var(--ok);border-color:var(--ok-border)">↩ Reverter</button>
-      </td>
-    </tr>`).join('');
+  save();renderHistorico();closeModal('modal-historico');
 }
 
-function updateStats() {
-  const ativos = getAtivos();
-  let vencido = 0, alerta = 0, ok = 0;
-  ativos.forEach(r => {
-    const s = calcStatus(calcVencimento(r));
-    if (s === 'VENCIDO') vencido++;
-    else if (s === 'VENCE EM BREVE') alerta++;
-    else if (s === 'OK') ok++;
-  });
-  document.getElementById('st-total').textContent  = ativos.length;
-  document.getElementById('st-vencido').textContent = vencido;
-  document.getElementById('st-alerta').textContent  = alerta;
-  document.getElementById('st-ok').textContent      = ok;
+// ══════════════════════
+//  EXCLUIR HISTÓRICO
+// ══════════════════════
+function confirmExcluirHistorico(idx){
+  const r=historico[idx];
+  showConfirm(
+    'EXCLUIR DO HISTÓRICO',
+    `Remover o registro de <span class="confirm-name">${e(r.nome)}</span> do histórico? Esta ação não pode ser desfeita.`,
+    ()=>{historico.splice(idx,1);save();renderHistorico();toast('Registro removido do histórico.','info');}
+  );
 }
 
-function renderAll() {
-  renderHistorico();
-  renderAtivos();
-  renderExcluidos();
-  updateStats();
+// ══════════════════════
+//  VOLTAR EXCLUÍDO → ATIVO
+// ══════════════════════
+function voltarParaAtivos(idx){
+  const r=excluidos[idx];
+  showConfirm(
+    'REATIVAR PRESO',
+    `Mover <span class="confirm-name">${e(r.nome)}</span> de volta para os Ativos?`,
+    ()=>{
+      const reg={...r,status:r.status||'OK',dias:r.dias||'—',_id:Date.now()};
+      delete reg.decisao;
+      ativos.unshift(reg);
+      excluidos.splice(idx,1);
+      save();renderAtivos();renderExcluidos();
+      document.getElementById('hdr-excluidos').textContent=excluidos.length;
+      toast('Preso reativado e movido para Ativos.','success');
+    },
+    'Reativar',
+    'btn-back'
+  );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════════════════════
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
-  });
+// ══════════════════════
+//  CONFIRM DIALOG
+// ══════════════════════
+function showConfirm(title,msg,action,btnLabel='Confirmar',btnClass='btn-del'){
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-msg').innerHTML=msg;
+  const btn=document.getElementById('confirm-btn-ok');
+  btn.textContent=btnLabel;
+  btn.className=`btn ${btnClass}`;
+  confirmAction=action;
+  document.getElementById('modal-confirm').classList.add('open');
+}
+document.getElementById('confirm-btn-ok').addEventListener('click',()=>{
+  if(confirmAction){confirmAction();confirmAction=null;}
+  closeModal('modal-confirm');
 });
 
-// ═══════════════════════════════════════════════════════════════════════
-// FILTROS / BUSCA
-// ═══════════════════════════════════════════════════════════════════════
-['search-hist','filter-dec','filter-ano'].forEach(id =>
-  document.getElementById(id).addEventListener('input', renderHistorico));
-['search-atv','filter-status','filter-regime'].forEach(id =>
-  document.getElementById(id).addEventListener('input', renderAtivos));
-document.getElementById('search-exc').addEventListener('input', renderExcluidos);
-
-// ═══════════════════════════════════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════════════════════════════════
-function openModal(id = null) {
-  editingId = id;
-  document.getElementById('modal-title').textContent = id ? 'Editar Registro' : 'Novo Registro';
-  const fields = ['ata','decisao','nome','ipen','processo','motivo','unidade',
-                  'dataDecisao','dataEntrada','dataVencimento','obs'];
-  if (id) {
-    const r = registros.find(x => x.id === id);
-    fields.forEach(f => {
-      const el = document.getElementById('f-' + f);
-      if (el) el.value = r[f] || '';
-    });
-    document.getElementById('f-motivo-custom').value = '';
-  } else {
-    fields.forEach(f => {
-      const el = document.getElementById('f-' + f);
-      if (el) el.value = '';
-    });
-    document.getElementById('f-motivo-custom').value = '';
-  }
-  document.getElementById('overlay').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-  editingId = null;
-}
-
-function closeModalOutside(e) {
-  if (e.target === document.getElementById('overlay')) closeModal();
-}
-
-function saveRecord() {
-  const ata     = document.getElementById('f-ata').value.trim();
-  const decisao = document.getElementById('f-decisao').value;
-  const nome    = document.getElementById('f-nome').value.trim();
-  if (!ata || !decisao || !nome) {
-    toast('Preencha os campos obrigatórios: Nº ATA, Decisão e Nome.', 'danger');
-    return;
-  }
-  const motivoSel    = document.getElementById('f-motivo').value;
-  const motivoCustom = document.getElementById('f-motivo-custom').value.trim();
-  const motivo = motivoCustom || motivoSel;
-
-  const rec = {
-    ata, decisao, nome: nome.toUpperCase(),
-    ipen:           document.getElementById('f-ipen').value.trim(),
-    processo:       document.getElementById('f-processo').value.trim(),
-    motivo,
-    unidade:        document.getElementById('f-unidade').value.trim(),
-    dataDecisao:    document.getElementById('f-dataDecisao').value,
-    dataEntrada:    document.getElementById('f-dataEntrada').value,
-    dataVencimento: document.getElementById('f-dataVencimento').value,
-    obs:            document.getElementById('f-obs').value.trim(),
-  };
-
-  if (editingId) {
-    const idx = registros.findIndex(x => x.id === editingId);
-    registros[idx] = { ...rec, id: editingId };
-    toast('Registro atualizado.', 'ok');
-  } else {
-    const maxId = registros.reduce((m, x) => Math.max(m, x.id || 0), 0);
-    registros.push({ ...rec, id: maxId + 1 });
-    toast('Registro adicionado ao Histórico.', 'ok');
-  }
-
-  saveData();
-  closeModal();
-  renderAll();
-}
-
-function editRecord(id) {
-  openModal(id);
-}
-
-function deleteRecord(id) {
-  if (!confirm('Confirmar exclusão deste registro?')) return;
-  registros = registros.filter(x => x.id !== id);
-  saveData();
-  renderAll();
-  toast('Registro removido.', 'danger');
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// EXCLUIR ATIVO → gera registro EXCLUSÃO no histórico
-// ═══════════════════════════════════════════════════════════════════════
-function excluirAtivo(id) {
-  const r = registros.find(x => x.id === id);
-  if (!r) return;
-  if (!confirm(`Confirmar exclusão de "${r.nome}" da USM?\n\nIsso criará um registro de EXCLUSÃO no Histórico e moverá o preso para a aba Excluídos.`)) return;
-
-  // Cria novo registro de EXCLUSÃO baseado no último registro do preso
-  const maxId = registros.reduce((m, x) => Math.max(m, x.id || 0), 0);
-  const hoje = new Date().toISOString().split('T')[0];
-  const novoReg = {
-    ...r,
-    id: maxId + 1,
-    decisao: 'EXCLUSÃO',
-    dataDecisao: hoje,
-    obs: r.obs ? r.obs + ' [excluído via sistema]' : '[excluído via sistema]',
-  };
-  registros.push(novoReg);
-  saveData();
-  renderAll();
-  toast(`${r.nome} movido para Excluídos.`, 'ok');
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// REVERTER EXCLUSÃO → remove o registro de EXCLUSÃO, preso volta para ATIVOS
-// ═══════════════════════════════════════════════════════════════════════
-function reverterExclusao(id) {
-  const r = registros.find(x => x.id === id);
-  if (!r) return;
-  if (!confirm(`Reverter exclusão de "${r.nome}"?\n\nO registro de EXCLUSÃO será removido e o preso voltará a aparecer em ATIVOS com a decisão anterior.`)) return;
-
-  // Remove apenas o registro de EXCLUSÃO (mantém os anteriores)
-  registros = registros.filter(x => x.id !== id);
-  saveData();
-  renderAll();
-  toast(`Exclusão de ${r.nome} revertida.`, 'ok');
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// SORT
-// ═══════════════════════════════════════════════════════════════════════
-function sortTable(tab, field) {
-  if (sortState.field === field) sortState.dir *= -1;
-  else { sortState.field = field; sortState.dir = 1; }
-  if (tab === 'historico') {
-    registros.sort((a,b) => {
-      const va = (a[field]||'').toString().toLowerCase();
-      const vb = (b[field]||'').toString().toLowerCase();
-      return va < vb ? -sortState.dir : va > vb ? sortState.dir : 0;
-    });
-    renderHistorico();
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// EXPORT CSV
-// ═══════════════════════════════════════════════════════════════════════
-function exportCSV(tipo) {
-  let dados, headers, filename;
-  const esc = v => `"${(v||'').toString().replace(/"/g,'""')}"`;
-
-  if (tipo === 'historico') {
-    headers = ['Nº ATA','DECISÃO','MOTIVO','NOME','IPEN','Nº PROCESSO','UNIDADE',
-               'DATA DECISÃO','DATA ENTRADA USM','DATA VENCIMENTO','OBSERVAÇÕES'];
-    dados = registros.map(r => [r.ata,r.decisao,r.motivo,r.nome,r.ipen,r.processo,
-      r.unidade,fmtDate(r.dataDecisao),fmtDate(r.dataEntrada),fmtDate(r.dataVencimento),r.obs]);
-    filename = 'USM_Historico.csv';
-  } else if (tipo === 'ativos') {
-    headers = ['Nº ATA','NOME','IPEN','Nº PROCESSO','MOTIVO','UNIDADE',
-               'DATA ENTRADA USM','DATA VENCIMENTO','DIAS RESTANTES','STATUS','OBSERVAÇÕES'];
-    dados = getAtivos().map(r => {
-      const v = calcVencimento(r);
-      return [r.ata,r.nome,r.ipen,r.processo,r.motivo,r.unidade,
-              fmtDate(r.dataEntrada),fmtDate(v),calcDias(v)??'',calcStatus(v),r.obs];
-    });
-    filename = 'USM_Ativos.csv';
-  } else {
-    headers = ['Nº ATA','NOME','IPEN','Nº PROCESSO','DECISÃO','MOTIVO','UNIDADE',
-               'DATA DECISÃO','DATA ENTRADA USM','DATA VENCIMENTO','OBSERVAÇÕES'];
-    dados = getExcluidos().map(r => [r.ata,r.nome,r.ipen,r.processo,r.decisao,r.motivo,
-      r.unidade,fmtDate(r.dataDecisao),fmtDate(r.dataEntrada),fmtDate(r.dataVencimento),r.obs]);
-    filename = 'USM_Excluidos.csv';
-  }
-
-  const bom = '\uFEFF';
-  const csv = bom + [headers, ...dados].map(row => row.map(esc).join(';')).join('\r\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = filename;
-  a.click();
-  toast(`Exportado: ${filename}`, 'ok');
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════════════════════════
-let toastTimer;
-function toast(msg, tipo = 'ok') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `show toast-${tipo}`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════════
-// CONTROLE DE PERMISSÕES — EDITORES vs LEITORES
-// ═══════════════════════════════════════════════════════════════════════
-const EMAILS_EDITORES = [
-  'jessicaveiga9@gmail.com',
-  'sepen@pp.sc.gov.br',
-  'leilakfarias@gmail.com'
-];
-
-// ─── APENAS CONSULTA (não estão em EMAILS_EDITORES) ───────────────────────
-// brunawlongen@gmail.com
-// day.sestren88@gmail.com
-// ivana.schafer@gmail.com
-// abeljuliana2012@gmail.com
-// ricardobritomarques12@gmail.com
-// ──────────────────────────────────────────────────────────────────────────
-
-let _modoSomenteLeitura = true; // começa restrito até receber o email
-
-function aplicarPermissoes(email) {
-  const podeEditar = EMAILS_EDITORES.includes((email || '').toLowerCase().trim());
-  _modoSomenteLeitura = !podeEditar;
-
-  // Oculta/mostra botões de edição na toolbar
-  // "Novo Registro" — btn-primary com onclick="openModal()"
-  // "Importar JSON" — label com input file
-  // "Resetar dados" — btn-danger com onclick="resetarDados()"
-  document.querySelectorAll('.toolbar .btn-primary, .toolbar .btn-danger, .toolbar label.btn-ghost').forEach(function(el) {
-    el.style.display = podeEditar ? '' : 'none';
-  });
-
-  // Botão excluir nas linhas da tabela (.act-btn.del) — renderizado dinamicamente
-  // Guardamos o estado para aplicar ao renderizar
-  window._usmPodeEditar = podeEditar;
-
-  // Indicador visual no header
-  const badge = document.getElementById('permissao-badge');
-  if (badge) {
-    badge.textContent = podeEditar ? '✏️ Editor' : '👁 Somente leitura';
-    badge.style.background = podeEditar ? 'rgba(34,197,94,.15)' : 'rgba(239,68,68,.12)';
-    badge.style.color = podeEditar ? 'var(--ok)' : 'var(--danger)';
-    badge.style.border = podeEditar ? '1px solid var(--ok-border)' : '1px solid var(--danger-border)';
-  }
-
-  // Re-renderiza para aplicar nas linhas da tabela
-  if (typeof renderAll === 'function') renderAll();
-}
-
-// Recebe o email enviado pelo index.html via postMessage
-window.addEventListener('message', function(e) {
-  if (e.data && e.data.tipo === 'usuarioEmail') {
-    aplicarPermissoes(e.data.email);
-  }
+// ══════════════════════
+//  MODAL / TOAST utils
+// ══════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',function(ev){if(ev.target===this)this.classList.remove('open');});
 });
+function toast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show '+type;
+  setTimeout(()=>{t.className='';},3000);
+}
 
-loadData();
-renderAll();
+// ══ INIT ══
+renderAtivos();renderHistorico();renderExcluidos();
 </script>
 </body>
 </html>
