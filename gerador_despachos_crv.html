@@ -174,17 +174,19 @@ html,body{height:100%;font-family:"Segoe UI",Calibri,sans-serif;background:var(-
 // ESTADO
 // ════════════════════════════════════════════════════════════
 var S = {
-  inciso: null,           // 'I' | 'II' | 'III' | 'PERNOITE'
+  inciso: null,           // 'I' | 'II' | 'III' | 'PERNOITE' | 'PERMUTA'
+  permulaInciso: null,    // 'II' | 'III' — subinciso da permuta
   resultado: null,        // 'def' | 'ind' | 'dev'
-  prazo: null,            // só para inciso I + def
-  pernoiteMotivo: '',     // só para PERNOITE + def
-  motivos: [],            // motivos de ind/dev
-  assFlts: [],            // assinaturas faltantes
-  docFlts: [],            // documentos faltantes
-  docOutros: '',          // campo livre de outros documentos
+  prazo: null,
+  pernoiteMotivo: '',
+  pernoiteSGPe: '',
+  motivos: [],
+  assFlts: [],
+  docFlts: [],
+  docOutros: '',
 };
 
-function rS(){ S={inciso:null,resultado:null,prazo:null,pernoiteMotivo:'',pernoiteSGPe:'',motivos:[],assFlts:[],docFlts:[],docOutros:''}; }
+function rS(){ S={inciso:null,permulaInciso:null,resultado:null,prazo:null,pernoiteMotivo:'',pernoiteSGPe:'',motivos:[],assFlts:[],docFlts:[],docOutros:''}; }
 
 // ════════════════════════════════════════════════════════════
 // HELPERS DOM
@@ -267,7 +269,7 @@ function toast(m){
 // ════════════════════════════════════════════════════════════
 // PAINEL DE MOTIVOS (checkboxes multi)
 // ════════════════════════════════════════════════════════════
-function buildPainelMotivos(tipo, cb){
+function buildPainelMotivos(tipo){
   lp();
   var cls = tipo==='ind' ? 'vm' : 'am';
   var label = tipo==='ind' ? '❌ Motivos do Indeferimento' : '🔄 Motivos da Devolução';
@@ -286,13 +288,11 @@ function buildPainelMotivos(tipo, cb){
   var body=document.createElement('div');
   body.className='motivos-body';
 
-  // Estado de seleção
   var sel = { fluxo:false, ass:false, doc:false };
   var assFlts = {};
   var docFlts = {};
   var docOutrosVal = '';
 
-  // Assinaturas disponíveis
   var ASS_OPTS = [
     {v:'ori_dir',  l:'Diretor(a) da Unidade Prisional de Origem'},
     {v:'des_dir',  l:'Diretor(a) da Unidade Prisional de Destino'},
@@ -300,7 +300,6 @@ function buildPainelMotivos(tipo, cb){
     {v:'des_sr',   l:'Superintendente da Regional de Destino'},
   ];
 
-  // Documentos disponíveis
   var DOC_OPTS = [
     {v:'bpi',       l:'BPI — Boletim Penal Informativo'},
     {v:'saude',     l:'Formulário de Saúde'},
@@ -312,13 +311,11 @@ function buildPainelMotivos(tipo, cb){
   ASS_OPTS.forEach(function(o){ assFlts[o.v]=false; });
   DOC_OPTS.forEach(function(o){ docFlts[o.v]=false; });
 
-  // ── Item: Fluxo não observado ──
-  var iFluxo = criarItem(cls,'O fluxo não foi observado na integralidade',null);
+  var iFluxo = criarItem(cls,'O fluxo não foi observado na integralidade');
   iFluxo.onclick = function(){ sel.fluxo=!sel.fluxo; toggleItem(iFluxo,cls,sel.fluxo); };
   body.appendChild(iFluxo);
 
-  // ── Item: Falta de Assinaturas ──
-  var iAss = criarItem(cls,'Falta de Assinaturas',null);
+  var iAss = criarItem(cls,'Falta de Assinaturas');
   var subAss = document.createElement('div');
   subAss.className='mi-sub';
   ASS_OPTS.forEach(function(o){
@@ -340,8 +337,7 @@ function buildPainelMotivos(tipo, cb){
   });
   body.appendChild(iAss);
 
-  // ── Item: Falta de Documento ──
-  var iDoc = criarItem(cls,'Falta de Documento',null);
+  var iDoc = criarItem(cls,'Falta de Documento');
   var subDoc = document.createElement('div');
   subDoc.className='mi-sub';
   var outrosInput = document.createElement('input');
@@ -376,7 +372,6 @@ function buildPainelMotivos(tipo, cb){
 
   painel.appendChild(body);
 
-  // ── Botão Confirmar ──
   var btnConf = document.createElement('button');
   btnConf.className='motivos-conf';
   btnConf.textContent='✓ Confirmar seleção e gerar despacho';
@@ -388,7 +383,6 @@ function buildPainelMotivos(tipo, cb){
     S.assFlts = assArr;
     S.docFlts = docArr;
 
-    // Monta resumo para mensagem usuário
     var partes=[];
     if(sel.fluxo) partes.push('Fluxo incompleto');
     if(assArr.length) partes.push('Falta assinatura: '+assArr.map(function(a){ return a.split(' ')[0]+' '+a.split(' ')[1]; }).join(', '));
@@ -448,27 +442,55 @@ async function passo1(){
     {l:'<strong>Art. 21, I</strong><br><small style="font-weight:400;font-size:.75rem">Emergencial — gerenciamento de crises</small>', v:'I', lg:true},
     {l:'<strong>Art. 21, II</strong><br><small style="font-weight:400;font-size:.75rem">Pedido da pessoa privada de liberdade ou familiar</small>', v:'II', lg:true},
     {l:'<strong>Art. 21, III</strong><br><small style="font-weight:400;font-size:.75rem">Adequação da capacidade de ocupação</small>', v:'III', lg:true},
+    {l:'<strong>🔄 Permuta</strong><br><small style="font-weight:400;font-size:.75rem">Transferência em permuta entre unidades</small>', v:'PERMUTA', lg:true},
     {l:'<strong>🌙 Pernoite</strong><br><small style="font-weight:400;font-size:.75rem">Medida excepcional administrativa</small>', v:'PERNOITE', lg:true},
   ], function(v){
     S.inciso = v;
+    if(v === 'PERMUTA'){
+      setTimeout(passoPermutaInciso, 200);
+    } else {
+      setTimeout(passo2, 200);
+    }
+  });
+}
+
+// ── PERMUTA: escolha do subinciso ──
+async function passoPermutaInciso(){
+  await mBot('A permuta está enquadrada em qual <strong>inciso</strong>?');
+  chips([
+    {l:'<strong>Art. 21, II</strong><br><small style="font-weight:400;font-size:.75rem">Pedido voluntário — iniciativa da pessoa privada de liberdade ou familiar</small>', v:'II', lg:true},
+    {l:'<strong>Art. 21, III</strong><br><small style="font-weight:400;font-size:.75rem">Pedido da unidade prisional — ajuste/equalização de vagas</small>', v:'III', lg:true},
+  ], function(v){
+    S.permulaInciso = v;
     setTimeout(passo2, 200);
   });
 }
 
 async function passo2(){
   await mBot('Qual é o <strong>resultado da análise</strong> para este pedido?');
-  chips([
-    {l:'✅ Deferir', v:'def', cl:'vd'},
-    {l:'❌ Indeferir', v:'ind', cl:'vm'},
-    {l:'🔄 Devolver para Retificação', v:'dev', cl:'am'},
-  ], function(v){
-    S.resultado = v;
-    if(v==='def'){
-      setTimeout(passo3Deferir, 200);
-    } else {
-      setTimeout(passo3IndDev, 200);
-    }
-  });
+
+  if(S.inciso === 'PERMUTA'){
+    chips([
+      {l:'✅ Deferir', v:'def', cl:'vd'},
+      {l:'❌ Indeferir', v:'ind', cl:'vm'},
+    ], function(v){
+      S.resultado = v;
+      setTimeout(v === 'def' ? passo3Deferir : gerarDespacho, 200);
+    });
+  } else {
+    chips([
+      {l:'✅ Deferir', v:'def', cl:'vd'},
+      {l:'❌ Indeferir', v:'ind', cl:'vm'},
+      {l:'🔄 Devolver para Retificação', v:'dev', cl:'am'},
+    ], function(v){
+      S.resultado = v;
+      if(v==='def'){
+        setTimeout(passo3Deferir, 200);
+      } else {
+        setTimeout(passo3IndDev, 200);
+      }
+    });
+  }
 }
 
 async function passo3Deferir(){
@@ -523,6 +545,7 @@ async function passo3Deferir(){
       }
     });
   } else {
+    // PERMUTA deferimento e demais incisos sem pergunta extra
     gerarDespacho();
   }
 }
@@ -545,49 +568,73 @@ var LABEL_INCISO = {
 function gerarDespacho(){
   var inc = S.inciso;
   var res = S.resultado;
-  var linc = LABEL_INCISO[inc];
   var texto = '';
   var badge = '';
   var badgeClass = '';
-  var subtit = inc === 'PERNOITE'
-    ? 'Pernoite — Medida Excepcional Administrativa'
-    : 'Resolução Conjunta Interinstitucional n. 01/2026 — '+linc;
+
+  // ── PERMUTA ───────────────────────────────────────────────
+  if(inc === 'PERMUTA'){
+    var linc = LABEL_INCISO[S.permulaInciso];
+    var subtitPermuta = 'Transferência em Permuta — Resolução Conjunta Interinstitucional n. 01/2026 — ' + linc;
+
+    if(res === 'def'){
+      badgeClass = 'badge-def';
+      badge = '✅ DEFERIDO';
+      texto = 'Trata-se de pedido de transferência administrativa, na modalidade "transferência em permuta", enquadrado no ' + linc + ', da Resolução Conjunta Interinstitucional n. 01/2026.\n\n'
+            + 'Após análise da documentação encaminhada, a Central de Regulação de Vagas decide pela aprovação do pedido, por estar em conformidade com o referido dispositivo legal, encontrando-se atendidos os requisitos formais e materiais exigidos para a modalidade requerida.\n\n'
+            + 'Após a efetivação da transferência, os estabelecimentos penais deverão comunicar ao Juízo competente no prazo máximo de 24 (vinte e quatro) horas em dias úteis, ou no primeiro dia útil seguinte, caso a movimentação ocorra no fim de semana ou feriado, nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.\n\n'
+            + 'Destaca-se, ainda, a necessidade de a unidade prisional de origem encaminhar, no momento da remoção, junto ao apenado, os itens de higiene pessoal e os uniformes que lhe foram entregues.';
+    } else {
+      // INDEFERIMENTO PERMUTA — texto fixo
+      badgeClass = 'badge-ind';
+      badge = '❌ INDEFERIDO';
+      texto = 'Trata-se de pedido de transferência administrativa, na modalidade "transferência em permuta", submetido à apreciação desta Central de Regulação de Vagas.\n\n'
+            + 'Após análise do pleito, esta Central de Regulação de Vagas decide pelo indeferimento do pedido, em razão das seguintes irregularidades identificadas na instrução do expediente:\n\n'
+            + '   * O fluxo procedimental não foi observado na integralidade, conforme as normas internas da CRV/DPP dispostas no Ofício-Circular nº 001/2026/PPSC/CRV (Processo SEJURI nº 00034889/2026) e os requisitos estabelecidos pela Resolução Conjunta Interinstitucional n. 01/2026.\n\n'
+            + 'Diante das irregularidades constatadas, o pedido não atende aos requisitos legais e procedimentais exigidos para a sua aprovação.\n\n'
+            + 'Deste modo, o interessado poderá, se entender cabível, formular novo pedido devidamente instruído, observando integralmente o fluxo estabelecido pela Resolução Conjunta Interinstitucional n. 01/2026 e pelas normativas internas desta Central, dispostas no Ofício-Circular nº 001/2026/PPSC/CRV.\n\n'
+            + 'Eventuais dúvidas poderão ser sanadas diretamente no site desta CRV (https://crv-dpp-sc.github.io/manual/), através dos menus "Hipóteses", "Fluxo Operacional" e "Documentos" — neste último há um checklist disponível —, ou pelo telefone/WhatsApp do plantão: (48) 3665-7330, disponível 24 horas.';
+    }
+    exibirDespacho(badge, badgeClass, subtitPermuta, texto);
+    return;
+  }
 
   // ── PERNOITE ──────────────────────────────────────────────
+  var linc = LABEL_INCISO[inc];
+  var subtit = inc === 'PERNOITE'
+    ? 'Pernoite — Medida Excepcional Administrativa'
+    : 'Resolução Conjunta Interinstitucional n. 01/2026 — ' + linc;
+
   if(inc === 'PERNOITE'){
     if(res === 'def'){
       badgeClass = 'badge-def';
       badge = '✅ DEFERIDO';
-      var refDocumento = S.pernoiteSGPe
-        ? 'Processo SGPe nº '+S.pernoiteSGPe
-        : 'documentação retro';
+      var refDoc = S.pernoiteSGPe ? 'Processo SGPe nº '+S.pernoiteSGPe : 'documentação retro';
       texto = 'Trata-se de pedido de pernoite, haja vista necessidade de '+S.pernoiteMotivo+'.\n\n'
-            + 'Em análise ao '+refDocumento+', a Central de Regulação de Vagas decide pela aprovação do pedido, eis que em conformidade com a legislação aplicável.\n\n'
+            + 'Em análise ao '+refDoc+', a Central de Regulação de Vagas decide pela aprovação do pedido, eis que em conformidade com a legislação aplicável.\n\n'
             + 'Destaca-se, ainda, a necessidade de a unidade prisional de origem encaminhar, no momento da remoção, junto ao apenado, os itens de higiene pessoal e os uniformes que lhe foram entregues.';
     } else {
-      // Indeferimento ou Devolução de pernoite usa o mesmo fluxo de motivos
       var mot = S.motivos || {};
-      var linhasMotivos = [];
-      if(mot.fluxo) linhasMotivos.push('   * O fluxo procedimental não foi observado na integralidade, conforme as normas internas da CRV/DPP.');
-      if(mot.ass && mot.ass.length) mot.ass.forEach(function(a){ linhasMotivos.push('   * Ausência de assinatura: '+a+'.'); });
-      if(mot.doc && mot.doc.length) mot.doc.forEach(function(d){ linhasMotivos.push('   * Ausência de documento obrigatório: '+d+'.'); });
-
-      var pContato = 'Eventuais dúvidas poderão ser sanadas diretamente no site desta CRV (https://crv-dpp-sc.github.io/manual/), através dos menus "Hipóteses", "Fluxo Operacional" e "Documentos" — neste último há um checklist disponível —, ou pelo telefone/WhatsApp do plantão: (48) 3665-7330, disponível 24 horas.';
+      var lm = [];
+      if(mot.fluxo) lm.push('   * O fluxo procedimental não foi observado na integralidade, conforme as normas internas da CRV/DPP.');
+      if(mot.ass && mot.ass.length) mot.ass.forEach(function(a){ lm.push('   * Ausência de assinatura: '+a+'.'); });
+      if(mot.doc && mot.doc.length) mot.doc.forEach(function(d){ lm.push('   * Ausência de documento obrigatório: '+d+'.'); });
+      var pC = 'Eventuais dúvidas poderão ser sanadas diretamente no site desta CRV (https://crv-dpp-sc.github.io/manual/), através dos menus "Hipóteses", "Fluxo Operacional" e "Documentos" — neste último há um checklist disponível —, ou pelo telefone/WhatsApp do plantão: (48) 3665-7330, disponível 24 horas.';
 
       if(res === 'ind'){
         badgeClass = 'badge-ind'; badge = '❌ INDEFERIDO';
-        var partes = ['Trata-se de pedido de pernoite submetido à apreciação desta Central de Regulação de Vagas.',
+        var pts = ['Trata-se de pedido de pernoite submetido à apreciação desta Central de Regulação de Vagas.',
           'Após análise da documentação encaminhada, esta Central decide pelo indeferimento do pedido, em razão das seguintes irregularidades identificadas:'];
-        if(linhasMotivos.length) partes.push(linhasMotivos.join('\n'));
-        partes.push('Diante das irregularidades constatadas, o pedido não atende aos requisitos exigidos para a sua aprovação. O interessado poderá, se entender cabível, formular novo pedido devidamente instruído.\n\n'+pContato);
-        texto = partes.join('\n\n');
+        if(lm.length) pts.push(lm.join('\n'));
+        pts.push('Diante das irregularidades constatadas, o pedido não atende aos requisitos exigidos para a sua aprovação. O interessado poderá, se entender cabível, formular novo pedido devidamente instruído.\n\n'+pC);
+        texto = pts.join('\n\n');
       } else {
         badgeClass = 'badge-dev'; badge = '🔄 DEVOLVIDO PARA RETIFICAÇÃO';
-        var partesd = ['Trata-se de pedido de pernoite submetido à apreciação desta Central de Regulação de Vagas.',
+        var ptd = ['Trata-se de pedido de pernoite submetido à apreciação desta Central de Regulação de Vagas.',
           'Após análise preliminar, esta Central decide pela devolução do expediente para retificação, tendo em vista as seguintes pendências:'];
-        if(linhasMotivos.length) partesd.push(linhasMotivos.join('\n'));
-        partesd.push('Após a devida regularização, o pedido poderá ser novamente submetido à apreciação desta CRV.\n\n'+pContato);
-        texto = partesd.join('\n\n');
+        if(lm.length) ptd.push(lm.join('\n'));
+        ptd.push('Após a devida regularização, o pedido poderá ser novamente submetido à apreciação desta CRV.\n\n'+pC);
+        texto = ptd.join('\n\n');
       }
     }
     exibirDespacho(badge, badgeClass, subtit, texto);
@@ -598,69 +645,41 @@ function gerarDespacho(){
   if(res === 'def'){
     badgeClass = 'badge-def';
     badge = '✅ DEFERIDO';
-
     var p1 = 'Trata-se de pedido de transferência administrativa enquadrado no '+linc+', da Resolução Conjunta Interinstitucional n. 01/2026.';
-
     var p2 = 'Após análise da documentação encaminhada, a Central de Regulação de Vagas decide pela aprovação do pedido, por estar em conformidade com o referido dispositivo legal, encontrando-se atendidos os requisitos formais e materiais exigidos para a modalidade requerida.';
-
-    var p3extra = '';
-    if(inc === 'I'){
-      p3extra = 'Por se tratar de situação de emergência, a transferência deverá ser realizada no prazo máximo de '+S.prazo+', contados a partir da ciência do presente despacho.';
-    }
-
-    var pFinal = 'Após a efetivação da transferência, os estabelecimentos penais deverão comunicar ao Juízo competente no prazo máximo de 24 (vinte e quatro) horas em dias úteis, ou no primeiro dia útil seguinte, caso a movimentação ocorra no fim de semana ou feriado, nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.';
-
-    var pKit = 'Destaca-se, ainda, a necessidade de a unidade prisional de origem encaminhar, no momento da remoção, junto ao apenado, os itens de higiene pessoal e os uniformes que lhe foram entregues.';
-
-    var partes = [p1, p2];
-    if(p3extra) partes.push(p3extra);
-    partes.push(pFinal);
-    partes.push(pKit);
-    texto = partes.join('\n\n');
-
+    var p3x = inc === 'I' ? 'Por se tratar de situação de emergência, a transferência deverá ser realizada no prazo máximo de '+S.prazo+', contados a partir da ciência do presente despacho.' : '';
+    var pF = 'Após a efetivação da transferência, os estabelecimentos penais deverão comunicar ao Juízo competente no prazo máximo de 24 (vinte e quatro) horas em dias úteis, ou no primeiro dia útil seguinte, caso a movimentação ocorra no fim de semana ou feriado, nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.';
+    var pK = 'Destaca-se, ainda, a necessidade de a unidade prisional de origem encaminhar, no momento da remoção, junto ao apenado, os itens de higiene pessoal e os uniformes que lhe foram entregues.';
+    var pp = [p1, p2];
+    if(p3x) pp.push(p3x);
+    pp.push(pF); pp.push(pK);
+    texto = pp.join('\n\n');
   } else {
     var mot = S.motivos || {};
-    var linhasMotivos = [];
-
-    if(mot.fluxo){
-      linhasMotivos.push('   * O fluxo procedimental não foi observado na integralidade, conforme as normas internas da CRV/DPP e os requisitos estabelecidos pela Resolução Conjunta Interinstitucional n. 01/2026.');
-    }
-    if(mot.ass && mot.ass.length){
-      mot.ass.forEach(function(a){ linhasMotivos.push('   * Ausência de assinatura: '+a+'.'); });
-    }
-    if(mot.doc && mot.doc.length){
-      mot.doc.forEach(function(d){ linhasMotivos.push('   * Ausência de documento obrigatório: '+d+'.'); });
-    }
+    var lm = [];
+    if(mot.fluxo) lm.push('   * O fluxo procedimental não foi observado na integralidade, conforme as normas internas da CRV/DPP e os requisitos estabelecidos pela Resolução Conjunta Interinstitucional n. 01/2026.');
+    if(mot.ass && mot.ass.length) mot.ass.forEach(function(a){ lm.push('   * Ausência de assinatura: '+a+'.'); });
+    if(mot.doc && mot.doc.length) mot.doc.forEach(function(d){ lm.push('   * Ausência de documento obrigatório: '+d+'.'); });
 
     var p1 = 'Trata-se de pedido de transferência administrativa enquadrado no '+linc+', da Resolução Conjunta Interinstitucional n. 01/2026, submetido à apreciação desta Central de Regulação de Vagas.';
-
-    var pContato = 'Eventuais dúvidas poderão ser sanadas diretamente no site desta CRV (https://crv-dpp-sc.github.io/manual/), através dos menus "Hipóteses", "Fluxo Operacional" e "Documentos" — neste último há um checklist disponível —, ou pelo telefone/WhatsApp do plantão: (48) 3665-7330, disponível 24 horas.';
+    var pC = 'Eventuais dúvidas poderão ser sanadas diretamente no site desta CRV (https://crv-dpp-sc.github.io/manual/), através dos menus "Hipóteses", "Fluxo Operacional" e "Documentos" — neste último há um checklist disponível —, ou pelo telefone/WhatsApp do plantão: (48) 3665-7330, disponível 24 horas.';
 
     if(res === 'ind'){
-      badgeClass = 'badge-ind';
-      badge = '❌ INDEFERIDO';
-
+      badgeClass = 'badge-ind'; badge = '❌ INDEFERIDO';
       var p2 = 'Após análise da documentação encaminhada, esta Central de Regulação de Vagas decide pelo indeferimento do pedido, em razão das seguintes irregularidades identificadas na instrução do expediente:';
-
-      var pFinal = 'Diante das irregularidades constatadas, o pedido não atende aos requisitos legais e procedimentais exigidos para a sua aprovação. O interessado poderá, se entender cabível, formular novo pedido devidamente instruído, observando integralmente o fluxo estabelecido pela Resolução Conjunta Interinstitucional n. 01/2026 e pelas normativas internas desta Central.\n\n'+pContato;
-
-      var partes2 = [p1, p2];
-      if(linhasMotivos.length) partes2.push(linhasMotivos.join('\n'));
-      partes2.push(pFinal);
-      texto = partes2.join('\n\n');
-
+      var pF = 'Diante das irregularidades constatadas, o pedido não atende aos requisitos legais e procedimentais exigidos para a sua aprovação. O interessado poderá, se entender cabível, formular novo pedido devidamente instruído, observando integralmente o fluxo estabelecido pela Resolução Conjunta Interinstitucional n. 01/2026 e pelas normativas internas desta Central.\n\n'+pC;
+      var pp = [p1, p2];
+      if(lm.length) pp.push(lm.join('\n'));
+      pp.push(pF);
+      texto = pp.join('\n\n');
     } else {
-      badgeClass = 'badge-dev';
-      badge = '🔄 DEVOLVIDO PARA RETIFICAÇÃO';
-
+      badgeClass = 'badge-dev'; badge = '🔄 DEVOLVIDO PARA RETIFICAÇÃO';
       var p2d = 'Após análise preliminar da documentação encaminhada, esta Central de Regulação de Vagas decide pela devolução do expediente para retificação, tendo em vista a necessidade de complementação da instrução processual, conforme as pendências identificadas abaixo:';
-
-      var pFinald = 'Após a devida regularização de todas as pendências apontadas, o pedido poderá ser novamente submetido à apreciação desta Central de Regulação de Vagas. Ressalta-se que a reapresentação deverá observar integralmente o fluxo estabelecido pela Resolução Conjunta Interinstitucional n. 01/2026 e pelas normativas internas desta CRV/DPP.\n\n'+pContato;
-
-      var partesd = [p1, p2d];
-      if(linhasMotivos.length) partesd.push(linhasMotivos.join('\n'));
-      partesd.push(pFinald);
-      texto = partesd.join('\n\n');
+      var pFd = 'Após a devida regularização de todas as pendências apontadas, o pedido poderá ser novamente submetido à apreciação desta Central de Regulação de Vagas. Ressalta-se que a reapresentação deverá observar integralmente o fluxo estabelecido pela Resolução Conjunta Interinstitucional n. 01/2026 e pelas normativas internas desta CRV/DPP.\n\n'+pC;
+      var ppd = [p1, p2d];
+      if(lm.length) ppd.push(lm.join('\n'));
+      ppd.push(pFd);
+      texto = ppd.join('\n\n');
     }
   }
 
