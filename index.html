@@ -4626,7 +4626,14 @@ import { getFirestore, doc, getDoc, setDoc, addDoc, collection,
          query, orderBy, onSnapshot, serverTimestamp }
          from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 // Inicializa o Firebase (ou reutiliza instância existente)
-
+const firebaseConfig = {
+    apiKey: "AIzaSyAtfo2cXialN7EWi4bBO9LMF2Ez3zz8Lo4",
+    authDomain: "crv-dpp-sc.firebaseapp.com",
+    projectId: "crv-dpp-sc",
+    storageBucket: "crv-dpp-sc.firebasestorage.app",
+    messagingSenderId: "707080008192",
+    appId: "1:707080008192:web:64f44c65629c0fc5941ee5"
+  };
 let app;
 try { app = getApp(); } catch(e) { app = initializeApp(firebaseConfig); }
 const auth = getAuth(app);
@@ -5585,4 +5592,42 @@ window.cxkVerAnexo = function(src, nome, tipo) {
     img.alt   = (nome || 'anexo').trim();
     img.style.cssText = 'max-width:88vw;max-height:80vh;display:block;border-radius:6px;';
     img.onerror = () => {
-      cont.innerHTML = `<div style="padding:2.5rem 2rem;font-family:'In
+      cont.innerHTML = `<div style="padding:2.5rem 2rem;font-family:'Inter',sans-serif;color:#374151;text-align:center;background:#fff;border-radius:8px;">
+        <div style="font-size:3rem;margin-bottom:1rem;">📄</div>
+        <div style="font-weight:600;margin-bottom:.5rem;">${(nome||'Arquivo').trim()}</div>
+        <div style="font-size:.85rem;color:#6b7280;">Não é possível visualizar este tipo de arquivo.<br>Use o botão ⬇ Baixar.</div>
+      </div>`;
+    };
+    cont.appendChild(img);
+  }
+
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+
+window.cxkFecharLightbox = function() {
+  document.getElementById('cxk-lightbox').style.display = 'none';
+  document.getElementById('cxk-lb-conteudo').innerHTML = '';
+  // Só restaura scroll se a caixinha ainda estiver aberta
+  if (document.getElementById('modal-caixinha').style.display !== 'none') {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+};
+
+// Fecha lightbox com ESC
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') cxkFecharLightbox();
+});
+
+// ── Toast ──────────────────────────────────────────────────
+function cxkToast(msg, tipo='sucesso') {
+  const d = document.createElement('div');
+  d.style.cssText=`background:#0a1628;color:#fff;padding:.85rem 1.25rem;border-radius:10px;font-size:.86rem;font-weight:500;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;align-items:center;gap:.75rem;max-width:340px;font-family:'Inter',sans-serif;border-left:4px solid ${tipo==='sucesso'?'#16a34a':tipo==='erro'?'#dc2626':'#f0b429'};`;
+  d.textContent = msg;
+  document.getElementById('cxk-toasts').appendChild(d);
+  setTimeout(()=>d.remove(),4000);
+}
+</script>
+</body
