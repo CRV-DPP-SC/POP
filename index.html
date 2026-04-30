@@ -4694,9 +4694,9 @@ window.cxkSalvarConfig = async function() {
     });
     cxkConfig={valorMensal:val,responsavel:resp};
     cxkRenderTab('painel');
-    cxkToast('✅ Configurações salvas!','sucesso');
+    cxkToast('✅ Configurações salvas! Novo valor vigente: '+fmt(val),'sucesso');
   } catch(e){ cxkToast('Erro: '+e.message,'erro'); }
-};
+}
 
 // ── Listener Firestore ─────────────────────────────────────
 function cxkIniciarListener() {
@@ -4744,6 +4744,55 @@ function cxkRenderTab(nome) {
   if (nome==='config')    { el.innerHTML = cxkHtmlConfig(); }
 }
 
+
+// ── Cálculo de meses pagos (lógica central) ────────────────
+// Retorna array de strings 'YYYY-MM' pagos pelo membro, em ordem
+function cxkMesesPagosMembro(membro) {
+  const conf = cxkLancamentos.filter(l=>l.status==='confirmado'&&l.tipo==='deposito'&&l.membro===membro);
+  // Ordena por data de criação
+  const deps = [...conf].sort((a,b)=>{
+    const da=a.criadoEm?.toDate?a.criadoEm.toDate():new Date(0);
+    const db2=b.criadoEm?.toDate?b.criadoEm.toDate():new Date(0);
+    return da-db2;
+  });
+  // Mês inicial fixo: maio/2026
+  let mesIdx = 0; // índice relativo a mai/2026
+  let saldo = 0;  // saldo acumulado ainda não usado
+  const pagos = new Set();
+  for (const dep of deps) {
+    const vigente = dep.valorVigente || cxkConfig.valorMensal || 0;
+    if (!vigente) continue;
+    saldo += dep.valor;
+    while (saldo >= vigente) {
+      saldo -= vigente;
+      // Converte mesIdx em YYYY-MM a partir de mai/2026
+      const base = new Date(2026, 4, 1); // maio/2026
+      base.setMonth(base.getMonth() + mesIdx);
+      const ym = base.getFullYear()+'-'+String(base.getMonth()+1).padStart(2,'0');
+      pagos.add(ym);
+      mesIdx++;
+    }
+  }
+  return { pagos, mesIdx, saldo };
+}
+
+// Converte índice relativo a mai/2026 em 'YYYY-MM'
+function cxkIdxParaMes(idx) {
+  const base = new Date(2026, 4, 1);
+  base.setMonth(base.getMonth() + idx);
+  return base.getFullYear()+'-'+String(base.getMonth()+1).padStart(2,'0');
+}
+
+// Formata 'YYYY-MM' em nome curto 'Mai', 'Jun'...
+function cxkMesNomeCurto(ym) {
+  const [a,m] = ym.split('-');
+  return new Date(a,m-1).toLocaleString('pt-BR',{month:'short'}).replace('.','');
+}
+function cxkMesNomeLongo(ym) {
+  const [a,m] = ym.split('-');
+  return new Date(a,m-1).toLocaleString('pt-BR',{month:'long',year:'numeric'});
+}
+
 // ── HTML PAINEL ────────────────────────────────────────────
 function cxkHtmlPainel() {
   return `
@@ -4767,25 +4816,52 @@ function cxkPopularPainel() {
     cxkCard('📤 Total Gasto',fmt(sai),'#dc2626')+
     cxkCard('👥 Valor Mensal',cxkConfig.valorMensal?fmt(cxkConfig.valorMensal):'R$ —','#b8860b');
 
-  const MESES_SEQ   = ['2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
-  const MESES_LABEL = ['Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const meta = cxkConfig.valorMensal||0;
   const mg = document.getElementById('cxk-membros-grid');
   if (!mg) return;
   mg.innerHTML = MEMBROS.map((nome,i) => {
     const totalDep = conf.filter(l=>l.tipo==='deposito'&&l.membro===nome).reduce((a,l)=>a+l.valor,0);
-    const mesesPagos = meta > 0 ? Math.min(Math.floor(totalDep/meta), MESES_SEQ.length) : 0;
-    const badgesMeses = MESES_LABEL.map((label,idx) => {
-      const pago = idx < mesesPagos;
-      return pago
-        ? '<span style="display:inline-flex;align-items:center;gap:2px;font-size:.62rem;font-weight:700;padding:.15rem .35rem;border-radius:5px;background:#dcfce7;color:#166534;white-space:nowrap;">✔ '+label+'</span>'
-        : '<span style="display:inline-flex;align-items:center;gap:2px;font-size:.62rem;font-weight:700;padding:.15rem .35rem;border-radius:5px;background:#fee2e2;color:#991b1b;white-space:nowrap;">✕ '+label+'</span>';
-    }).join('');
+    const { pagos, mesIdx, saldo } = cxkMesesPagosMembro(nome);
+
+    // Agrupa meses pagos por ano + gera pendentes até cobrir pelo menos o mês atual
+    const hoje = new Date();
+    const mesHojeYM = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+
+    // Quantos meses mostrar: até o mês atual ou até o último pago, o que for maior
+    const totalMostrar = Math.max(mesIdx + 1, (() => {
+      const base = new Date(2026, 4, 1);
+      const diff = (hoje.getFullYear()-2026)*12 + (hoje.getMonth()-4);
+      return Math.max(diff+1, 1);
+    })());
+
+    // Monta por ano
+    const porAno = {};
+    for (let k=0; k<totalMostrar; k++) {
+      const ym = cxkIdxParaMes(k);
+      const ano = ym.split('-')[0];
+      if (!porAno[ano]) porAno[ano] = [];
+      porAno[ano].push({ ym, pago: pagos.has(ym) });
+    }
+
+    let gruposHtml = '';
+    for (const ano of Object.keys(porAno).sort()) {
+      const badges = porAno[ano].map(({ym,pago}) => {
+        const label = cxkMesNomeCurto(ym);
+        return pago
+          ? '<span style="display:inline-flex;align-items:center;font-size:.6rem;font-weight:700;padding:.12rem .32rem;border-radius:4px;background:#dcfce7;color:#166534;white-space:nowrap;">✔ '+label+'</span>'
+          : '<span style="display:inline-flex;align-items:center;font-size:.6rem;font-weight:700;padding:.12rem .32rem;border-radius:4px;background:#fee2e2;color:#991b1b;white-space:nowrap;">✕ '+label+'</span>';
+      }).join('');
+      gruposHtml += '<div style="margin-bottom:.3rem;">'
+        +'<div style="font-size:.6rem;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:2px;">'+ano+'</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:2px;">'+badges+'</div>'
+        +'</div>';
+    }
+
     return '<div style="background:#fff;border-radius:12px;padding:.9rem .75rem;box-shadow:0 4px 16px rgba(0,0,0,.08);text-align:center;">'
       +'<div style="width:44px;height:44px;border-radius:50%;background:'+CORES[i]+';display:flex;align-items:center;justify-content:center;font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin:0 auto .5rem;">'+nome.charAt(0)+'</div>'
-      +'<div style="font-size:.82rem;font-weight:700;color:#111827;margin-bottom:.2rem;">'+nome+'</div>'
-      +'<div style="font-size:.72rem;color:#6b7280;margin-bottom:.5rem;">'+fmt(totalDep)+' depositado</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">'+badgesMeses+'</div>'
+      +'<div style="font-size:.82rem;font-weight:700;color:#111827;margin-bottom:.15rem;">'+nome+'</div>'
+      +'<div style="font-size:.7rem;color:#6b7280;margin-bottom:.5rem;">'+fmt(totalDep)+' depositado</div>'
+      +gruposHtml
+      +(saldo>0?'<div style="font-size:.65rem;color:#92400e;margin-top:.3rem;">Saldo: '+fmt(saldo)+'</div>':'')
       +'</div>';
   }).join('');
 }
@@ -5022,21 +5098,19 @@ window.cxkSalvarLancamento = function(tipo) {
     const valor  = parseFloat(document.getElementById('cxk-dep-valor').value);
     if (!membro) { cxkToast('Selecione o membro.','aviso'); return; }
     if (!valor||valor<=0) { cxkToast('Informe um valor válido.','aviso'); return; }
-    const MESES_SEQ = ['2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
-    const meta = cxkConfig.valorMensal||0;
-    const conf2 = cxkLancamentos.filter(l=>l.status==='confirmado');
-    const totalAnterior = conf2.filter(l=>l.tipo==='deposito'&&l.membro===membro).reduce((a,l)=>a+l.valor,0);
-    const mesesJaPagos = meta > 0 ? Math.min(Math.floor(totalAnterior/meta), MESES_SEQ.length) : 0;
-    const novosMeses = meta > 0 ? Math.min(Math.floor((totalAnterior+valor)/meta), MESES_SEQ.length) - mesesJaPagos : 0;
-    const proxMes = MESES_SEQ[mesesJaPagos] || MESES_SEQ[MESES_SEQ.length-1];
-    const [ano,mes2] = proxMes.split('-');
-    const mesNomeRef = new Date(ano,mes2-1).toLocaleString('pt-BR',{month:'long',year:'numeric'});
-    const descricao = novosMeses > 1
-      ? 'Depósito — ' + novosMeses + ' meses (' + mesNomeRef + ' e seguintes)'
-      : 'Depósito — ' + mesNomeRef;
-    dados = { tipo, membro, mesRef: proxMes, valor, descricao };
+    // Calcula próximo mês a pagar para mostrar na descrição
+    const { mesIdx } = cxkMesesPagosMembro(membro);
+    const proxMes = cxkIdxParaMes(mesIdx);
+    const vigente = cxkConfig.valorMensal||0;
+    const novos = vigente > 0 ? Math.floor(valor/vigente) : 0;
+    const descricao = novos > 1
+      ? 'Depósito — ' + novos + ' meses (' + cxkMesNomeLongo(proxMes) + ' e seguintes)'
+      : novos === 1
+        ? 'Depósito — ' + cxkMesNomeLongo(proxMes)
+        : 'Depósito (sem mês completo)';
+    dados = { tipo, membro, mesRef: proxMes, valor, descricao, valorVigente: vigente };
   }
-  if (tipo==='compra') {
+    if (tipo==='compra') {
     const membro = document.getElementById('cxk-cmp-membro').value;
     const data   = document.getElementById('cxk-cmp-data').value;
     const desc   = document.getElementById('cxk-cmp-desc').value.trim();
@@ -5168,36 +5242,33 @@ window.cxkLimparFiltros = function() {
 };
 
 function cxkMesesCobertosHtml(membro, valorDep, criadoEm) {
-  // Descobre quais meses este depósito cobriu, baseado na ordem cronológica
-  const MESES_SEQ   = ['2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
-  const MESES_LABEL = ['Mai/26','Jun/26','Jul/26','Ago/26','Set/26','Out/26','Nov/26','Dez/26'];
-  const meta = cxkConfig.valorMensal||0;
-  if (!meta) return '—';
-  // Ordena todos os depósitos deste membro por data
-  const deps = cxkLancamentos
-    .filter(l=>l.status==='confirmado'&&l.tipo==='deposito'&&l.membro===membro)
-    .sort((a,b)=>{
-      const da=a.criadoEm?.toDate?a.criadoEm.toDate():new Date(0);
-      const db2=b.criadoEm?.toDate?b.criadoEm.toDate():new Date(0);
-      return da-db2;
-    });
-  // Calcula acumulado antes deste depósito
-  let acum = 0;
-  for (const d of deps) {
-    const isThis = d.criadoEm === criadoEm || (d.criadoEm?.toDate && criadoEm?.toDate && d.criadoEm.toDate().getTime() === criadoEm.toDate().getTime());
-    if (isThis) break;
-    acum += d.valor;
+  // Ordena depósitos deste membro cronologicamente
+  const conf = cxkLancamentos.filter(l=>l.status==='confirmado'&&l.tipo==='deposito'&&l.membro===membro);
+  const deps = [...conf].sort((a,b)=>{
+    const da=a.criadoEm?.toDate?a.criadoEm.toDate():new Date(0);
+    const db2=b.criadoEm?.toDate?b.criadoEm.toDate():new Date(0);
+    return da-db2;
+  });
+  // Simula acumulado até (e incluindo) este depósito
+  let mesIdx=0, saldo=0, mesesDesteDeposito=[];
+  const tsAlvo = criadoEm?.toDate?criadoEm.toDate().getTime():null;
+  for (const dep of deps) {
+    const vigente = dep.valorVigente || cxkConfig.valorMensal || 0;
+    if (!vigente) continue;
+    const mesAntes = mesIdx;
+    saldo += dep.valor;
+    while (saldo >= vigente) { saldo -= vigente; mesIdx++; }
+    const tsD = dep.criadoEm?.toDate?dep.criadoEm.toDate().getTime():null;
+    const isThis = tsAlvo && tsD && Math.abs(tsD-tsAlvo)<2000;
+    if (isThis) {
+      for (let k=mesAntes; k<mesIdx; k++) mesesDesteDeposito.push(cxkIdxParaMes(k));
+      break;
+    }
   }
-  const mesesAntes = Math.min(Math.floor(acum/meta), MESES_SEQ.length);
-  const mesesDepois = Math.min(Math.floor((acum+valorDep)/meta), MESES_SEQ.length);
-  const novos = mesesDepois - mesesAntes;
-  if (novos <= 0) return '<span style="color:#92400e;font-size:.75rem;">Sem mês completo</span>';
-  let out = '';
-  for (let k=0; k<novos; k++) {
-    const idx = mesesAntes+k;
-    if (idx < MESES_SEQ.length) out += '<span style="display:inline-block;padding:.1rem .35rem;border-radius:4px;background:#dcfce7;color:#166534;font-size:.72rem;font-weight:700;margin:1px;">'+MESES_LABEL[idx]+'</span>';
-  }
-  return out || '—';
+  if (!mesesDesteDeposito.length) return '<span style="color:#92400e;font-size:.75rem;">Sem mês completo</span>';
+  return mesesDesteDeposito.map(ym =>
+    '<span style="display:inline-block;padding:.1rem .35rem;border-radius:4px;background:#dcfce7;color:#166534;font-size:.72rem;font-weight:700;margin:1px;">'+cxkMesNomeCurto(ym)+'/'+ym.split('-')[0].slice(2)+'</span>'
+  ).join('');
 }
 
 function cxkRenderHistorico(lista, tbId) {
@@ -5407,32 +5478,27 @@ window.cxkAtualizarPreviewMeses = function() {
   if (!preview) return;
   const membro = document.getElementById('cxk-dep-membro')?.value;
   const valor  = parseFloat(document.getElementById('cxk-dep-valor')?.value||'0');
-  const MESES_SEQ   = ['2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
-  const MESES_LABEL = ['Mai/26','Jun/26','Jul/26','Ago/26','Set/26','Out/26','Nov/26','Dez/26'];
-  const meta = cxkConfig.valorMensal||0;
-  if (!meta || !valor || valor <= 0) {
+  const vigente = cxkConfig.valorMensal||0;
+  if (!vigente || !valor || valor<=0) {
     preview.innerHTML = '<span style="color:#9ca3af;">Informe o valor para calcular automaticamente</span>';
     return;
   }
-  const conf2 = cxkLancamentos.filter(l=>l.status==='confirmado');
-  const totalAnterior = membro ? conf2.filter(l=>l.tipo==='deposito'&&l.membro===membro).reduce((a,l)=>a+l.valor,0) : 0;
-  const mesesJaPagos  = Math.min(Math.floor(totalAnterior/meta), MESES_SEQ.length);
-  const mesesNovos    = Math.min(Math.floor((totalAnterior+valor)/meta), MESES_SEQ.length) - mesesJaPagos;
-  const resto = (totalAnterior + valor) % meta;
-  if (mesesNovos <= 0) {
-    preview.innerHTML = '<span style="color:#92400e;">⚠ Valor insuficiente para cobrir 1 mês (faltam '+fmt(meta-((totalAnterior%meta)+valor))+')</span>';
+  const { mesIdx, saldo } = membro ? cxkMesesPagosMembro(membro) : {mesIdx:0, saldo:0};
+  const novos = Math.floor((saldo+valor)/vigente);
+  const sobra = (saldo+valor) % vigente;
+  if (novos<=0) {
+    const falta = vigente - (saldo+valor);
+    preview.innerHTML = '<span style="color:#92400e;">⚠ Insuficiente para 1 mês (faltam '+fmt(falta)+')</span>';
     return;
   }
-  let badges = '';
-  for (let k = 0; k < mesesNovos; k++) {
-    const idx = mesesJaPagos + k;
-    if (idx < MESES_SEQ.length) {
-      badges += '<span style="display:inline-block;padding:.15rem .45rem;border-radius:5px;background:#dbeafe;color:#1d4ed8;font-size:.75rem;font-weight:700;margin:2px;">'+MESES_LABEL[idx]+'</span>';
-    }
+  let badges='';
+  for (let k=0;k<novos;k++) {
+    const ym = cxkIdxParaMes(mesIdx+k);
+    badges += '<span style="display:inline-block;padding:.15rem .45rem;border-radius:5px;background:#dbeafe;color:#1d4ed8;font-size:.75rem;font-weight:700;margin:2px;">'+cxkMesNomeCurto(ym)+'/'+ym.split('-')[0].slice(2)+'</span>';
   }
-  const sobra = resto > 0 ? ' <span style="font-size:.72rem;color:#6b7280;">(sobram '+fmt(resto)+')</span>' : '';
-  preview.innerHTML = badges + sobra;
-};
+  const sobraHtml = sobra>0?'<span style="font-size:.72rem;color:#6b7280;margin-left:4px;">(sobram '+fmt(sobra)+')</span>':'';
+  preview.innerHTML = badges+sobraHtml;
+}
 
 // ── Datas padrão ───────────────────────────────────────────
 function cxkInicializarDatas() {
@@ -5519,42 +5585,4 @@ window.cxkVerAnexo = function(src, nome, tipo) {
     img.alt   = (nome || 'anexo').trim();
     img.style.cssText = 'max-width:88vw;max-height:80vh;display:block;border-radius:6px;';
     img.onerror = () => {
-      cont.innerHTML = `<div style="padding:2.5rem 2rem;font-family:'Inter',sans-serif;color:#374151;text-align:center;background:#fff;border-radius:8px;">
-        <div style="font-size:3rem;margin-bottom:1rem;">📄</div>
-        <div style="font-weight:600;margin-bottom:.5rem;">${(nome||'Arquivo').trim()}</div>
-        <div style="font-size:.85rem;color:#6b7280;">Não é possível visualizar este tipo de arquivo.<br>Use o botão ⬇ Baixar.</div>
-      </div>`;
-    };
-    cont.appendChild(img);
-  }
-
-  lb.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-};
-
-window.cxkFecharLightbox = function() {
-  document.getElementById('cxk-lightbox').style.display = 'none';
-  document.getElementById('cxk-lb-conteudo').innerHTML = '';
-  // Só restaura scroll se a caixinha ainda estiver aberta
-  if (document.getElementById('modal-caixinha').style.display !== 'none') {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = '';
-  }
-};
-
-// Fecha lightbox com ESC
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') cxkFecharLightbox();
-});
-
-// ── Toast ──────────────────────────────────────────────────
-function cxkToast(msg, tipo='sucesso') {
-  const d = document.createElement('div');
-  d.style.cssText=`background:#0a1628;color:#fff;padding:.85rem 1.25rem;border-radius:10px;font-size:.86rem;font-weight:500;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;align-items:center;gap:.75rem;max-width:340px;font-family:'Inter',sans-serif;border-left:4px solid ${tipo==='sucesso'?'#16a34a':tipo==='erro'?'#dc2626':'#f0b429'};`;
-  d.textContent = msg;
-  document.getElementById('cxk-toasts').appendChild(d);
-  setTimeout(()=>d.remove(),4000);
-}
-</script>
-</body
+      cont.innerHTML = `<div style="padding:2.5rem 2rem;font-family:'In
