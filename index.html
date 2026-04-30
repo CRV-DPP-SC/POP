@@ -3956,7 +3956,7 @@ window.abrirEscalaPlantao = function() {
       '<div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;text-align:justify;">' + corpo + '</div>' +
       getRod() +
       '<scr' + 'ipt>window.onload=function(){window.print();}<\/scr' + 'ipt>' +
-      '<script type="module">
+      '<scr' + 'ipt type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -4556,7 +4556,7 @@ window.abrirEscalaPlantao = function() {
       usuarioAtual = null;
     }
   });
-</script>
+<\/script>
 </body></html>';
     var w = window.open('', '_blank');
     if (w) { w.document.write(html); w.document.close(); }
@@ -4577,7 +4577,7 @@ window.abrirEscalaPlantao = function() {
       (data ? '<p style="text-align:right;font-family:Arial;font-size:11pt;">' + data + '</p>' : '') +
       '<div style="font-family:Arial;font-size:11pt;line-height:1.0;text-align:justify;">' + corpo + '</div>' +
       getRod() +
-      '<script type="module">
+      '<scr' + 'ipt type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -5176,7 +5176,7 @@ window.abrirEscalaPlantao = function() {
       usuarioAtual = null;
     }
   });
-</script>
+<\/script>
 </body></html>';
     var blob = new Blob(['\ufeff' + doc], {type: 'application/msword'});
     var url = URL.createObjectURL(blob);
@@ -6681,5 +6681,4 @@ function cxkToast(msg, tipo='sucesso') {
   setTimeout(()=>d.remove(),4000);
 }
 </script>
-</body>
-</html>
+</body
