@@ -37,6 +37,9 @@ html,body{height:100%;font-family:"Segoe UI",Calibri,sans-serif;background:var(-
 .chip.perigo{border-color:#c0392b;color:#c0392b}
 .chip.perigo:hover{background:#c0392b;color:#fff;border-color:#c0392b}
 .chip.perigo.sel{background:#c0392b;color:#fff;border-color:#c0392b}
+.btn-voltar{display:none;padding:6px 14px;border:2px solid var(--borda);border-radius:20px;background:#fff;color:var(--azul2);font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;margin-bottom:4px;align-items:center;gap:5px}
+.btn-voltar:hover{background:#edf3ff;border-color:var(--azul3)}
+.btn-voltar.vis{display:inline-flex}
 .iw{max-width:820px;margin:0 auto;padding:0 16px 10px;display:none}
 .ir{display:flex;gap:8px}
 .ir input,.ir textarea{flex:1;padding:11px 15px;border:2px solid var(--borda);border-radius:22px;font-size:.88rem;font-family:inherit;color:var(--texto);transition:border .2s}
@@ -81,6 +84,8 @@ html,body{height:100%;font-family:"Segoe UI",Calibri,sans-serif;background:var(-
 /* OFÍCIO PAPEL - tela */
 #oficio{background:#fff;border:1px solid #bbb;border-radius:4px;padding:1.5cm 1.5cm 0 1.5cm;font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;color:#111;max-width:21cm;margin:0 auto;display:flex;flex-direction:column;min-height:27cm}
 #oficio .oficio-corpo{display:flex;flex-direction:column;flex:1;padding-bottom:0}
+/* Dentro do modal CJ: sem altura mínima forçada, sem borda externa */
+.mcj-oficio-wrap #oficio{min-height:unset;max-width:100%;margin:0;border:none;border-radius:0;padding:0.8cm 1.2cm 0 1.2cm}
 .ofc-cab{display:flex;align-items:center;gap:10px;border-bottom:none;padding-bottom:6px;margin-bottom:0}
 .ofc-cab img{height:46px;flex-shrink:0}
 .ofc-cab-txt{flex:1;text-align:left;line-height:1.3;padding-left:6px}
@@ -99,11 +104,11 @@ html,body{height:100%;font-family:"Segoe UI",Calibri,sans-serif;background:var(-
 .ass-nome{font-weight:bold;text-transform:uppercase;font-size:11pt;display:block}
 .ass-cargo{font-weight:normal;font-size:10pt;color:#222;display:block}
 /* Destinatário — sempre no final, sem recuo */
-.ofc-dest{font-size:11pt;line-height:1.6;font-family:Arial,sans-serif;margin-top:0;padding-top:0}
+.ofc-dest{font-size:11pt;line-height:1.0;font-family:Arial,sans-serif;margin-top:0;padding-top:0}
 .ofc-dest-wrap{margin-top:auto;padding-top:18pt;border-top:none}
-.dest-t{font-weight:normal;display:block}
-.dest-n{font-weight:bold;text-transform:uppercase;display:block}
-.dest-l{font-weight:normal;display:block}
+.dest-t{font-weight:normal;display:block;margin:0;padding:0}
+.dest-n{font-weight:bold;text-transform:uppercase;display:block;margin:0;padding:0}
+.dest-l{font-weight:normal;display:block;margin:0;padding:0}
 .ofc-lista{margin:3pt 0 3pt 1.5cm;padding:0;list-style:disc;font-size:11pt;line-height:1.0;font-family:Arial,sans-serif;text-align:left}
 .ofc-lista li{margin-bottom:2pt}
 .ofc-lista{margin:2pt 0 4pt 1.5cm}
@@ -162,7 +167,7 @@ html,body{height:100%;font-family:"Segoe UI",Calibri,sans-serif;background:var(-
 .mcj-foot button{padding:10px 22px;border-radius:8px;font-size:.86rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
 .mcj-btn-gerar{background:#0d2b55;color:#fff}.mcj-btn-gerar:hover{background:#2563b0}
 .mcj-btn-fechar{background:#fff;border:2px solid #c8d6ec!important;color:#0d2b55}.mcj-btn-fechar:hover{background:#f0f0f0}
-.mcj-oficio-wrap{background:#fff;border:1px solid #bbb;border-radius:6px;padding:1.2cm 1.5cm 0 1.5cm;font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;color:#111;max-width:100%}
+.mcj-oficio-wrap{background:transparent;border:none;padding:0;font-family:Arial,sans-serif;font-size:11pt;line-height:1.0;color:#111;max-width:100%}
 .mcj-nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .mcj-nav-info{font-size:.82rem;color:#555;font-weight:600}
 .mcj-nav-btn{padding:6px 14px;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer;border:none;font-family:inherit}
@@ -193,7 +198,10 @@ html,body{height:100%;font-family:"Segoe UI",Calibri,sans-serif;background:var(-
 </div>
 <div class="layout">
   <div class="chat-area" id="chatArea"><div class="chat-inner" id="ci"></div></div>
-  <div class="ow" id="ow" style="display:none"><div class="or" id="or"></div></div>
+  <div class="ow" id="ow" style="display:none">
+    <button class="btn-voltar" id="btnVoltar" onclick="voltarPasso()">&#8592; Voltar</button>
+    <div class="or" id="or"></div>
+  </div>
   <div class="iw" id="iw"></div>
 </div>
 <div class="um-bg" id="umBg">
@@ -294,7 +302,7 @@ const UNS=[
   {n:'Presídio Regional de Itapema',c:'Itapema',sr:'SR04',dir:'Eduardo Weber Xavier',cg:'Diretor',em:'pr18@pp.sc.gov.br',tel:'(47) 3398-6684',e:'Rua 440, s/n – Morretes – Itapema/SC – CEP 88220-000'},
   {n:'Penitenciária Industrial de São Cristóvão do Sul',c:'São Cristóvão do Sul',sr:'SR05',dir:'Giselle Cordeiro Demeneck Remor',cg:'Diretora',em:'pe09@pp.sc.gov.br',tel:'(49) 3412-3190',e:'Estrada Geral Paredão, s/n – São Cristóvão do Sul/SC – CEP 89533-000'},
   {n:'Penitenciária Regional de Curitibanos',c:'São Cristóvão do Sul',sr:'SR05',dir:'Fabio Marcelo Palhano',cg:'Diretor',em:'pe08@pp.sc.gov.br',tel:'(49) 3412-3300',e:'Rua Juventino França de Moraes, s/n – São Cristóvão do Sul/SC – CEP 89533-000'},
-  {n:'Presídio Masculino de Lages',c:'Lages',sr:'SR05',dir:'',cg:'Diretor',em:'pr19@pp.sc.gov.br',tel:'(49) 3289-8467',e:'Rua Ricardo Marin, s/n – Santa Clara – Lages/SC – CEP 88513-210'},
+  {n:'Presídio Masculino de Lages',c:'Lages',sr:'SR05',dir:'Rodrigo Araújo Aquino',cg:'Diretor',em:'pr19@pp.sc.gov.br',tel:'(49) 3289-8467',e:'Rua Ricardo Marin, s/n – Santa Clara – Lages/SC – CEP 88513-210'},
   {n:'Presídio Regional de Lages',c:'Lages',sr:'SR05',dir:'Ricardo Fernando Moreira Floriani',cg:'Diretor',em:'pr20@pp.sc.gov.br',tel:'(49) 3289-8403',e:'Rua Mato Grosso, 247 – São Cristóvão – Lages/SC – CEP 88509-220'},
   {n:'Presídio Regional de Caçador',c:'Caçador',sr:'SR05',dir:'André Luiz Pierdoná',cg:'Diretor',em:'pr21@pp.sc.gov.br',tel:'(49) 3561-6945',e:'Av. Albino Felipe Potrick, 50 – Bom Sucesso – Caçador/SC – CEP 89501-335'},
   {n:'Presídio Regional de Campos Novos',c:'Campos Novos',sr:'SR05',dir:'Evalcir Morais dos Santos',cg:'Diretor',em:'pr22@pp.sc.gov.br',tel:'(49) 3541-3588',e:'Estrada Geral Usina Velha, s/n – Campos Novos/SC – CEP 89620-000'},
@@ -348,134 +356,6 @@ var LB='<div style="display:block;height:11pt;line-height:11pt;font-family:Arial
 function lb(n){var s='';for(var i=0;i<n;i++)s+=LB;return s;}
 function fld(t){return '<span class="ofc-campo">'+t+'</span>';}
 function dHoje(cidade){var d=new Date();var m=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];return cidade+', '+d.getDate()+' de '+m[d.getMonth()]+' de '+d.getFullYear();}
-/* FLUXOS */
-async function pReed(){
-  await pGenero();
-  await mBot('Qual é o <strong>nome completo</strong> '+(E.numero==='P'?'do(a) 1º(ª) reeducando(a)':'do(a) reeducando(a)')+'?');
-  await new Promise(r=>inp('Ex.: João da Silva Santos',v=>{E.nome=v;r();}));
-  await mBot('Qual é o <strong>número IPEN</strong>?');
-  await new Promise(r=>inp('Ex.: 123456',v=>{E.ipen=v;r();}));
-}
-async function pOri(){await mBot('Selecione a <strong>unidade de origem</strong>:');return new Promise(r=>btnUn('Escolher Unidade de Origem',u=>{E.ori=u;r();}));}
-async function pDes(){await mBot('Selecione a <strong>unidade de destino</strong>:');return new Promise(r=>btnUn('Escolher Unidade de Destino',u=>{E.des=u;r();}));}
-async function pSau(){await mBot('Qual é a <strong>saudação</strong>?');return new Promise(r=>cps([{l:'Senhor(a) Coordenador(a)',v:'Senhor(a) Coordenador(a),'},{l:'Senhor(a) Juiz(a)',v:'Senhor(a) Juiz(a),'},{l:'Senhor(a) Diretor(a)',v:'Senhor(a) Diretor(a),'},{l:'Senhor(a) Superintendente',v:'Senhor(a) Superintendente,'}],v=>{E.sau=v;r();}));}
-async function pDesp(){await mBot('Qual é o <strong>fechamento</strong>?');return new Promise(r=>cps([{l:'Atenciosamente',v:'Atenciosamente,'},{l:'Respeitosamente',v:'Respeitosamente,'}],v=>{E.desp=v;r();}));}
-async function pNumOficio(){
-  await mBot('O ofício terá <strong>número</strong>?');
-  return new Promise(r=>cps([{l:'Sim',v:'sim'},{l:'Não',v:'nao'}],v=>{
-    if(v==='nao'){E.numOficio='';r();}
-    else{
-      lp();
-      mBot('Digite o <strong>número do ofício</strong>:').then(()=>{
-        inp('Ex.: Ofício nº 042/2026/DPP',n=>{E.numOficio=n;r();});
-      });
-    }
-  }));
-}
-async function pJuizo(){
-  await mBot('Qual o <strong>nome do(a) Juiz(a)</strong>?');await new Promise(r=>inp('Ex.: Dra. Ana Paula Ferreira',v=>{E.nomejuiz=v;r();}));
-  await mBot('Qual é a <strong>Vara / Unidade Judiciária</strong>?');await new Promise(r=>inp('Ex.: 1ª Vara de Execuções Penais',v=>{E.vara=v;r();}));
-  await mBot('Qual é a <strong>cidade/UF</strong> do juízo?');await new Promise(r=>inp('Ex.: Blumenau/SC',v=>{E.cidJuizo=v;r();}));
-}
-async function pAss(){
-  await mBot('Além do(a) <strong>Diretor(a) de Origem</strong>, o ofício terá mais assinaturas?<span class="sub">Selecione e clique em Confirmar.</span>');
-  var s=await cpsM([{l:'&#128084; Diretor(a) da Unidade de Destino',v:'dd'},{l:'&#127970; Superintendente Regional de Origem',v:'sro'},{l:'&#127970; Superintendente Regional de Destino',v:'srd'}]);
-  E.dd=!!s.dd;E.sro=!!s.sro;E.srd=!!s.srd;
-}
-async function iniciar(){
-  await mBot('Olá! &#128075; Sou o assistente de geração de ofícios da <strong>Central de Regulação de Vagas — CRV/DPP</strong>.<br><br>Qual tipo de ofício você precisa gerar?');
-  cps([
-    {l:'&#128680; Emergencial<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, I</small>',v:'emergencial'},
-    {l:'&#127963;&#65039; Mandado de Comarca Diversa<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, III</small>',v:'mandado'},
-    {l:'&#127769; Pernoite',v:'pernoite'},
-    {l:'&#9878;&#65039; Adequação da Capacidade<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, III</small>',v:'adequacao'},
-    {l:'&#128100; Pedido Voluntário<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, II</small>',v:'pedido'},
-    {l:'&#128257; Permuta entre Unidades<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, III</small>',v:'permuta'},
-    {l:'&#9878;&#65039; Prisão Civil<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Transferência especializada</small>',v:'prisaocivil'},
-    {l:'&#128233; Ofícios de Comunicação<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 16</small>',v:'comunicacao'},
-  ],v=>{E.mod=v;desp();});
-}
-async function desp(){
-  if(E.mod==='emergencial') await flEmerg();
-  if(E.mod==='mandado')     await flMandado();
-  if(E.mod==='pernoite')    await flPernoite();
-  if(E.mod==='adequacao')   await flAdequacao();
-  if(E.mod==='pedido')      await flPedido();
-  if(E.mod==='comunicacao') await flComun();
-}
-async function flEmerg(){
-  await mBot('Qual é a situação que fundamenta a transferência?');
-  await new Promise(r=>cps([{l:'&#128203; Com PAD — falta grave (art. 50/52 LEP)',v:'com_pad'},{l:'&#9888;&#65039; Sem PAD — risco à integridade / segurança',v:'sem_pad'}],v=>{E.sub=v;r();}));
-  await pReed();await pOri();await pDes();
-  await mBot('Descreva <strong>detalhadamente</strong> a situação concreta:');
-  await new Promise(r=>inp('Ex.: O reeducando ameaçou agentes e outros custodiados...',v=>{E.sit=v;r();},true));
-  if(E.sub==='com_pad'){
-    await mBot('Quanto ao PAD:');
-    await new Promise(r=>cps([{l:'&#10003; Foi instaurado',v:'FOI INSTAURADO'},{l:'&#128221; Será instaurado',v:'SERÁ INSTAURADO'}],v=>{E.pad=v;r();}));
-    await mBot('Qual foi a <strong>falta disciplinar</strong> praticada?<span class="sub">Selecione o inciso da LEP.</span>');
-    await new Promise(r=>cps(FALTAS.map(f=>({l:'<strong>'+f.c+'</strong> — '+f.d,v:f.c+'||'+f.d})),v=>{var pts=v.split('||');E.faltaCod=pts[0];E.faltaDesc=pts[1];r();}));
-  }
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();
-}
-async function flMandado(){
-  await pReed();await pOri();await pDes();
-  await mBot('Qual é o <strong>Juízo expedidor</strong> do Mandado de Prisão?');
-  await new Promise(r=>inp('Ex.: 2ª Vara Criminal da Comarca de Blumenau',v=>{E.juizo=v;r();}));
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();
-}
-async function flPernoite(){
-  await pReed();await pOri();await pDes();
-  await mBot('Qual é a <strong>razão do pernoite</strong>?');
-  await new Promise(r=>inp('Ex.: Audiência judicial na comarca de destino',v=>{E.razPernoite=v;r();},true));
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();
-}
-
-async function flPedido(){
-  await mBot('O pedido foi formulado por:');
-  await new Promise(r=>cps([{l:'&#128100; Pelo próprio reeducando',v:'preso'},{l:'&#128106; Por familiar',v:'familiar'},{l:'&#9878;&#65039; Por advogado',v:'advogado'}],v=>{E.sub=v;r();}));
-  await pReed();await pFormSaude();await pOri();await pDes();
-  if(E.sub==='preso'){
-    await mBot('Data do <strong>memorando</strong>?');await new Promise(r=>inp('Ex.: 10/05/2025',v=>{E.dataMem=v;r();}));
-    await mBot('<strong>Motivo alegado</strong>?');await new Promise(r=>inp('Ex.: Necessidade de aproximação da família',v=>{E.motPreso=v;r();},true));
-  }
-  if(E.sub==='familiar'){
-    await mBot('Nome do <strong>familiar</strong>?');await new Promise(r=>inp('Ex.: Maria da Silva Santos',v=>{E.nomeFam=v;r();}));
-    await mBot('<strong>Grau de parentesco</strong>?');await new Promise(r=>inp('Ex.: mãe',v=>{E.grauFam=v;r();}));
-    await mBot('Como o pedido foi apresentado?');await new Promise(r=>cps([{l:'&#128221; Carta',v:'carta'},{l:'&#128231; E-mail',v:'e-mail'},{l:'&#128196; Petição física',v:'petição física'},{l:'&#9878;&#65039; Petição judicial',v:'petição judicial'}],v=>{E.tipoFam=v;r();}));
-    await mBot('<strong>Data do pedido</strong>?');await new Promise(r=>inp('Ex.: 05/06/2025',v=>{E.dataFam=v;r();}));
-    await mBot('<strong>Motivo alegado</strong>?');await new Promise(r=>inp('Ex.: Mudança de domicílio da família',v=>{E.motFam=v;r();},true));
-  }
-  if(E.sub==='advogado'){
-    await mBot('Nome do <strong>advogado</strong>?');await new Promise(r=>inp('Ex.: Dr. Carlos Eduardo Lima',v=>{E.nomeAdv=v;r();}));
-    await mBot('<strong>OAB/UF e número</strong>?');await new Promise(r=>inp('Ex.: OAB/SC nº 45.678',v=>{E.oab=v;r();}));
-    await mBot('<strong>Data da petição</strong>?');await new Promise(r=>inp('Ex.: 12/07/2025',v=>{E.dataAdv=v;r();}));
-    await mBot('<strong>Motivo alegado</strong>?');await new Promise(r=>inp('Ex.: Proximidade familiar',v=>{E.motAdv=v;r();},true));
-  }
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();
-}
-async function flPrisaoCivil(){
-  await pReed();await pFormSaude();await pOri();await pDes();
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
-
-async function flPermuta(){
-  await pReed();await pFormSaude();await pOri();await pDes();
-  await mBot('Qual o <strong>motivo da transferência</strong> (permuta)?<span class="sub">Ex.: Necessidade de ajuste em relação às características das Unidades Prisionais — ajuste/equalização de vagas</span>');
-  await new Promise(r=>inp('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',v=>{E.motTransfPermuta=v;r();},true));
-  await mBot('Qual foi o <strong>critério utilizado para a escolha/indicação</strong> deste reeducando?<span class="sub">Ex.: Pena mais alta, crime cometido, idade avançada, perfil de risco</span>');
-  await new Promise(r=>inp('Ex.: Pena mais alta dentre os custodiados (18 anos), art. 121 §2° CP',v=>{E.motPermuta=v;r();},true));
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
-
-async function flComun(){
-  await mBot('Que tipo de comunicação?');
-  await new Promise(r=>cps([{l:'&#128682; Saída — reeducando saiu desta unidade',v:'saida'},{l:'&#127968; Entrada — reeducando chegou nesta unidade',v:'entrada'}],v=>{E.sub=v;r();}));
-  await pReed();await pOri();await pDes();
-  await mBot('<strong>Data da transferência</strong>?');await new Promise(r=>inp('Ex.: 15/07/2025',v=>{E.dataTrans=v;r();}));
-  await mBot('<strong>Motivo da transferência</strong>?');await new Promise(r=>inp('Ex.: A unidade de destino é competente por estar vinculada ao juízo que determinou a prisão',v=>{E.motComun=v;r();},true));
-  E.sau='Senhor(a) Juiz(a),';
-  await pJuizo();await pDesp();await pNumOficio();
-  E.dd=false;E.sro=false;E.srd=false;
-  gerar();
-}
 /* CONSTRUÇÃO DO OFÍCIO */
 function ass(nome,cargo,unidade,ultimo){
   return '<div class="ass-bloco">'
@@ -530,97 +410,6 @@ function p(t){
     }
     return '<div class="ofc-p">'+t+'</div>';
   }
-async function gerar(){
-  lp();
-  await mBot('&#10006; Gerando o ofício...');
-  await new Promise(r=>setTimeout(r,600));
-  var o=E.ori,d=E.des,ec=E.mod==='comunicacao';
-  var ps=[];
-  if(E.mod==='mandado'){ps=[
-    'Encaminho para análise pedido de transferência do(a) reeducando(a) '+fld(E.nome)+', IPEN Nº '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', em razão do cumprimento de Mandado de Prisão expedido pelo(a) '+fld(E.juizo)+'.',
-    'Considerando que o(a) referido(a) custodiado(a) foi preso(a) em comarca diversa daquela que expediu a ordem de prisão, bem como que o(a) '+fld(d.n)+' é a unidade responsável pela circunscrição da autoridade judiciária expedidora, a transferência mostra-se adequada, em conformidade com as diretrizes estabelecidas para a gestão de vagas e movimentações prisionais previstas na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III, bem como em cumprimento ao art. 24 da Portaria Normativa nº 2.189/2025 do Departamento de Polícia Penal.',
-    'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, quais sejam, o(a) Diretor(a) da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.',
-  ];}
-  else if(E.mod==='emergencial'){var cp=E.sub==='com_pad';ps=[
-    'Encaminho para análise urgente dessa Central de Regulação de Vagas pedido de transferência excepcional do(a) reeducando(a) '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', em razão de situação emergencial identificada pelas equipes deste estabelecimento penal, conforme segue.',
-    'A presente solicitação fundamenta-se no art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026, em razão de situação de risco '+(cp?'atual, concreto e relevante que exige a retirada imediata do(a) reeducando(a). A medida possui natureza administrativa e não punitiva':'atual, concreto e relevante à integridade física do(a) reeducando(a), de terceiros, ou à estabilidade e segurança da unidade prisional. A medida possui natureza administrativa e não punitiva, não estando vinculada à prática de falta grave')+'.',
-    'A situação concreta consiste em '+fld(E.sit)+', demonstrando risco atual, concreto e relevante à segurança institucional, o que torna inviável a permanência do(a) reeducando(a) nesta unidade prisional.',
-    'Diante da urgência, solicita-se a transferência do(a) reeducando(a) para o(a) '+fld(d.n)+', onde há condições adequadas para sua custódia'+(cp?'':' em segurança')+'.',
-    ...(cp?[
-      'Informa-se que '+fld(E.pad)+' o competente Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente, em razão de conduta enquadrada no rol taxativo da Lei de Execução Penal, especificamente: '+fld(E.faltaCod+' — '+E.faltaDesc)+'.',
-      'Esclarece-se que a presente medida não possui natureza de sanção disciplinar, tratando-se de providência administrativa de caráter cautelar, sem prejuízo da apuração regular dos fatos no âmbito do PAD.',
-      'Ressalta-se que eventual isolamento preventivo observará rigorosamente os limites legais, especialmente quanto ao prazo máximo (até 10 dias, prorrogável por mais 20 se o PAD for concluído com decisão procedente dentro desse período, nos termos do art. 60 da LEP) e à vedação de punição antecipada, com preservação integral dos direitos da pessoa privada de liberdade.',
-    ]:[
-      'Esclarece-se que a presente medida não possui natureza disciplinar, tratando-se exclusivamente de providência administrativa destinada à preservação da segurança do(a) reeducando(a) e de terceiros. Não há instauração de PAD, por não se verificar, no caso concreto, a prática de falta grave tipificada nos arts. 50 ou 52 da Lei de Execução Penal.',
-      'Ressalta-se que o(a) reeducando(a) permanecerá em cela de convívio, com a integral preservação de seus direitos, sendo vedada qualquer forma de isolamento.',
-    ]),
-    'Para subsidiar a análise, encaminham-se, anexos, o Boletim Penal Informativo devidamente atualizado, o Relatório de Saúde, assinado pelo Responsável Técnico, pelo Coordenador de Saúde ou pelo Diretor, e demais documentos pertinentes.',
-    'Uma vez efetivada a remoção, caso aprovada, o Juízo competente será devidamente comunicado no prazo legal de até 24 horas.',
-    'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, incluindo o(a) Diretor(a) do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.',
-    'Diante do exposto, solicita-se análise e célere deliberação quanto à viabilidade da transferência.',
-  ];}
-  else if(E.mod==='pernoite'){ps=[
-    'Encaminho para análise pedido de PERNOITE do(a) reeducando(a) '+fld(E.nome)+', IPEN Nº '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', no estabelecimento penal '+fld(d.n)+', em razão de '+fld(E.razPernoite)+'.',
-    'Informo, por fim, que foi realizado contato prévio com a gestão da unidade de destino, que subscreve também o presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade do pleito administrativo.',
-  ];}
-  else if(E.mod==='adequacao'){var tm={coletiva:'equalização da lotação entre as unidades (transferência coletiva)',pontual:'transferência pontual com vistas à adequação da capacidade de ocupação',regime:'adequação decorrente de alteração de regime de cumprimento de pena'};ps=[
-    'Considerando a necessidade de gestão e equalização da ocupação carcerária no âmbito do(a) '+fld(o.n)+', encaminho para análise dessa Central de Regulação de Vagas pedido de transferência do(a) reeducando(a) '+fld(E.nome)+', IPEN Nº '+fld(E.ipen)+', atualmente custodiado(a) nesta unidade prisional, para o(a) '+fld(d.n)+', com fundamento na '+(tm[E.sub]||'adequação da capacidade de ocupação')+'.',
-    'A solicitação fundamenta-se na necessidade de equalização da lotação entre as unidades do sistema prisional catarinense, em conformidade com as diretrizes estabelecidas para a gestão de vagas e movimentações prisionais previstas na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.',
-    'Para subsidiar a análise, informo a devida atualização no sistema i-PEN do Boletim Penal Informativo, assinado pelo Coordenador de Execução Penal (ou pelo Diretor da Unidade Prisional), bem como anexo o Relatório de Saúde, assinado pelo Responsável Técnico, pelo Coordenador de Saúde ou pelo Diretor.',
-    'Uma vez efetivada a remoção, caso aprovada, o Juízo competente será devidamente comunicado no prazo legal de até 24 horas.',
-    'Informo, por fim, que foram realizados contatos prévios com as autoridades pertinentes, quais sejam, o(a) Diretor(a) do estabelecimento penal de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.',
-  ];}
-  else if(E.mod==='pedido'&&E.sub==='preso'){ps=[
-    'Encaminho para análise dessa Central pedido de transferência do(a) reeducando(a) '+fld(E.nome)+', IPEN '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', formulado pelo próprio reeducando por meio de memorando datado de '+fld(E.dataMem)+'.',
-    'A solicitação tem por fundamento '+fld(E.motPreso)+', nos termos do art. 21, inciso II, da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'Para subsidiar a análise, encaminho em anexo Boletim Penal Informativo devidamente atualizado, Relatório de Saúde e memorando original do reeducando.',
-    'Uma vez efetivada a remoção — caso aprovada —, o r. Juízo competente será devidamente comunicado no prazo legal de até 24 horas.',
-    'Informo, por fim, que foram realizados contatos prévios com os entes envolvidos, quais sejam, o(a) Diretor(a) da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.',
-  ];}
-  else if(E.mod==='pedido'&&E.sub==='familiar'){ps=[
-    'Encaminho para análise dessa Central pedido de transferência do(a) reeducando(a) '+fld(E.nome)+', IPEN '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', formulado por seu(sua) familiar '+fld(E.nomeFam)+', '+fld(E.grauFam)+', por meio de '+fld(E.tipoFam)+' datado(a) de '+fld(E.dataFam)+'.',
-    'A solicitação tem por fundamento '+fld(E.motFam)+', nos termos do art. 21, inciso II, da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'Para subsidiar a análise, encaminho em anexo Boletim Penal Informativo devidamente atualizado, Relatório de Saúde e '+fld(E.tipoFam)+' original do familiar.',
-    'Uma vez efetivada a remoção — caso aprovada —, o r. Juízo competente será devidamente comunicado no prazo legal de até 24 horas.',
-    'Informo, por fim, que foram realizados contatos prévios com os entes envolvidos, quais sejam, o(a) Diretor(a) da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.',
-  ];}
-  else if(E.mod==='pedido'&&E.sub==='advogado'){ps=[
-    'Encaminho para análise dessa Central pedido de transferência do(a) reeducando(a) '+fld(E.nome)+', IPEN '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', formulado pelo advogado constituído '+fld(E.nomeAdv)+', '+fld(E.oab)+', por meio de petição datada de '+fld(E.dataAdv)+'.',
-    'A solicitação tem por fundamento '+fld(E.motAdv)+', nos termos do art. 21, inciso II, da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'Para subsidiar a análise, encaminho em anexo Boletim Penal Informativo devidamente atualizado, Relatório de Saúde e petição original do advogado, com comprovação de mandato.',
-    'Uma vez efetivada a remoção — caso aprovada —, o r. Juízo competente será devidamente comunicado no prazo legal de até 24 horas.',
-    'Informo, por fim, que foram realizados contatos prévios com os entes envolvidos, quais sejam, o(a) Diretor(a) da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.',
-  ];}
-  else if(E.mod==='prisaocivil'){ps=[
-    'Encaminho para análise e deliberação da Central de Regulação de Vagas — CRV/DPP pedido de transferência do(a) preso(a) civil '+fld(E.nome)+', IPEN Nº '+fld(E.ipen)+', atualmente custodiado(a) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+'.',
-    'A presente solicitação fundamenta-se na natureza específica da prisão civil, modalidade de privação de liberdade distinta da prisão penal, cujo caráter não é sancionatório, mas coercitivo, visando ao cumprimento de obrigação legal. Nessa perspectiva, é imprescindível que a pessoa privada de liberdade sob essa modalidade seja custodiada em unidade prisional adequada e especializada para tanto.',
-    textoBPI(', bem como encaminho cópia da decisão judicial que determinou a prisão civil'),
-    'Efetivada a remoção, o Juízo competente será devidamente comunicado no prazo legal.',
-    'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
-  ];}
-  else if(E.mod==='comunicacao'&&E.sub==='saida'){ps=[
-    'Comunicamos a Vossa Excelência que o(a) custodiado(a) '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', foi transferido(a) desta Unidade Prisional — '+fld(o.n)+' — para '+fld(d.n)+', localizada em '+fld(d.c)+'/SC, no dia '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'A transferência foi devidamente autorizada pela Central de Regulação de Vagas — CRV/DPP, uma vez que '+fld(E.motComun)+'.',
-    'Nada mais havendo a comunicar, ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos que se façam necessários.',
-  ];}
-  else if(E.mod==='comunicacao'&&E.sub==='entrada'){ps=[
-    'Comunicamos a Vossa Excelência que o(a) custodiado(a) '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', ingressou nesta Unidade Prisional — '+fld(d.n)+' —, oriundo(a) de '+fld(o.n)+', localizada em '+fld(o.c)+'/SC, no dia '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'A transferência foi devidamente autorizada pela Central de Regulação de Vagas — CRV/DPP, uma vez que '+fld(E.motComun)+'.',
-    'Nada mais havendo a comunicar, ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos que se façam necessários.',
-  ];}
-  var corpo=ps.map(function(t){return p(t);}).join(lb(1));
-  G('oficio').innerHTML=cab()+lb(1)+'<div class="oficio-corpo">'+numData()+lb(4)+'<div class="ofc-sau">'+E.sau+'</div>'+lb(4)+corpo+lb(4)+'<div class="ofc-desp">'+E.desp+'</div>'+lb(5)+blocoAss()+(ec?dJuizo():dCRV())+'</div>'+rod();
-  G('chatArea').style.display='none';G('ow').style.display='none';G('iw').style.display='none';
-  document.querySelector('.layout').classList.add('collapsed');
-  G('ofw').classList.add('vis');window.scrollTo({top:0,behavior:'smooth'});
-}
 
 /* ══════════════ ESTADO ══════════════ */
 const E={};
@@ -642,13 +431,95 @@ function rE(){Object.assign(E,{
 });}
 rE();
 
-/* ══════════════ CONCORDÂNCIA DE GÊNERO E NÚMERO ══════════════ */
+/* ══════════════ HISTÓRICO DE PASSOS (VOLTAR) ══════════════ */
+var _hist=[];
+
+function _snapE(){
+  var s={};
+  Object.keys(E).forEach(function(k){
+    var v=E[k];
+    if(Array.isArray(v))s[k]=v.slice();
+    else if(v&&typeof v==='object')s[k]=Object.assign({},v);
+    else s[k]=v;
+  });
+  return s;
+}
+
+function _atualizarBtnVoltar(){
+  var btn=document.getElementById('btnVoltar');
+  if(!btn)return;
+  var chatVis=G('chatArea')&&G('chatArea').style.display!=='none';
+  btn.classList.toggle('vis',_hist.length>0&&chatVis);
+}
+
+/* cpsH: wrapper de cps que salva checkpoint antes de confirmar */
+function cpsH(ops,cb){
+  var snap=_snapE();
+  var nMsgs=ci?ci.children.length:0;
+  cps(ops,function(v){
+    _hist.push({nMsgs:nMsgs,estado:snap});
+    _atualizarBtnVoltar();
+    cb(v);
+  });
+}
+
+/* Promise-aware helpers que registram histórico */
+function cpsP(ops){
+  return new Promise(function(resolve){
+    cpsH(ops,resolve);
+  });
+}
+
+function inpP(ph,ml){
+  return new Promise(function(resolve){
+    var snap=_snapE();
+    var nMsgs=ci?ci.children.length:0;
+    inp(ph,function(v){
+      _hist.push({nMsgs:nMsgs,estado:snap});
+      _atualizarBtnVoltar();
+      resolve(v);
+    },ml);
+  });
+}
+
+function btnUnP(lbl){
+  return new Promise(function(resolve){
+    var snap=_snapE();
+    var nMsgs=ci?ci.children.length:0;
+    lp();ow.style.display='block';
+    var b=document.createElement('button');b.className='chip vd';b.textContent='\uD83D\uDCCB '+lbl;
+    b.onclick=function(){b.classList.add('dis');aModal(lbl,function(u){
+      mUser('\uD83D\uDCCB '+u.n+' \u2014 '+u.c);lp();
+      _hist.push({nMsgs:nMsgs,estado:snap});
+      _atualizarBtnVoltar();
+      setTimeout(function(){resolve(u);},300);
+    });};
+    or.appendChild(b);
+  });
+}
+
+function voltarPasso(){
+  if(_hist.length===0)return;
+  var h=_hist.pop();
+  if(ci){while(ci.children.length>h.nMsgs)ci.removeChild(ci.lastChild);}
+  Object.assign(E,h.estado);
+  lp();
+  _atualizarBtnVoltar();
+  /* Re-exibir a última pergunta relançando o fluxo a partir do ponto salvo via reiniciar suave */
+  /* Não é possível retomar promise já descartada; ao invés disso avisamos e o usuário clica em Reiniciar se quiser ir mais atrás */
+  toast('↩ Voltou um passo. Reescolha a opção acima ou clique em Reiniciar.');
+  /* Mostra novamente a última mensagem do bot como orientação */
+  if(ci&&ci.lastChild){
+    ci.lastChild.scrollIntoView({behavior:'smooth'});
+  }
+}
+
 async function pGenero(){
   await mBot('O(a) preso(a) é do sexo:');
-  var gen=await new Promise(r=>cps([{l:'&#128100; Masculino',v:'M'},{l:'&#128100; Feminino',v:'F'}],v=>r(v)));
+  var gen=await cpsP([{l:'&#128100; Masculino',v:'M'},{l:'&#128100; Feminino',v:'F'}]);
   E.genero=gen;
   await mBot('Trata-se de:');
-  var num=await new Promise(r=>cps([{l:'1️⃣ Um(a) preso(a)',v:'S'},{l:'&#128101; Mais de um preso(a)',v:'P'}],v=>r(v)));
+  var num=await cpsP([{l:'1️⃣ Um(a) preso(a)',v:'S'},{l:'&#128101; Mais de um preso(a)',v:'P'}]);
   E.numero=num;
 }
 /* Retorna concordância: g('o','a') → 'o' ou 'a'; gp('o(a)') para quando precisar do padrão antigo */
@@ -688,7 +559,7 @@ function doA(){return g('do','da')+(E.numero==='P'?'s':'');}
 const G=id=>document.getElementById(id);
 const ci=G('ci'),ow=G('ow'),or=G('or'),iw=G('iw');
 function sb(){setTimeout(()=>G('chatArea').scrollTo({top:9e6,behavior:'smooth'}),80);}
-function lp(){or.innerHTML='';ow.style.display='none';iw.style.display='none';iw.innerHTML='';}
+function lp(){or.innerHTML='';ow.style.display='none';iw.style.display='none';iw.innerHTML='';_atualizarBtnVoltar();}
 
 function mBot(h,d=0){return new Promise(r=>{setTimeout(()=>{
   const t=document.createElement('div');t.className='msg bot';
@@ -764,6 +635,45 @@ async function coletarLista(tipo,pergInicio,pergAdicionar,ph){
 }
 
 /* ══════════════ COLETA REEDUCANDOS (LARGA ESCALA) ══════════════ */
+/* Versão simples: sem regime/alocação (para prisão civil, permuta, adequacao pontual/regime) */
+async function coletarReeducandosSimples(){
+  var lista=[];
+  var idx=1;
+  var cont=true;
+  while(cont){
+    await mBot('Informe o <strong>nome completo</strong> do '+idx+'º reeducando:');
+    var nX=await inpP('Ex.: João da Silva Santos');
+    await mBot('Informe o <strong>IPEN</strong> do '+idx+'º reeducando:');
+    var iX=await inpP('Ex.: 123456');
+    lista.push({nome:nX,ipen:iX,regime:'',alocacao:'',comorbidades:[],medicamentos:[]});
+    idx++;
+    await mBot('Há mais algum reeducando a incluir?');
+    var resp=await cpsP([{l:'&#10003; Sim, adicionar mais',v:'sim'},{l:'&#10060; Não, finalizar',v:'nao'}]);
+    if(resp==='nao') cont=false;
+  }
+  return lista;
+}
+
+/* Coleta nome, IPEN, regime e alocação de cada reeducando (para permuta e adequação pontual/regime) */
+async function coletarReeducandosComSitPenal(){
+  var lista=[];
+  var idx=1;
+  var cont=true;
+  while(cont){
+    await mBot('Informe o <strong>nome completo</strong> do '+idx+'º reeducando:');
+    var nX=await inpP('Ex.: João da Silva Santos');
+    await mBot('Informe o <strong>IPEN</strong> do '+idx+'º reeducando:');
+    var iX=await inpP('Ex.: 123456');
+    var sitX=await pSitPenal(idx);
+    lista.push({nome:nX,ipen:iX,regime:sitX.regime,alocacao:sitX.alocacao,comorbidades:[],medicamentos:[]});
+    idx++;
+    await mBot('Há mais algum reeducando a incluir?');
+    var resp=await cpsP([{l:'&#10003; Sim, adicionar mais',v:'sim'},{l:'&#10060; Não, finalizar',v:'nao'}]);
+    if(resp==='nao') cont=false;
+  }
+  return lista;
+}
+
 async function coletarReeducandos(){
   var lista=[];
   var coletaSaude=(E.saudeOpcao==='individual');
@@ -866,9 +776,9 @@ function pSaudeTextoLarga(reed){
 async function pReed(){
   await pGenero();
   await mBot('Qual é o <strong>nome completo</strong> '+(E.numero==='P'?'do(a) 1º(ª) reeducando(a)':'do(a) reeducando(a)')+'?');
-  await new Promise(r=>inp('Ex.: João da Silva Santos',v=>{E.nome=v;r();}));
+  E.nome=await inpP('Ex.: João da Silva Santos');
   await mBot('Qual é o <strong>número IPEN</strong>?');
-  await new Promise(r=>inp('Ex.: 123456',v=>{E.ipen=v;r();}));
+  E.ipen=await inpP('Ex.: 123456');
 }
 async function pSaude(){
   E.comorbidades=await coletarLista('comorbidade','possui alguma <strong>comorbidade</strong> (doença ou condição de saúde)','mais alguma comorbidade','Ex.: Hipertensão arterial');
@@ -878,17 +788,17 @@ async function pSaude(){
 /* ══ NOVA ETAPA: Formulário de Saúde ══ */
 async function pFormSaude(){
   await mBot('Será juntado <strong>Formulário de Saúde</strong> assinado por profissional técnico (médico, enfermeiro, técnico em enfermagem, etc.)?');
-  var resp=await new Promise(r=>cps([{l:'✅ Sim',v:'sim'},{l:'❌ Não',v:'nao'}],v=>r(v)));
+  var resp=await cpsP([{l:'✅ Sim',v:'sim'},{l:'❌ Não',v:'nao'}]);
   if(resp==='sim'){
     E.saudeOpcao='formulario';
     return; /* segue sem perguntas de saúde */
   }
   /* NÃO: apresentar duas opções */
   await mBot('Selecione a justificativa:');
-  var opt=await new Promise(r=>cps([
+  var opt=await cpsP([
     {l:'🏥 Esta Unidade Prisional não dispõe de profissional apto a realizar avaliação de saúde',v:'sem_profissional'},
     {l:'📋 Será informado individualmente (para cada reeducando)',v:'individual'},
-  ],v=>r(v)));
+  ]);
   E.saudeOpcao=opt;
   if(opt==='individual'){
     /* mantém fluxo antigo */
@@ -896,25 +806,25 @@ async function pFormSaude(){
   }
   /* sem_profissional: segue sem perguntas, texto automático no ofício */
 }
-async function pOri(){await mBot('Selecione a <strong>unidade prisional de origem</strong>:');return new Promise(r=>btnUn('Escolher Unidade de Origem',u=>{E.ori=u;r();}));}
-async function pDes(){await mBot('Selecione a <strong>unidade prisional de destino</strong>:');return new Promise(r=>btnUn('Escolher Unidade de Destino',u=>{E.des=u;r();}));}
-async function pSau(){await mBot('Qual é a <strong>saudação</strong>?');return new Promise(r=>cps([
+async function pOri(){await mBot('Selecione a <strong>unidade prisional de origem</strong>:');E.ori=await btnUnP('Escolher Unidade de Origem');}
+async function pDes(){await mBot('Selecione a <strong>unidade prisional de destino</strong>:');E.des=await btnUnP('Escolher Unidade de Destino');}
+async function pSau(){await mBot('Qual é a <strong>saudação</strong>?');E.sau=await cpsP([
   {l:'Senhor(a) Coordenador(a)',v:'Senhor(a) Coordenador(a),'},{l:'Senhor(a) Juiz(a)',v:'Senhor(a) Juiz(a),'},
   {l:'Senhor(a) Diretor(a)',v:'Senhor(a) Diretor(a),'},{l:'Senhor(a) Superintendente',v:'Senhor(a) Superintendente,'}
-],v=>{E.sau=v;r();}));}
-async function pDesp(){await mBot('Qual é o <strong>fechamento</strong>?');return new Promise(r=>cps([
+]);}
+async function pDesp(){await mBot('Qual é o <strong>fechamento</strong>?');E.desp=await cpsP([
   {l:'Atenciosamente',v:'Atenciosamente,'},{l:'Respeitosamente',v:'Respeitosamente,'}
-],v=>{E.desp=v;r();}));}
+]);}
 async function pNumOficio(){
   await mBot('O ofício terá <strong>número</strong>?');
-  return new Promise(r=>cps([{l:'Sim',v:'sim'},{l:'Não',v:'nao'}],v=>{
-    if(v==='nao'){E.numOficio='';r();}
-    else{lp();mBot('Digite o <strong>número do ofício</strong>:').then(()=>{inp('Ex.: Ofício nº 042/2026/DPP',n=>{E.numOficio=n;r();});});}
-  }));}
+  var v=await cpsP([{l:'Sim',v:'sim'},{l:'Não',v:'nao'}]);
+  if(v==='nao'){E.numOficio='';}
+  else{await mBot('Digite o <strong>número do ofício</strong>:');E.numOficio=await inpP('Ex.: Ofício nº 042/2026/DPP');}
+}
 async function pJuizo(){
-  await mBot('Qual o <strong>nome do(a) Juiz(a)</strong>?');await new Promise(r=>inp('Ex.: Dra. Ana Paula Ferreira',v=>{E.nomejuiz=v;r();}));
-  await mBot('Qual é a <strong>Vara / Unidade Judiciária</strong>?');await new Promise(r=>inp('Ex.: 1ª Vara de Execuções Penais',v=>{E.vara=v;r();}));
-  await mBot('Qual é a <strong>cidade/UF</strong> do juízo?');await new Promise(r=>inp('Ex.: Blumenau/SC',v=>{E.cidJuizo=v;r();}));}
+  await mBot('Qual o <strong>nome do(a) Juiz(a)</strong>?');E.nomejuiz=await inpP('Ex.: Dra. Ana Paula Ferreira');
+  await mBot('Qual é a <strong>Vara / Unidade Judiciária</strong>?');E.vara=await inpP('Ex.: 1ª Vara de Execuções Penais');
+  await mBot('Qual é a <strong>cidade/UF</strong> do juízo?');E.cidJuizo=await inpP('Ex.: Blumenau/SC');}
 async function pAss(){
   await mBot('Além do(a) <strong>Diretor(a) de Origem</strong>, o ofício terá mais assinaturas?<span class="sub">Selecione e clique em Confirmar.</span>');
   var s=await cpsM([{l:'&#128084; Diretor(a) da Unidade de Destino',v:'dd'},{l:'&#127970; Superintendente Regional de Origem',v:'sro'},{l:'&#127970; Superintendente Regional de Destino',v:'srd'}]);
@@ -922,126 +832,182 @@ async function pAss(){
 
 async function pBPI(){
   await mBot('<strong>SOBRE O BPI (Boletim Penal Informativo):</strong>');
-  return new Promise(r=>cps([
+  var v=await cpsP([
     {l:'&#10003; Está atualizado',v:'atualizado'},
     {l:'&#9888;&#65039; Não está atualizado',v:'nao_atualizado'},
     {l:'&#128100; Não está atualizado, mas o Gestor da Unidade Prisional de destino está ciente, não manifestou óbice e comprometeu-se com a atualização',v:'nao_ciente'},
-  ],async v=>{
-    E.bpi=v;
-    if(v==='nao_atualizado'){
-      await mBot('Qual o <strong>motivo</strong> da não atualização?');
-      await new Promise(r2=>inp('Ex.: Aguardando atualização pelo Coordenador de Execução Penal',v2=>{E.bpiMotivo=v2;r2();}));
-    }
-    r();
-  }));
+  ]);
+  E.bpi=v;
+  if(v==='nao_atualizado'){
+    await mBot('Qual o <strong>motivo</strong> da não atualização?');
+    E.bpiMotivo=await inpP('Ex.: Aguardando atualização pelo Coordenador de Execução Penal');
+  }
 }
 
 /* Coleta Situação Penal (Regime) + Característica de Alocação */
 async function pSitPenal(idx){
   var prefixo=idx?'do '+idx+'º reeducando':'do(a) reeducando(a)';
   await mBot('Qual é a <strong>Situação Penal (Regime)</strong> '+prefixo+'?');
-  var regime=await new Promise(r=>cps([
+  var regime=await cpsP([
     {l:'&#9878;&#65039; Provisório',v:'Provisório'},
     {l:'&#128274; Fechado',v:'Fechado'},
     {l:'&#128275; Semiaberto',v:'Semiaberto'},
-  ],v=>r(v)));
+  ]);
   await mBot('Qual é a <strong>Característica de Alocação</strong>?<span class="sub">SEGURO em vermelho = situação diferenciada (indicativo/suposição de que referida pessoa integre/pertença a ORCRIM).</span>');
-  var aloc=await new Promise(r=>cps([
+  var aloc=await cpsP([
     {l:'&#128101; Convívio',v:'Convívio'},
     {l:'&#128737;&#65039; Seguro',v:'Seguro'},
     {l:'&#128737;&#65039; SEGURO',v:'SEGURO',cl:'perigo'},
-  ],v=>r(v)));
+  ]);
   return {regime:regime,alocacao:aloc};
 }
 
 /* ══════════════ FLUXOS POR MODALIDADE ══════════════ */
+/* ── Helper: coleta nome/IPEN (único ou lista) ── */
+async function pReedOuLista(labelSingular){
+  await pGenero();
+  if(E.numero==='P'){
+    await mBot('&#9432; Serão coletados os dados de cada reeducando. O ofício será gerado com tabela em folha Anexo.');
+    E.reed=await coletarReeducandosSimples();
+    E.nome=E.reed[0].nome;E.ipen=E.reed[0].ipen;
+  } else {
+    await mBot('Qual é o <strong>nome completo</strong> '+(labelSingular||'do(a) reeducando(a)')+'?');
+    E.nome=await inpP('Ex.: João da Silva Santos');
+    await mBot('Qual é o <strong>número IPEN</strong>?');
+    E.ipen=await inpP('Ex.: 123456');
+  }
+}
+
 async function flEmerg(){
   await mBot('Qual é a situação que fundamenta a transferência?');
-  await new Promise(r=>cps([{l:'&#128203; Com PAD — falta grave (art. 50/52 LEP)',v:'com_pad'},{l:'&#9888;&#65039; Sem PAD — risco à integridade / segurança',v:'sem_pad'}],v=>{E.sub=v;r();}));
-  await pReed();
-  var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;
+  E.sub=await cpsP([{l:'&#128203; Com PAD — falta grave (art. 50/52 LEP)',v:'com_pad'},{l:'&#9888;&#65039; Sem PAD — risco à integridade / segurança',v:'sem_pad'}]);
+  await pReedOuLista();
+  if(E.numero==='S'){var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;}
   await pFormSaude();await pOri();await pDes();
   await mBot('Descreva <strong>detalhadamente</strong> a situação concreta:');
-  await new Promise(r=>inp('Ex.: O reeducando ameaçou agentes...',v=>{E.sit=v;r();},true));
+  E.sit=await inpP('Ex.: O reeducando ameaçou agentes...',true);
   if(E.sub==='com_pad'){
     await mBot('Quanto ao PAD:');
-    await new Promise(r=>cps([{l:'&#10003; Foi instaurado',v:'FOI INSTAURADO'},{l:'&#128221; Será instaurado',v:'SERÁ INSTAURADO'}],v=>{E.pad=v;r();}));
+    E.pad=await cpsP([{l:'&#10003; Foi instaurado',v:'FOI INSTAURADO'},{l:'&#128221; Será instaurado',v:'SERÁ INSTAURADO'}]);
     await mBot('Qual foi a <strong>falta disciplinar</strong>?<span class="sub">Selecione o inciso da LEP.</span>');
-    await new Promise(r=>cps(FALTAS.map(f=>({l:'<strong>'+f.c+'</strong> — '+f.d,v:f.c+'||'+f.d})),v=>{var pts=v.split('||');E.faltaCod=pts[0];E.faltaDesc=pts[1];r();}));}
+    var fv=await cpsP(FALTAS.map(f=>({l:'<strong>'+f.c+'</strong> — '+f.d,v:f.c+'||'+f.d})));
+    var pts=fv.split('||');E.faltaCod=pts[0];E.faltaDesc=pts[1];}
   await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
 
 async function flMandado(){
-  await pReed();
-  var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;
+  await pReedOuLista();
+  if(E.numero==='S'){var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;}
   await pFormSaude();await pOri();await pDes();
   await mBot('Qual é o <strong>Juízo expedidor</strong> do Mandado de Prisão?');
-  await new Promise(r=>inp('Ex.: 2ª Vara Criminal da Comarca de Blumenau',v=>{E.juizo=v;r();}));
+  E.juizo=await inpP('Ex.: 2ª Vara Criminal da Comarca de Blumenau');
   await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
 
 async function flPernoite(){
-  await pReed();
-  var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;
-  await pFormSaude();await pOri();await pDes();
+  await pReedOuLista();
+  await pOri();await pDes();
   await mBot('Qual é a <strong>razão do pernoite</strong>?');
-  await new Promise(r=>inp('Ex.: Audiência judicial na comarca de destino',v=>{E.razPernoite=v;r();},true));
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
+  E.razPernoite=await inpP('Ex.: Audiência judicial na comarca de destino',true);
+  await pSau();await pDesp();await pNumOficio();await pAss();gerar();}
 
 async function flAdequacao(){
   await mBot('Qual é o tipo de adequação/transferência?');
-  await new Promise(r=>cps([
+  E.sub=await cpsP([
     {l:'&#128230; Larga Escala — coletiva',v:'coletiva'},
     {l:'&#127919; Pontual — individual',v:'pontual'},
     {l:'&#128260; Alteração de Regime',v:'regime'},
-    ],v=>{E.sub=v;r();}));
+    ]);
   if(E.sub==='coletiva'){
     await pFormSaude();
     E.reed=await coletarReeducandos();
     E.nome=E.reed[0].nome;E.ipen=E.reed[0].ipen;
     await pOri();await pDes();
     await mBot('Qual o <strong>motivo da transferência</strong>?<span class="sub">Ex.: Necessidade de ajuste em relação às características das Unidades Prisionais — ajuste/equalização de vagas</span>');
-    await new Promise(r=>inp('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',v=>{E.motTransf=v;r();},true));
+    E.motTransf=await inpP('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',true);
     await mBot('Qual foi o <strong>critério utilizado para a escolha/indicação</strong> destes reeducandos?<span class="sub">Ex.: Penas mais altas, crimes cometidos, idade avançada, perfil de risco</span>');
-    await new Promise(r=>inp('Ex.: Presos com maiores penas e perfil de alta periculosidade',v=>{E.motIndicacao=v;r();},true));
-  }else if(E.sub==='permuta'){
-    await pReed();
-    var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;
-    await pFormSaude();await pOri();await pDes();
-    await mBot('Qual é o <strong>motivo</strong> da permuta?');
-    await new Promise(r=>inp('Ex.: Superlotação da unidade de origem',v=>{E.motPreso=v;r();},true));
+    E.motIndicacao=await inpP('Ex.: Presos com maiores penas e perfil de alta periculosidade',true);
   }else{
-    await pReed();
-    var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;
-    await pFormSaude();await pOri();await pDes();
+    /* pontual e regime: 1 ou mais presos — sempre pede situação penal */
+    await pGenero();
+    if(E.numero==='P'){
+      await mBot('&#9432; Serão coletados os dados de cada reeducando. O ofício será gerado com tabela em folha Anexo.');
+      await pFormSaude();
+      E.reed=await coletarReeducandosComSitPenal();
+      E.nome=E.reed[0].nome;E.ipen=E.reed[0].ipen;
+    } else {
+      await mBot('Qual é o <strong>nome completo</strong> do(a) reeducando(a)?');
+      E.nome=await inpP('Ex.: João da Silva Santos');
+      await mBot('Qual é o <strong>número IPEN</strong>?');
+      E.ipen=await inpP('Ex.: 123456');
+      var sitAdec=await pSitPenal(0);E.regime=sitAdec.regime;E.alocacao=sitAdec.alocacao;
+      await pFormSaude();
+    }
+    await pOri();await pDes();
     await mBot('Qual o <strong>motivo da transferência</strong>?<span class="sub">Ex.: Necessidade de ajuste em relação às características das Unidades Prisionais — ajuste/equalização de vagas</span>');
-    await new Promise(r=>inp('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',v=>{E.motTransf=v;r();},true));
+    E.motTransf=await inpP('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',true);
     await mBot('Qual foi o <strong>critério utilizado para a escolha/indicação</strong> '+(E.numero==='P'?'destes reeducandos':'deste reeducando')+'?<span class="sub">Ex.: Pena mais alta, crime cometido, idade avançada, perfil de risco</span>');
-    await new Promise(r=>inp('Ex.: Pena mais alta dentre os custodiados (15 anos), art. 157 CP',v=>{E.motIndicacao=v;r();},true));
+    E.motIndicacao=await inpP('Ex.: Pena mais alta dentre os custodiados (15 anos), art. 157 CP',true);
   }
   await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
 
 
 async function flPrisaoCivil(){
-  await pReed();await pFormSaude();await pOri();await pDes();
-  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
+  /* Coleta gênero e número */
+  await pGenero();
+  if(E.numero==='P'){
+    /* Mais de um preso civil → coletar todos, gerar tabela em Anexo, mas manter texto de prisão civil */
+    await mBot('&#9432; Serão coletados os dados de cada preso civil. O ofício será gerado com tabela em folha Anexo.');
+    await pFormSaude();
+    E.reed=await coletarReeducandosSimples();
+    E.nome=E.reed[0].nome;E.ipen=E.reed[0].ipen;
+  } else {
+    /* Preso civil individual */
+    await mBot('Qual é o <strong>nome completo</strong> do(a) preso(a) civil?');
+    E.nome=await inpP('Ex.: João da Silva Santos');
+    await mBot('Qual é o <strong>número IPEN</strong>?');
+    E.ipen=await inpP('Ex.: 123456');
+    await pFormSaude();
+  }
+  await pOri();await pDes();
+  await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();
+}
 
 async function flPermuta(){
-  await pReed();
-  var sit=await pSitPenal(0);E.regime=sit.regime;E.alocacao=sit.alocacao;
-  await pFormSaude();await pOri();await pDes();
+  await pGenero();
+  if(E.numero==='P'){
+    await mBot('&#9432; Serão coletados os dados de cada reeducando envolvido na permuta. O ofício será gerado com tabela em folha Anexo.');
+    await pFormSaude();
+    E.reed=await coletarReeducandosComSitPenal();
+    E.nome=E.reed[0].nome;E.ipen=E.reed[0].ipen;
+  } else {
+    await mBot('Qual é o <strong>nome completo</strong> do(a) reeducando(a)?');
+    E.nome=await inpP('Ex.: João da Silva Santos');
+    await mBot('Qual é o <strong>número IPEN</strong>?');
+    E.ipen=await inpP('Ex.: 123456');
+    var sitPerm=await pSitPenal(0);E.regime=sitPerm.regime;E.alocacao=sitPerm.alocacao;
+    await pFormSaude();
+  }
+  await pOri();await pDes();
   await mBot('Qual o <strong>motivo da transferência</strong> (permuta)?<span class="sub">Ex.: Necessidade de ajuste em relação às características das Unidades Prisionais — ajuste/equalização de vagas</span>');
-  await new Promise(r=>inp('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',v=>{E.motTransfPermuta=v;r();},true));
-  await mBot('Qual foi o <strong>critério utilizado para a escolha/indicação</strong> deste reeducando?<span class="sub">Ex.: Pena mais alta, crime cometido, idade avançada, perfil de risco</span>');
-  await new Promise(r=>inp('Ex.: Pena mais alta dentre os custodiados (18 anos), art. 121 §2° CP',v=>{E.motPermuta=v;r();},true));
+  E.motTransfPermuta=await inpP('Ex.: Necessidade de ajuste/equalização de vagas entre unidades',true);
+  if(E.numero==='S'){
+    await mBot('Qual foi o <strong>critério utilizado para a escolha/indicação</strong> deste reeducando?<span class="sub">Ex.: Pena mais alta, crime cometido, idade avançada, perfil de risco</span>');
+    E.motPermuta=await inpP('Ex.: Pena mais alta dentre os custodiados (18 anos), art. 121 §2° CP',true);
+  } else {
+    await mBot('Qual foi o <strong>critério utilizado para a escolha/indicação</strong> destes reeducandos?<span class="sub">Ex.: Penas mais altas, crimes cometidos, idade avançada, perfil de risco</span>');
+    E.motPermuta=await inpP('Ex.: Presos com maiores penas e perfil de alta periculosidade',true);
+  }
   await pSau();await pDesp();await pNumOficio();await pAss();await pBPI();gerar();}
 
 async function flComun(){
   await mBot('Que tipo de comunicação?');
-  await new Promise(r=>cps([{l:'&#128682; Saída — reeducando saiu desta unidade',v:'saida'},{l:'&#127968; Entrada — reeducando chegou nesta unidade',v:'entrada'}],v=>{E.sub=v;r();}));
-  await pReed();await pOri();await pDes();
-  await mBot('<strong>Data da transferência</strong>?');await new Promise(r=>inp('Ex.: 15/07/2025',v=>{E.dataTrans=v;r();}));
-  await mBot('<strong>Motivo da transferência</strong>?');await new Promise(r=>inp('Ex.: A unidade de destino é competente...',v=>{E.motComun=v;r();},true));
+  E.sub=await cpsP([{l:'&#128682; Saída — reeducando saiu desta unidade',v:'saida'},{l:'&#127968; Entrada — reeducando chegou nesta unidade',v:'entrada'}]);
+  await pReedOuLista();
+  await pOri();await pDes();
+  await mBot('<strong>Data da transferência</strong>?');E.dataTrans=await inpP('Ex.: 15/07/2025');
+  await mBot('<strong>Motivo da transferência</strong>?');E.motComun=await inpP('Ex.: A unidade de destino é competente...',true);
   E.sau='Senhor(a) Juiz(a),';
   await pJuizo();await pDesp();await pNumOficio();E.dd=false;E.sro=false;E.srd=false;await pBPI();gerar();}
+
 
 async function desp(){
   if(E.mod==='emergencial') await flEmerg();
@@ -1060,43 +1026,85 @@ async function gerar(){
   var o=E.ori,d=E.des,ec=E.mod==='comunicacao';
   var ps=[];
 
-  if(E.mod==='mandado'){ps=[
-    'Encaminho para análise pedido de transferência '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', em razão do cumprimento de Mandado de Prisão expedido pelo(a) '+fld(E.juizo)+'.',
-    'A transferência ampara-se no art. 21, inciso III, da Resolução Conjunta Interinstitucional n. 01/2026, e no art. 24 da Portaria Normativa nº 2.189/2025 do Departamento de Polícia Penal, sendo '+fld(d.n)+' a unidade responsável pela circunscrição da autoridade judiciária expedidora.',
-    textoBPI(),
-    'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
-  ];}
-  else if(E.mod==='emergencial'){var cp=E.sub==='com_pad';ps=[
-    'Encaminho para análise urgente pedido de transferência excepcional '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', em razão de situação emergencial identificada pelas equipes deste estabelecimento penal.',
-    'A solicitação fundamenta-se no art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026, em razão de '+fld(E.sit)+', o que torna inviável a permanência '+doA()+' '+gng('reeducando','reeducanda','reeducandos','reeducandas')+' nesta unidade.',
-    ...(cp?[
-      'Informa-se que '+fld(E.pad)+' o Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente, em razão de conduta enquadrada no '+fld(E.faltaCod+' — '+E.faltaDesc)+'.',
-      'A presente medida possui natureza administrativa e cautelar, sem caráter punitivo, sem prejuízo da regular apuração no âmbito do PAD.',
-    ]:[
-      'A medida possui natureza administrativa, não estando vinculada à prática de falta grave, sendo vedada qualquer forma de isolamento do(a) reeducando(a).',
-    ]),
-    textoBPI(),
-    'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
-    'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.',
-    'Diante do exposto, solicita-se análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
-  ];}
-  else if(E.mod==='pernoite'){ps=[
-    'Encaminho para análise pedido de pernoite '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', na unidade de '+fld(d.n)+', em razão de '+fld(E.razPernoite)+'.',
-    'Foi realizado contato prévio com a gestão da unidade de destino, que subscreve o presente expediente.',
-    'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade do pleito.',
-  ];}
+  /* Referência padrão para múltiplos presos — sempre Anexo I, nunca lista nominal no corpo */
+  function refPresos(reed,prefixo){
+    return (prefixo||'dos(as) reeducandos(as) ')+'relacionados(as) no Anexo I deste ofício,';
+  }
+  var isMulti=(E.numero==='P'&&E.reed&&E.reed.length>0);
+
+  if(E.mod==='mandado'){
+    if(isMulti){
+      ps=[
+        'Encaminho para análise pedido de transferência '+refPresos(E.reed)+' custodiados(as) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', em razão do cumprimento de Mandado de Prisão expedido pelo(a) '+fld(E.juizo)+'.',
+        'A transferência ampara-se no art. 21, inciso III, da Resolução Conjunta Interinstitucional n. 01/2026, e no art. 24 da Portaria Normativa nº 2.189/2025 do Departamento de Polícia Penal, sendo '+fld(d.n)+' a unidade responsável pela circunscrição da autoridade judiciária expedidora.',
+        textoBPI(),
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+        'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade das transferências.',
+      ];
+    } else {
+      ps=[
+        'Encaminho para análise pedido de transferência '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', em razão do cumprimento de Mandado de Prisão expedido pelo(a) '+fld(E.juizo)+'.',
+        'A transferência ampara-se no art. 21, inciso III, da Resolução Conjunta Interinstitucional n. 01/2026, e no art. 24 da Portaria Normativa nº 2.189/2025 do Departamento de Polícia Penal, sendo '+fld(d.n)+' a unidade responsável pela circunscrição da autoridade judiciária expedidora.',
+        textoBPI(),
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+        'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
+      ];
+    }
+  }
+  else if(E.mod==='emergencial'){var cp=E.sub==='com_pad';
+    if(isMulti){
+      ps=[
+        'Encaminho para análise urgente pedido de transferência excepcional '+refPresos(E.reed)+' custodiados(as) no(a) '+fld(o.n)+', em razão de situação emergencial identificada pelas equipes deste estabelecimento penal.',
+        'A solicitação fundamenta-se no art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026, em razão de '+fld(E.sit)+', o que torna inviável a permanência dos(as) reeducandos(as) nesta unidade.',
+        ...(cp?[
+          'Informa-se que '+fld(E.pad)+' o Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente, em razão de conduta enquadrada no '+fld(E.faltaCod+' — '+E.faltaDesc)+'.',
+          'A presente medida possui natureza administrativa e cautelar, sem caráter punitivo, sem prejuízo da regular apuração no âmbito do PAD.',
+        ]:[
+          'A medida possui natureza administrativa, não estando vinculada à prática de falta grave, sendo vedada qualquer forma de isolamento dos(as) reeducandos(as).',
+        ]),
+        textoBPI(),
+        'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.',
+        'Diante do exposto, solicita-se análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade das transferências.',
+      ];
+    } else {
+      ps=[
+        'Encaminho para análise urgente pedido de transferência excepcional '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', em razão de situação emergencial identificada pelas equipes deste estabelecimento penal.',
+        'A solicitação fundamenta-se no art. 21, inciso I, da Resolução Conjunta Interinstitucional n. 01/2026, em razão de '+fld(E.sit)+', o que torna inviável a permanência '+doA()+' '+gng('reeducando','reeducanda','reeducandos','reeducandas')+' nesta unidade.',
+        ...(cp?[
+          'Informa-se que '+fld(E.pad)+' o Procedimento Administrativo Disciplinar (PAD), nos termos da legislação vigente, em razão de conduta enquadrada no '+fld(E.faltaCod+' — '+E.faltaDesc)+'.',
+          'A presente medida possui natureza administrativa e cautelar, sem caráter punitivo, sem prejuízo da regular apuração no âmbito do PAD.',
+        ]:[
+          'A medida possui natureza administrativa, não estando vinculada à prática de falta grave, sendo vedada qualquer forma de isolamento do(a) reeducando(a).',
+        ]),
+        textoBPI(),
+        'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem o presente expediente.',
+        'Diante do exposto, solicita-se análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
+      ];
+    }
+  }
+  else if(E.mod==='pernoite'){
+    if(isMulti){
+      ps=[
+        'Encaminho para análise pedido de pernoite '+refPresos(E.reed)+' custodiados(as) no(a) '+fld(o.n)+', na unidade de '+fld(d.n)+', em razão de '+fld(E.razPernoite)+'.',
+        'Foi realizado contato prévio com a gestão da unidade de destino, que subscreve o presente expediente.',
+        'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade do pleito.',
+      ];
+    } else {
+      ps=[
+        'Encaminho para análise pedido de pernoite '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', na unidade de '+fld(d.n)+', em razão de '+fld(E.razPernoite)+'.',
+        'Foi realizado contato prévio com a gestão da unidade de destino, que subscreve o presente expediente.',
+        'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade do pleito.',
+      ];
+    }
+  }
   else if(E.mod==='adequacao'){
     var tm={coletiva:'equalização da lotação entre as unidades do sistema prisional',pontual:'adequação pontual da capacidade de ocupação',regime:'adequação decorrente de alteração de regime de cumprimento de pena'};
     var isLarga=(E.sub==='coletiva'&&E.reed&&E.reed.length>0);
     if(isLarga){
-      var nomesList=E.reed.map(r=>fld(r.nome)+', IPEN Nº '+fld(r.ipen)).join('; ');
-      /* Até 5 presos: lista nominal. Acima de 5: remete ao Anexo I */
-      var refReed=E.reed.length<=5
-        ? 'dos(as) reeducandos(as) '+nomesList+','
-        : 'dos(as) reeducandos(as) relacionados(as) no Anexo I deste ofício,';
       ps=[
-        'Encaminho para análise dessa Central de Regulação de Vagas pedido de transferência coletiva '+refReed+' custodiados(as) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', com fundamento na '+tm.coletiva+'.',
+        'Encaminho para análise dessa Central de Regulação de Vagas pedido de transferência coletiva dos(as) reeducandos(as) relacionados(as) no Anexo I deste ofício, custodiados(as) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', com fundamento na '+tm.coletiva+'.',
         'A solicitação ampara-se na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.',
         'A transferência justifica-se pela '+fld(E.motTransf||'necessidade de ajuste/equalização de vagas entre as unidades prisionais')+'.',
         'O critério utilizado para a escolha dos(as) reeducandos(as) para a presente transferência foi: '+fld(E.motIndicacao)+'.',
@@ -1110,15 +1118,31 @@ async function gerar(){
         'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
         'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
       ];
-    }else{ps=[
-      'Encaminho para análise dessa Central de Regulação de Vagas pedido de transferência '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', com fundamento na '+(tm[E.sub]||'adequação da capacidade de ocupação')+'.',
-      'A solicitação ampara-se na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.',
-      'A transferência justifica-se pela '+fld(E.motTransf||'necessidade de ajuste/equalização de vagas entre as unidades prisionais')+'.',
-      'O critério utilizado para a escolha '+doA()+' '+gng('reeducando','reeducanda','reeducandos','reeducandas')+' para a presente transferência foi: '+fld(E.motIndicacao)+'.',
-      textoBPI(),
-      'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
-      'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-    ];}
+    }else{
+      /* pontual / regime — 1 ou múltiplos presos */
+      if(isMulti){
+        ps=[
+          'Encaminho para análise dessa Central de Regulação de Vagas pedido de transferência dos(as) reeducandos(as) relacionados(as) no Anexo I deste ofício, custodiados(as) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', com fundamento na '+(tm[E.sub]||'adequação da capacidade de ocupação')+'.',
+          'A solicitação ampara-se na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.',
+          'A transferência justifica-se pela '+fld(E.motTransf||'necessidade de ajuste/equalização de vagas entre as unidades prisionais')+'.',
+          'O critério utilizado para a escolha dos(as) reeducandos(as) para a presente transferência foi: '+fld(E.motIndicacao)+'.',
+          textoBPI(),
+          'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
+          'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+          'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
+        ];
+      } else {
+        ps=[
+          'Encaminho para análise dessa Central de Regulação de Vagas pedido de transferência '+reedFld(E.nome,E.ipen)+', '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', com fundamento na '+(tm[E.sub]||'adequação da capacidade de ocupação')+'.',
+          'A solicitação ampara-se na Resolução Conjunta Interinstitucional n. 01/2026, especialmente em seu art. 21, inciso III.',
+          'A transferência justifica-se pela '+fld(E.motTransf||'necessidade de ajuste/equalização de vagas entre as unidades prisionais')+'.',
+          'O critério utilizado para a escolha '+doA()+' '+gng('reeducando','reeducanda','reeducandos','reeducandas')+' para a presente transferência foi: '+fld(E.motIndicacao)+'.',
+          textoBPI(),
+          'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
+          'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+        ];
+      }
+    }
   }
   else if(E.mod==='pedido'&&E.sub==='preso'){ps=[
     'Encaminho para análise dessa Central pedido de transferência '+reedFld(E.nome,E.ipen)+', atualmente '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', formulado pel'+g('o','a')+' própri'+g('o','a')+' reeducand'+g('o','a')+' por meio de memorando datado de '+fld(E.dataMem)+'.',
@@ -1144,42 +1168,92 @@ async function gerar(){
     'Foram realizados contatos prévios com os entes envolvidos, quais sejam, o(a) Diretor(a) da Unidade Prisional de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que subscrevem ou anuem ao presente expediente.',
     'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência administrativa.',
   ];}
-    else if(E.mod==='permuta'||E.mod==='adequacao'&&E.sub==='permuta'){ps=[
-    'Encaminho para análise dessa Central de Regulação de Vagas pedido de permuta entre a '+fld(o.n)+' e a '+fld(d.n)+', envolvendo '+reedFld(E.nome,E.ipen)+', nos termos do art. 21, inciso III, da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'A medida visa à '+fld(E.motTransfPermuta||'equalização da ocupação entre as unidades prisionais')+'.',
-    'O critério utilizado para a escolha '+doA()+' '+gng('reeducando','reeducanda','reeducandos','reeducandas')+' para a presente permuta foi: '+fld(E.motPermuta)+'.',
-    textoBPI(),
-    'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
-    'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-  ];
+    else if(E.mod==='permuta'||E.mod==='adequacao'&&E.sub==='permuta'){
+    var isMultiPerm=(E.numero==='P'&&E.reed&&E.reed.length>0);
+    if(isMultiPerm){
+      ps=[
+        'Encaminho para análise dessa Central de Regulação de Vagas pedido de permuta entre a '+fld(o.n)+' e a '+fld(d.n)+', envolvendo os(as) reeducandos(as) relacionados(as) no Anexo I deste ofício, nos termos do art. 21, inciso III, da Resolução Conjunta Interinstitucional n. 01/2026.',
+        'A medida visa à '+fld(E.motTransfPermuta||'equalização da ocupação entre as unidades prisionais')+'.',
+        'O critério utilizado para a escolha dos(as) reeducandos(as) para a presente permuta foi: '+fld(E.motPermuta)+'.',
+        textoBPI(),
+        'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+        'Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da permuta.',
+      ];
+    } else {
+      ps=[
+        'Encaminho para análise dessa Central de Regulação de Vagas pedido de permuta entre a '+fld(o.n)+' e a '+fld(d.n)+', envolvendo '+reedFld(E.nome,E.ipen)+', nos termos do art. 21, inciso III, da Resolução Conjunta Interinstitucional n. 01/2026.',
+        'A medida visa à '+fld(E.motTransfPermuta||'equalização da ocupação entre as unidades prisionais')+'.',
+        'O critério utilizado para a escolha '+doA()+' '+gng('reeducando','reeducanda','reeducandos','reeducandas')+' para a presente permuta foi: '+fld(E.motPermuta)+'.',
+        textoBPI(),
+        'Efetivada a remoção, o Juízo competente será comunicado no prazo legal de até 24 horas.',
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+      ];
+    }
+  
   /* injeta saúde para permuta */
   var _isPermutaBlock=(E.mod==='permuta'||(E.mod==='adequacao'&&E.sub==='permuta'));
   if(_isPermutaBlock){var psSp=textoSaudeOficio(E.numero==='P');if(psSp.length>0)ps.push(...psSp);}
   if(_isPermutaBlock)ps.push('Diante do exposto, solicita-se a análise e deliberação da Central de Regulação de Vagas quanto à viabilidade da permuta.');
   }
-  else if(E.mod==='prisaocivil'){ps=[
-    'Encaminho para análise e deliberação da Central de Regulação de Vagas — CRV/DPP pedido de transferência do(a) '+pres()+' civil '+fld(E.nome)+', IPEN Nº '+fld(E.ipen)+', atualmente '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+'.',
-    'A presente solicitação fundamenta-se na natureza específica da prisão civil, modalidade de privação de liberdade distinta da prisão penal, cujo caráter não é sancionatório, mas coercitivo, visando ao cumprimento de obrigação legal. Nessa perspectiva, é imprescindível que a pessoa privada de liberdade sob essa modalidade seja custodiada em unidade prisional adequada e especializada para tanto.',
-    textoBPI(', bem como encaminho cópia da decisão judicial que determinou a prisão civil'),
-    'Efetivada a remoção, o Juízo competente será devidamente comunicado no prazo legal.',
-    'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
-    'Diante do exposto, solicita-se a análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
-  ];}
-  else if(E.mod==='comunicacao'&&E.sub==='saida'){ps=[
-    'Comunica-se a Vossa Excelência que '+cust()+' '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', '+foi()+' '+transf()+' desta unidade — '+fld(o.n)+' — para '+fld(d.n)+', em '+fld(d.c)+'/SC, em '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que '+fld(E.motComun)+'.',
-    'Ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos.',
-  ];}
-  else if(E.mod==='comunicacao'&&E.sub==='entrada'){ps=[
-    'Comunica-se a Vossa Excelência que '+cust()+' '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', ingressou nesta unidade — '+fld(d.n)+' —, oriundo(a) de '+fld(o.n)+', em '+fld(o.c)+'/SC, em '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
-    'A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que '+fld(E.motComun)+'.',
-    'Ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos.',
-  ];}
+  else if(E.mod==='prisaocivil'){
+    var isMultiPC=(E.numero==='P'&&E.reed&&E.reed.length>0);
+    if(isMultiPC){
+      ps=[
+        'Encaminho para análise e deliberação da Central de Regulação de Vagas — CRV/DPP pedido de transferência dos(as) presos(as) civis relacionados(as) no Anexo I deste ofício, atualmente custodiados(as) no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', unidade prisional com estrutura adequada para o recebimento e custódia de presos civis.',
+        'A presente solicitação fundamenta-se na natureza específica da prisão civil, modalidade de privação de liberdade distinta da prisão penal, cujo caráter não é sancionatório, mas coercitivo, visando ao cumprimento de obrigação legal. Nessa perspectiva, é imprescindível que as pessoas privadas de liberdade sob essa modalidade sejam custodiadas em unidade prisional adequada e especializada para tanto.',
+        textoBPI(', bem como encaminho cópia das decisões judiciais que determinaram as prisões civis'),
+        'Efetivada a remoção, o Juízo competente será devidamente comunicado no prazo legal.',
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+        'Diante do exposto, solicita-se a análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade das transferências.',
+      ];
+    } else {
+      ps=[
+        'Encaminho para análise e deliberação da Central de Regulação de Vagas — CRV/DPP pedido de transferência do(a) '+pres()+' civil '+fld(E.nome)+', IPEN Nº '+fld(E.ipen)+', atualmente '+custAdj()+' no(a) '+fld(o.n)+', para o(a) '+fld(d.n)+', unidade prisional com estrutura adequada para o recebimento e custódia de preso(a) civil.',
+        'A presente solicitação fundamenta-se na natureza específica da prisão civil, modalidade de privação de liberdade distinta da prisão penal, cujo caráter não é sancionatório, mas coercitivo, visando ao cumprimento de obrigação legal. Nessa perspectiva, é imprescindível que a pessoa privada de liberdade sob essa modalidade seja custodiada em unidade prisional adequada e especializada para tanto.',
+        textoBPI(', bem como encaminho cópia da decisão judicial que determinou a prisão civil'),
+        'Efetivada a remoção, o Juízo competente será devidamente comunicado no prazo legal.',
+        'Foram realizados contatos prévios com o(a) Diretor(a) da unidade de destino e o(s) respectivo(s) Superintendente(s) Regional(is), que anuem ao presente expediente.',
+        'Diante do exposto, solicita-se a análise e célere deliberação da Central de Regulação de Vagas quanto à viabilidade da transferência.',
+      ];
+    }
+  }
+  else if(E.mod==='comunicacao'&&E.sub==='saida'){
+    if(isMulti){
+      ps=[
+        'Comunica-se a Vossa Excelência que os(as) custodiados(as) relacionados(as) no Anexo I deste ofício foram transferidos(as) desta unidade — '+fld(o.n)+' — para '+fld(d.n)+', em '+fld(d.c)+'/SC, em '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
+        'A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que '+fld(E.motComun)+'.',
+        'Ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos.',
+      ];
+    } else {
+      ps=[
+        'Comunica-se a Vossa Excelência que '+cust()+' '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', '+foi()+' '+transf()+' desta unidade — '+fld(o.n)+' — para '+fld(d.n)+', em '+fld(d.c)+'/SC, em '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
+        'A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que '+fld(E.motComun)+'.',
+        'Ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos.',
+      ];
+    }
+  }
+  else if(E.mod==='comunicacao'&&E.sub==='entrada'){
+    if(isMulti){
+      ps=[
+        'Comunica-se a Vossa Excelência que os(as) custodiados(as) relacionados(as) no Anexo I deste ofício ingressaram nesta unidade — '+fld(d.n)+' —, oriundos(as) de '+fld(o.n)+', em '+fld(o.c)+'/SC, em '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
+        'A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que '+fld(E.motComun)+'.',
+        'Ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos.',
+      ];
+    } else {
+      ps=[
+        'Comunica-se a Vossa Excelência que '+cust()+' '+fld(E.nome)+', IPEN nº '+fld(E.ipen)+', ingressou nesta unidade — '+fld(d.n)+' —, oriundo(a) de '+fld(o.n)+', em '+fld(o.c)+'/SC, em '+fld(E.dataTrans)+', nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.',
+        'A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que '+fld(E.motComun)+'.',
+        'Ficamos à disposição de Vossa Excelência para quaisquer esclarecimentos.',
+      ];
+    }
+  }
 
-  /* Injetar saúde (não larga escala, não comunicação) */
+  /* Injetar saúde apenas para preso único (não larga escala, não comunicação, não múltiplos presos) */
   var isLarga2=(E.mod==='adequacao'&&E.sub==='coletiva'&&E.reed&&E.reed.length>0);
-  var isPermuta=(E.mod==='permuta'||(E.mod==='adequacao'&&E.sub==='permuta'));
-  if(!isLarga2&&!ec&&!isPermuta){
+  var isPermutaBlk=(E.mod==='permuta'||(E.mod==='adequacao'&&E.sub==='permuta'));
+  var isQualquerMulti=(E.numero==='P'&&E.reed&&E.reed.length>0);
+  if(!isLarga2&&!ec&&!isPermutaBlk&&!isQualquerMulti){
     var isPlural=(E.numero==='P');
     var psSaude=textoSaudeOficio(isPlural);
     if(psSaude.length>0){
@@ -1198,20 +1272,24 @@ async function gerar(){
 
   /* Gera anexo com tabela de reeducandos (larga escala) */
   function gerarAnexoTabela(reed){
-    /* Agrupamento automático: Convívio → Seguro → SEGURO */
+    /* Detecta se há dados de regime/alocação (larga escala) ou só nome/ipen (simples) */
+    var temRegime=reed.some(function(r){return r.regime&&r.regime.length>0;});
+    /* Agrupamento automático: Convívio → Seguro → SEGURO (só quando há alocação) */
     var ordemAloc={'Convívio':1,'Seguro':2,'SEGURO':3};
-    var reedOrdenado=reed.slice().sort(function(a,b){
+    var reedOrdenado=temRegime?reed.slice().sort(function(a,b){
       var oa=ordemAloc[a.alocacao]||99, ob=ordemAloc[b.alocacao]||99;
       return oa-ob;
-    });
+    }):reed.slice();
     var tdBase='padding:5pt 7pt;border:0.5pt solid #aab;font-size:9.5pt;font-family:Arial,sans-serif;';
     var thBase='padding:6pt 7pt;border:0.5pt solid #aab;font-size:9.5pt;font-family:Arial,sans-serif;';
-    var mostrarSaude=(E.saudeOpcao==='individual');
+    var mostrarSaude=(E.saudeOpcao==='individual'&&temRegime);
     var linhas=reedOrdenado.map(function(r,i){
-      var regVal=r.regime||'—';
-      var alocVal=r.alocacao||'—';
-      var alocDisplay=alocVal;
       var bg=i%2===0?'#f5f8ff':'#ffffff';
+      var colsRegime='';
+      if(temRegime){
+        colsRegime='<td style="'+tdBase+'text-align:center;">'+(r.regime||'—')+'</td>'+
+                   '<td style="'+tdBase+'text-align:center;">'+(r.alocacao||'—')+'</td>';
+      }
       var colsSaude='';
       if(mostrarSaude){
         var com=r.comorbidades&&r.comorbidades.length>0?r.comorbidades.join(', '):'Não';
@@ -1222,11 +1300,13 @@ async function gerar(){
         '<td style="'+tdBase+'text-align:center;">'+(i+1)+'</td>'+
         '<td style="'+tdBase+'font-weight:bold;">'+r.nome.toUpperCase()+'</td>'+
         '<td style="'+tdBase+'text-align:center;">'+r.ipen+'</td>'+
-        '<td style="'+tdBase+'text-align:center;">'+regVal+'</td>'+
-        '<td style="'+tdBase+'text-align:center;">'+alocDisplay+'</td>'+
-        colsSaude+
+        colsRegime+colsSaude+
         '</tr>';
     }).join('');
+    var thColsRegime=temRegime
+      ? '<th style="'+thBase+'white-space:nowrap;text-align:center;">Regime</th>'+
+        '<th style="'+thBase+'white-space:nowrap;text-align:center;">Alocação</th>'
+      : '';
     var thColsSaude=mostrarSaude
       ? '<th style="'+thBase+'text-align:left;">Comorbidades</th>'+'<th style="'+thBase+'text-align:left;">Medicamentos Contínuos</th>'
       : '';
@@ -1235,13 +1315,11 @@ async function gerar(){
         '<th style="'+thBase+'white-space:nowrap;text-align:center;">#</th>'+
         '<th style="'+thBase+'text-align:left;">Nome</th>'+
         '<th style="'+thBase+'white-space:nowrap;text-align:center;">IPEN</th>'+
-        '<th style="'+thBase+'white-space:nowrap;text-align:center;">Regime</th>'+
-        '<th style="'+thBase+'white-space:nowrap;text-align:center;">Alocação</th>'+
-        thColsSaude+
+        thColsRegime+thColsSaude+
       '</tr>';
-    var subtitulo=mostrarSaude
-      ? 'Relação de Reeducandos — Situação Penal e Informações de Saúde'
-      : 'Relação de Reeducandos — Situação Penal';
+    var subtitulo=temRegime
+      ? (mostrarSaude?'Relação de Reeducandos — Situação Penal e Informações de Saúde':'Relação de Reeducandos — Situação Penal')
+      : 'Relação de Custodiados';
     return '<div class="anexo-wrapper" style="font-family:Arial,sans-serif;">'+
       '<div style="padding:8pt 0 10pt 0;text-align:center;">'+
         '<div style="font-size:12pt;font-weight:bold;text-transform:uppercase;font-family:Arial,sans-serif;letter-spacing:1pt;">ANEXO I</div>'+
@@ -1254,9 +1332,10 @@ async function gerar(){
     '</div>';
   }
 
+  /* Gera Anexo I para qualquer modalidade com múltiplos presos */
   var isLargaFinal=(E.mod==='adequacao'&&E.sub==='coletiva'&&E.reed&&E.reed.length>0);
-  /* Passa cab e rod já renderizados para o anexo poder repetir em todas as páginas */
-  var anexoHTML=isLargaFinal?gerarAnexoTabela(E.reed):'';
+  var isQualquerMultiFinal=(E.numero==='P'&&E.reed&&E.reed.length>0);
+  var anexoHTML=(isLargaFinal||isQualquerMultiFinal)?gerarAnexoTabela(E.reed):'';
 
   G('oficio').innerHTML=
     cab()+lb(1)+
@@ -1323,8 +1402,8 @@ function getCSS(){
     '.ass-dig{font-style:italic;color:#444;font-size:10pt;display:block}'+
     '.ass-nome{font-weight:bold;text-transform:uppercase;font-size:11pt;display:block}'+
     '.ass-cargo{font-weight:normal;font-size:10pt;color:#222;display:block}'+
-    '.ofc-dest{font-size:11pt;line-height:1.4;font-family:Arial,sans-serif;margin-top:10pt;page-break-inside:avoid}.ofc-dest-wrap{margin-top:8pt;padding-top:0;margin-bottom:1cm;page-break-inside:avoid}'+
-    '.dest-t{font-weight:normal;display:block}.dest-n{font-weight:bold;text-transform:uppercase;display:block}.dest-l{display:block}'+
+    '.ofc-dest{font-size:11pt;line-height:1.0;font-family:Arial,sans-serif;margin-top:10pt;page-break-inside:avoid}.ofc-dest-wrap{margin-top:8pt;padding-top:0;margin-bottom:1cm;page-break-inside:avoid}'+
+    '.dest-t{font-weight:normal;display:block;margin:0;padding:0}.dest-n{font-weight:bold;text-transform:uppercase;display:block;margin:0;padding:0}.dest-l{display:block;margin:0;padding:0}'+
     '.ofc-lista{margin:3pt 0 3pt 1.5cm;padding:0;list-style:disc;font-size:11pt;line-height:1.0;font-family:Arial,sans-serif}'+
     '.ofc-lista li{margin-bottom:2pt}'+
     '.ofc-lista-wrap{margin:0;padding:0}'+
@@ -1333,9 +1412,11 @@ function getCSS(){
     '.rod-dpp{font-weight:bold;font-size:9pt;text-transform:uppercase;display:block;color:#111}'+
     '.rod-un{font-weight:bold;color:#174b8a;display:block;font-size:8.5pt}'+
     '.rod-cont{font-size:8pt;display:block;color:#333}'+
-    '.ofc-dest{font-size:11pt;line-height:1.6;font-family:Arial,sans-serif;margin-top:0;page-break-inside:avoid}'+
+    '.ofc-dest{font-size:11pt;line-height:1.0;font-family:Arial,sans-serif;margin-top:0;page-break-inside:avoid}'+
     '.ofc-dest-wrap{margin-top:0;padding-top:14pt;page-break-inside:avoid;margin-bottom:0.5cm}'+
-    '.anexo-tabela{width:100%;border-collapse:collapse}'+
+    '.dest-t{font-weight:normal;display:block;margin:0;padding:0}'+
+    '.dest-n{font-weight:bold;text-transform:uppercase;display:block;margin:0;padding:0}'+
+    '.dest-l{display:block;margin:0;padding:0}'+
     'th,td{padding:5pt 7pt;border:0.5pt solid #aab;font-size:9.5pt;font-family:Arial,sans-serif}'+
     'th{background:#0d2b55;color:#fff;font-size:9.5pt}';}
 
@@ -1719,7 +1800,7 @@ function copiarResumo(){
    ══════════════════════════════════════════════════════ */
 
 /* Modalidades que geram o botão "Comunicar Judiciário" */
-var MODS_COM_JUD=['emergencial','mandado','adequacao','permuta','prisaocivil'];
+var MODS_COM_JUD=['emergencial','mandado','pernoite','adequacao','permuta','prisaocivil'];
 
 /* Estado interno do modal CJ */
 var CJ={
@@ -1741,14 +1822,11 @@ function atualizarBotaoCJ(){
 /* ── Montar lista de presos do ofício atual ─────── */
 function presosDoOficio(){
   var lista=[];
-  if(E.mod==='adequacao'&&E.sub==='coletiva'&&E.reed&&E.reed.length>0){
-    E.reed.forEach(function(r){lista.push({nome:r.nome,ipen:r.ipen});});
-  } else if(E.mod==='permuta'&&E.reed&&E.reed.length>0){
+  /* Se há lista E.reed com presos (qualquer modalidade) */
+  if(E.reed&&E.reed.length>0){
     E.reed.forEach(function(r){lista.push({nome:r.nome,ipen:r.ipen});});
   } else if(E.nome){
     lista.push({nome:E.nome,ipen:E.ipen});
-    /* Permuta clássica de 2 presos: checar se há E.nome2 */
-    if(E.nome2) lista.push({nome:E.nome2,ipen:E.ipen2});
   }
   return lista;
 }
@@ -1974,27 +2052,51 @@ function gerarOficiosCJ(){
 function montarOficioCJ(cfg){
   var o=E.ori;
   var data=dHoje(o?o.c:'');
-  /* cabeçalho */
-  var cabHTML=cab(); /* reutiliza função existente */
-  /* num/data */
+  /* num/data — igual ao numData() mas com cfg.numOficio */
   var ndHTML=cfg.numOficio
     ?'<div class="ofc-numdata"><span class="ofc-num">'+cfg.numOficio+'</span><span class="ofc-data">'+data+'</span></div>'
     :'<div class="ofc-data-only">'+data+'</div>';
-  /* destinatário */
-  var destHTML='<div class="ofc-dest">'+
-    '<div class="dest-t">'+cfg.sau.replace(',','')+'</div>'+
+  /* destinatário — padrão dJuizo() sem recuo, margin-top:auto */
+  var destHTML='<div class="ofc-dest-wrap"><div class="ofc-dest">'+
+    '<div class="dest-t">Ao(À) Senhor(a)</div>'+
     '<div class="dest-n">Dr(a). '+cfg.juiz.toUpperCase()+'</div>'+
     '<div class="dest-l">Juiz(a) de Direito</div>'+
-    '<div class="dest-l">'+cfg.vara+'</div>'+
-    '<div class="dest-l">'+cfg.cidJuizo+'</div>'+
-    '</div>';
+    (cfg.vara?'<div class="dest-l">'+cfg.vara+'</div>':'')+
+    (cfg.cidJuizo?'<div class="dest-l">'+cfg.cidJuizo.toUpperCase()+'</div>':'')+
+    '</div></div>';
   /* corpo */
   var txtPresos;
+  var anexoHTML='';
   if(cfg.presos.length===1){
     txtPresos='o(a) custodiado(a) <strong>'+cfg.presos[0].nome.toUpperCase()+'</strong>, IPEN nº <strong>'+cfg.presos[0].ipen+'</strong>, foi transferido(a)';
   } else {
-    var nomes=cfg.presos.map(function(p){return '<strong>'+p.nome.toUpperCase()+'</strong> (IPEN nº <strong>'+p.ipen+'</strong>)';}).join('; ');
-    txtPresos='os(as) custodiados(as) '+nomes+' foram transferidos(as)';
+    /* múltiplos presos: referência ao Anexo I no texto; tabela gerada no mesmo estilo do gerarAnexoTabela */
+    txtPresos='os(as) custodiados(as) relacionados(as) no <strong>Anexo I</strong> deste ofício foram transferidos(as)';
+    var tdBase='padding:5pt 7pt;border:0.5pt solid #aab;font-size:9.5pt;font-family:Arial,sans-serif;';
+    var thBase='padding:6pt 7pt;border:0.5pt solid #aab;font-size:9.5pt;font-family:Arial,sans-serif;';
+    var linhas=cfg.presos.map(function(p,i){
+      var bg=i%2===0?'#f5f8ff':'#ffffff';
+      return '<tr style="background:'+bg+'">'+
+        '<td style="'+tdBase+'text-align:center;">'+(i+1)+'</td>'+
+        '<td style="'+tdBase+'font-weight:bold;">'+p.nome.toUpperCase()+'</td>'+
+        '<td style="'+tdBase+'text-align:center;">'+p.ipen+'</td>'+
+        '</tr>';
+    }).join('');
+    var thCols='<tr style="background:#0d2b55;color:#fff;">'+
+      '<th style="'+thBase+'white-space:nowrap;text-align:center;">#</th>'+
+      '<th style="'+thBase+'text-align:left;">Nome</th>'+
+      '<th style="'+thBase+'white-space:nowrap;text-align:center;">IPEN</th>'+
+      '</tr>';
+    anexoHTML='<div class="anexo-wrapper" style="font-family:Arial,sans-serif;">'+
+      '<div style="padding:8pt 0 10pt 0;text-align:center;">'+
+        '<div style="font-size:12pt;font-weight:bold;text-transform:uppercase;font-family:Arial,sans-serif;letter-spacing:1pt;">ANEXO I</div>'+
+        '<div style="font-size:10pt;font-family:Arial,sans-serif;margin-top:4pt;">Relação de Custodiados Transferidos</div>'+
+      '</div>'+
+      '<table class="anexo-tabela">'+
+        '<thead>'+thCols+'</thead>'+
+        '<tbody>'+linhas+'</tbody>'+
+      '</table>'+
+    '</div>';
   }
   var p1='Comunica-se a Vossa Excelência que '+txtPresos+' desta unidade — <strong>'+(o?o.n:'[Unidade de Origem]')+'</strong> — para <strong>'+cfg.destNome+'</strong>, em '+cfg.destCidade+', na data de <strong>'+cfg.dataTrans+'</strong>, nos termos do art. 16 da Resolução Conjunta Interinstitucional n. 01/2026.';
   var p2='A transferência foi autorizada pela Central de Regulação de Vagas — CRV/DPP, em razão de que <strong>'+cfg.motivo+'</strong>.';
@@ -2002,21 +2104,23 @@ function montarOficioCJ(cfg){
   var corpo='<div class="ofc-p">'+p1+'</div>'+lb(1)+
     '<div class="ofc-p">'+p2+'</div>'+lb(1)+
     '<div class="ofc-p">'+p3+'</div>';
-  /* assinatura somente diretor de origem */
+  /* assinatura — diretor de origem, mesmo padrão do blocoAss() */
   var assHTML=ass(o?o.dir:'',o?o.cg:'Diretor(a)',o?o.n:'',true);
-  /* rodapé */
-  var rodHTML=rod();
 
-  return cabHTML+lb(1)+
+  /* Estrutura IDÊNTICA ao ofício principal — usa as mesmas funções cab() e rod() */
+  return '<div id="oficio" style="min-height:auto">'+
+    cab()+lb(1)+
     '<div class="oficio-corpo">'+
     ndHTML+lb(4)+
-    '<div class="ofc-sau">'+cfg.sau+'</div>'+lb(2)+
-    destHTML+lb(3)+
+    '<div class="ofc-sau">'+cfg.sau+'</div>'+lb(4)+
     corpo+lb(4)+
     '<div class="ofc-desp">'+cfg.desp+'</div>'+lb(5)+
-    assHTML+lb(4)+
+    assHTML+
+    destHTML+
     '</div>'+
-    rodHTML;
+    rod()+
+    '</div>'+
+    anexoHTML;
 }
 
 /* ── FASE 2: Preview ─────────────────────────────── */
@@ -2053,12 +2157,9 @@ function voltarFormCJ(){
 function baixarPDFCJ(){
   var wrap=document.getElementById('mcjOficioWrap');
   if(!wrap){toast('Erro: ofício não encontrado.');return;}
-  var o=E.ori;
-  var css=getCSS()+
-    '.mcj-oficio-wrap{padding:0!important;border:none!important;border-radius:0!important}';
-  var conteudo='<div class="mcj-oficio-wrap">'+CJ.ofHtmls[CJ.paginaAtual]+'</div>';
-  var wBlob=new Blob(['\ufeff','<html><head><meta charset="UTF-8"><style>'+css+'</style></head><body>'+conteudo+'</body></html>'],{type:'application/msword'});
-  /* Usar pdfmake se disponível, senão print */
+  var css=getCSS();
+  /* O conteúdo já tem a estrutura idêntica ao ofício principal (#oficio + cab + rod) */
+  var conteudo=CJ.ofHtmls[CJ.paginaAtual];
   var win=window.open('','_blank');
   if(!win){toast('Permita pop-ups para gerar o PDF.');return;}
   win.document.write('<html><head><meta charset="UTF-8"><title>Ofício Judicial</title>'+
@@ -2074,7 +2175,7 @@ function baixarPDFCJ(){
 /* ══════════════ INICIAR ══════════════ */
 async function iniciar(){
   await mBot('Olá! &#128075; Sou o assistente de geração de ofícios da <strong>Central de Regulação de Vagas — CRV/DPP</strong>.<br><br>Qual tipo de ofício você precisa gerar?');
-  cps([
+  var v=await cpsP([
     {l:'&#128680; Emergencial<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, I</small>',v:'emergencial'},
     {l:'&#127963;&#65039; Mandado de Comarca Diversa<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, III</small>',v:'mandado'},
     {l:'&#127769; Pernoite',v:'pernoite'},
@@ -2082,7 +2183,9 @@ async function iniciar(){
     {l:'&#128257; Permuta entre Unidades<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 21, III</small>',v:'permuta'},
     {l:'&#9878;&#65039; Prisão Civil<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Transferência especializada</small>',v:'prisaocivil'},
     {l:'&#128233; Ofícios de Comunicação<small style="display:block;font-size:.72rem;opacity:.75;font-weight:400">Art. 16</small>',v:'comunicacao'},
-  ],v=>{E.mod=v;desp();});}
+  ]);
+  E.mod=v;desp();
+}
 
 function modoEditar(){
   var ofw=G('ofw');var banner=G('editBanner');
@@ -2103,7 +2206,7 @@ function modoEditar(){
     toast('Edição finalizada!');
   }
 }
-function reiniciar(){rE();G('ci').innerHTML='';G('ofw').classList.remove('vis');document.querySelector('.layout').classList.remove('collapsed');G('chatArea').style.display='';lp();iniciar();}
+function reiniciar(){rE();_hist=[];_atualizarBtnVoltar();G('ci').innerHTML='';G('ofw').classList.remove('vis');document.querySelector('.layout').classList.remove('collapsed');G('chatArea').style.display='';lp();iniciar();}
 function voltarChat(){G('ofw').classList.remove('vis');document.querySelector('.layout').classList.remove('collapsed');G('chatArea').style.display='';G('ow').style.display='none';G('iw').style.display='none';window.scrollTo({top:9e6,behavior:'smooth'});}
 function toast(m){var t=G('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
 function fecharModalAviso(){G('modalAvisoBg').classList.remove('open');}
