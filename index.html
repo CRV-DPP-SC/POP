@@ -26,6 +26,83 @@
     pointer-events: none;
     font-style: italic;
   }
+
+/* ── GUIA GERADOR DE OFÍCIOS CARD ── */
+.guia-card {
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(13,43,85,.13);
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+}
+.guia-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(13,43,85,.18);
+}
+.guia-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 28px;
+  background: linear-gradient(135deg, #0d2b55 0%, #1a4a8a 60%, #2563b0 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.guia-card-inner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 120% at 95% 50%, rgba(200,147,10,.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.guia-card-icon {
+  font-size: 2.6rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.guia-card-body {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+.guia-card-label {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #f0c040;
+  margin-bottom: 4px;
+}
+.guia-card-titulo {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: white;
+  margin: 0 0 6px;
+  line-height: 1.2;
+  font-family: 'Playfair Display', 'Georgia', serif;
+}
+.guia-card-desc {
+  font-size: .88rem;
+  color: rgba(255,255,255,.78);
+  line-height: 1.55;
+  margin: 0;
+}
+.guia-card-arrow {
+  font-size: 1.8rem;
+  color: #f0c040;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  transition: transform .2s;
+}
+.guia-card:hover .guia-card-arrow {
+  transform: translateX(5px);
+}
+
 </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -109,6 +186,21 @@
   
 
   <div class="main-wrapper">
+
+
+    <!-- ====== GUIA — GERADOR DE OFÍCIOS ====== -->
+    <a href="guia_crv_dpp.html" class="guia-card fade-up fade-up-delay-1" style="text-decoration:none;display:block;margin-bottom:1.5rem;">
+      <div class="guia-card-inner">
+        <div class="guia-card-icon">📄</div>
+        <div class="guia-card-body">
+          <div class="guia-card-label">Ferramenta</div>
+          <h2 class="guia-card-titulo">Guia — Gerador de Ofícios</h2>
+          <p class="guia-card-desc">Passo a passo completo de uso do Gerador de Ofícios CRV/DPP: modalidades, checklist de documentos, edição após geração e comunicação ao Poder Judiciário.</p>
+        </div>
+        <div class="guia-card-arrow">→</div>
+      </div>
+    </a>
+    <!-- ====== /GUIA — GERADOR DE OFÍCIOS ====== -->
 
     <div class="alerta alerta-info fade-up fade-up-delay-1">
       <span class="alerta-icone">📖</span>
