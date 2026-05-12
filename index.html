@@ -75,22 +75,22 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')window.gdFec
 /* == DRAWER == */
 #gd-overlay{position:fixed;inset:0;background:rgba(5,15,35,.55);z-index:3000;opacity:0;pointer-events:none;transition:opacity .3s}
 #gd-overlay.open{opacity:1;pointer-events:auto}
-#gd-drawer{position:fixed;top:0;right:0;bottom:0;width:min(98vw,1100px);background:#f0f4fa;z-index:3001;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 48px rgba(0,0,0,.22);height:100%}
+#gd-drawer{position:fixed;top:0;right:0;bottom:0;width:min(98vw,920px);background:#f0f4fa;z-index:3001;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 48px rgba(0,0,0,.22);height:100%}
 #gd-drawer.open{transform:translateX(0)}
 #gd-drawer-head{display:flex;align-items:center;gap:14px;padding:14px 24px;background:linear-gradient(135deg,#081828 0%,#0d2b55 60%,#174b8a 100%);color:white;flex-shrink:0}
 #gd-drawer-head h2{font-family:'Playfair Display','Georgia',serif;font-size:1.1rem;font-weight:900;color:white;margin:0;flex:1}
 #gd-drawer-head h2 em{font-style:normal;color:#f0c040}
 #gd-drawer-close{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:background .15s;flex-shrink:0}
 #gd-drawer-close:hover{background:rgba(255,255,255,.22)}
-#gd-drawer-body{flex:1;overflow-y:auto;display:flex;min-height:0}
-#gd-drawer-nav{width:160px;flex-shrink:0;background:white;border-right:1px solid #c8d6ec;overflow-y:auto}
-#gd-drawer-nav .gdn-head{background:#0d2b55;color:white;padding:10px 14px;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-#gd-drawer-nav a{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:.81rem;font-weight:600;color:#4a6080;text-decoration:none;border-left:3px solid transparent;border-bottom:1px solid #f0f4fa;transition:background .14s,border-color .14s,color .14s}
-#gd-drawer-nav a:last-child{border-bottom:none}
-#gd-drawer-nav a:hover{background:#f0f5ff;color:#174b8a;border-left-color:#2563b0}
-#gd-drawer-nav a.gd-cl{background:#f0f7ee}
-#gd-drawer-nav a.gd-cl span{font-size:.68rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#1a7a40}
-#gd-main{flex:1;min-width:0;padding:28px 28px 60px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;height:100%}
+#gd-drawer-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0}
+#gd-drawer-nav{display:none}
+
+
+
+
+
+
+#gd-main{flex:1;min-width:0;padding:28px 32px 60px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
 #gd-main .gcard{background:white;border-radius:16px;box-shadow:0 2px 18px rgba(13,43,85,.07);overflow:hidden}
 #gd-main .gcard-head{display:flex;align-items:flex-start;gap:14px;padding:20px 24px 16px;border-bottom:1px solid #c8d6ec}
 #gd-main .gcard-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0}
@@ -111,7 +111,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')window.gdFec
 #gd-main .gstep-body h4{font-size:.93rem;font-weight:700;color:#0d2b55;margin:0 0 4px}
 #gd-main .gstep-body p{font-size:.84rem;color:#4a6080;line-height:1.6;margin:0}
 #gd-main .gtip{display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:5px 12px;font-size:.78rem;color:#7a5000}
-#gd-main .gmod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+#gd-main .gmod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 #gd-main .gmod-card{border:1.5px solid #c8d6ec;border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .2s}
 #gd-main .gmod-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--stripe);transform:scaleX(0);transform-origin:left;transition:transform .3s}
 #gd-main .gmod-card:hover{border-color:var(--stripe);box-shadow:0 4px 14px rgba(13,43,85,.1);transform:translateY(-2px)}
