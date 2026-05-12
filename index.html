@@ -2425,131 +2425,38 @@
 
     <!-- FERRAMENTAS DA ÁREA RESTRITA -->
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;">
-      <div onclick="(function(){var m=document.getElementById('modal-calculadora');var f=document.getElementById('calc-iframe');if(f&&f.src.indexOf('calculadora')<0)f.src='calculadora-prisional.html';if(m)m.style.display='flex';})()"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">📊</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Calculadora de Gestão de Vagas</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Déficit, excedente e taxa de ocupação</div>
-      </div>
-      <!-- Unidades Prisionais -->
-      <div onclick="(function(){var m=document.getElementById('modal-porta-entrada');if(m)m.style.display='flex';})()"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">&#127963;</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Unidades Prisionais</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Informações sobre as Unidades Prisionais, cidades abrangidas</div>
+
+      <!-- ── GRUPO: CRV ── -->
+      <div onclick="abrirGrupoCRV()"
+        style="background:linear-gradient(135deg,#0d2b55 0%,#1a2a4a 100%);border:2px solid #3b82f6;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;position:relative;"
+        onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        <div style="position:absolute;top:8px;right:10px;background:#3b82f6;color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.05em;">SETOR</div>
+        <div style="font-size:2rem;margin-bottom:.6rem;">📁</div>
+        <div style="font-weight:700;color:#fff;font-size:.95rem;">CRV</div>
+        <div style="font-size:.75rem;color:#93c5fd;margin-top:.3rem;">Ferramentas internas do setor</div>
       </div>
 
-      <!-- Gerador de Despachos -->
-      <div onclick="window.open('gerador_despachos_crv.html','_blank')"
-        style="background:#fff;border:2px solid #0d2b55;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
+      <!-- ── GRUPO: Sistemas — Judiciário ── -->
+      <div onclick="abrirGrupoJud()"
+        style="background:linear-gradient(135deg,#312e81 0%,#4338ca 100%);border:2px solid #818cf8;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;position:relative;"
+        onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        <div style="position:absolute;top:8px;right:10px;background:#818cf8;color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.05em;">JUDICIÁRIO</div>
         <div style="font-size:2rem;margin-bottom:.6rem;">⚖️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Gerador de Despachos</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Deferir, Indeferir e Devolver — CRV</div>
+        <div style="font-weight:700;color:#fff;font-size:.95rem;">Sistemas — Judiciário</div>
+        <div style="font-size:.75rem;color:#c7d2fe;margin-top:.3rem;">SEEU · EPROC 1º · EPROC 2º</div>
       </div>
 
-      <!-- Trello Fake by Jessica -->
-      <div onclick="window.open('https://regulation-flow-pro.lovable.app/board/1966025a-82e4-4cc4-bfd9-fd88671ba682','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">📋</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">TRELLO FAKE BY JESSICA</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Gestão de tarefas da equipe</div>
-      </div>
-
-      <!-- Escala de Plantão -->
-      <div onclick="window.open('https://sparkle-spark-spark.lovable.app','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">📅</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">ESCALA DE PLANTÃO</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Acesso à escala da equipe</div>
-      </div>
-
-      <!-- Questionário Fluxo Ingresso -->
-      <div onclick="abrirPainelRespostas()"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">📋</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Fluxo — Ingresso de Presos / Exame de Corpo de Delito</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Respostas, compilados e filtros</div>
-      </div>
-
-      <!-- Caixinha do Setor -->
-      <div onclick="abrirCaixinha()"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">☕</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">Caixinha do Setor</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Controle de depósitos, compras e prestação de contas</div>
-      </div>
-
-      <!-- SEEU -->
-      <div onclick="window.open('https://seeu.pje.jus.br/seeu/','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">⚖️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">SEEU</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Sistema Eletrônico de Execução Unificado</div>
-      </div>
-
-      <!-- SGPe -->
-      <div onclick="window.open('https://sgpe.sea.sc.gov.br/sgpe/#/container','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">📂</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">SGPe</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Sistema de Gestão de Processos Eletrônicos</div>
-      </div>
-
-      <!-- iPEN -->
-      <div onclick="window.open('https://www.sc.gov.br/sap/ipen/signin','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">🔑</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">iPEN</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Sistema iPEN SC</div>
-      </div>
-
-      <!-- EPROC 1o Grau -->
-      <div onclick="window.open('https://eproc1g.tjsc.jus.br/eproc/','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
+      <!-- ── GRUPO: Sistemas — Estado ── -->
+      <div onclick="abrirGrupoEstado()"
+        style="background:linear-gradient(135deg,#064e3b 0%,#0f6e56 100%);border:2px solid #34d399;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;position:relative;"
+        onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        <div style="position:absolute;top:8px;right:10px;background:#34d399;color:#064e3b;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.05em;">ESTADO</div>
         <div style="font-size:2rem;margin-bottom:.6rem;">🏛️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">EPROC 1º Grau</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Processo eletrônico 1ª instância</div>
+        <div style="font-weight:700;color:#fff;font-size:.95rem;">Sistemas — Estado</div>
+        <div style="font-size:.75rem;color:#6ee7b7;margin-top:.3rem;">SIGRHPORTAL · iPEN · SGPe</div>
       </div>
 
-      <!-- EPROC 2o Grau -->
-      <div onclick="window.open('https://eproc2g.tjsc.jus.br/eproc/externo_controlador.php?acao=principal','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">🏛️</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">EPROC 2º Grau</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Processo eletrônico 2ª instância</div>
-      </div>
-
-      <!-- SIGRHPORTAL -->
-      <div onclick="window.open('https://sigrhportal.sea.sc.gov.br/SIGRHNovoPortal/#/auth','_blank')"
-        style="background:#fff;border:2px solid #1a2a4a;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">👤</div>
-        <div style="font-weight:700;color:#1a2a4a;font-size:.95rem;">SIGRHPORTAL</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Recursos Humanos SC</div>
-      </div>
-
-      <!-- Sistema de Diárias -->
-      <div onclick="window.open('formulario-diarias-sc.html','_blank')"
-        style="background:#fff;border:2px solid #0F6E56;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#E1F5EE'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">✈️</div>
-        <div style="font-weight:700;color:#0F6E56;font-size:.95rem;">Sistema de Diárias</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">MLR-41 e MLR-42 — Requerimento e Relatório</div>
-      </div>
-
-      <!-- USM — Controle -->
+      <!-- ── USM — Controle (permanece na área de trabalho) ── -->
       <div onclick="abrirUSMControle()"
         style="background:#0d1117;border:2px solid #3b82f6;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;position:relative;"
         onmouseover="this.style.background='#161b22'" onmouseout="this.style.background='#0d1117'">
@@ -2557,19 +2464,200 @@
         <div style="font-size:2rem;margin-bottom:.6rem;">🔐</div>
         <div style="font-weight:700;color:#3b82f6;font-size:.95rem;">USM — Controle</div>
         <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Controle de presos — Segurança Máxima</div>
+      </div>
 
-      <!-- Controle de Viagens -->
-      <div onclick="(function(){var m=document.getElementById('modal-controle-viagens');var f=document.getElementById('viagens-iframe');if(f&&f.src.indexOf('controle-viagens')<0)f.src='controle-viagens.html';if(m)m.style.display='flex';})()"
-        style="background:#fff;border:2px solid #0F6E56;border-radius:12px;padding:1.5rem;cursor:pointer;transition:.2s;text-align:center;"
-        onmouseover="this.style.background='#E1F5EE'" onmouseout="this.style.background='#fff'">
-        <div style="font-size:2rem;margin-bottom:.6rem;">✈️</div>
-        <div style="font-weight:700;color:#0F6E56;font-size:.95rem;">Controle de Viagens</div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:.3rem;">Registro de saídas, itinerários e observações</div>
-      </div>
-      </div>
     </div>
   </div>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MODAL GRUPO: CRV
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="modal-grupo-crv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9994;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1.5rem;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#f4f6f9;border-radius:16px;width:100%;max-width:860px;margin:auto;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#0d2b55,#1a2a4a);padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;">📁 CRV — Ferramentas do Setor</div>
+        <div style="font-size:.75rem;color:#93c5fd;margin-top:.15rem;">Central de Regulação de Vagas · DPP/SC</div>
+      </div>
+      <button onclick="document.getElementById('modal-grupo-crv').style.display='none'" style="background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:.35rem .85rem;font-size:.82rem;cursor:pointer;font-weight:600;">✕ Fechar</button>
+    </div>
+    <div style="padding:1.2rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.9rem;">
+
+      <!-- Calculadora -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';(function(){var m=document.getElementById('modal-calculadora');var f=document.getElementById('calc-iframe');if(f&&f.src.indexOf('calculadora')<0)f.src='calculadora-prisional.html';if(m)m.style.display='flex';})()"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">📊</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Calculadora de Gestão de Vagas</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Déficit, excedente e taxa de ocupação</div>
+      </div>
+
+      <!-- Unidades Prisionais -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';(function(){var m=document.getElementById('modal-porta-entrada');if(m)m.style.display='flex';})()"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">&#127963;</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Unidades Prisionais</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Informações e cidades abrangidas</div>
+      </div>
+
+      <!-- Gerador de Despachos -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';window.open('gerador_despachos_crv.html','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">⚖️</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Gerador de Despachos</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Deferir, Indeferir e Devolver — CRV</div>
+      </div>
+
+      <!-- Trello Fake -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';window.open('https://regulation-flow-pro.lovable.app/board/1966025a-82e4-4cc4-bfd9-fd88671ba682','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">📋</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">TRELLO FAKE BY JESSICA</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Gestão de tarefas da equipe</div>
+      </div>
+
+      <!-- Escala de Plantão -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';window.open('https://sparkle-spark-spark.lovable.app','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">📅</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">ESCALA DE PLANTÃO</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Acesso à escala da equipe</div>
+      </div>
+
+      <!-- Fluxo Ingresso -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';abrirPainelRespostas()"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">📋</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Fluxo — Ingresso de Presos</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Respostas, compilados e filtros</div>
+      </div>
+
+      <!-- Caixinha -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';abrirCaixinha()"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#f0f4ff';this.style.borderColor='#3b82f6'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">☕</div>
+        <div style="font-weight:700;color:#1a2a4a;font-size:.88rem;">Caixinha do Setor</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Controle de depósitos e prestação de contas</div>
+      </div>
+
+      <!-- Sistema de Diárias -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';window.open('formulario-diarias-sc.html','_blank')"
+        style="background:#fff;border:1.5px solid #0F6E56;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#E1F5EE';this.style.borderColor='#0F6E56'" onmouseout="this.style.background='#fff';this.style.borderColor='#0F6E56'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">✈️</div>
+        <div style="font-weight:700;color:#0F6E56;font-size:.88rem;">Sistema de Diárias</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">MLR-41 e MLR-42</div>
+      </div>
+
+      <!-- Controle de Viagens -->
+      <div onclick="document.getElementById('modal-grupo-crv').style.display='none';(function(){var m=document.getElementById('modal-controle-viagens');var f=document.getElementById('viagens-iframe');if(f&&f.src.indexOf('controle-viagens')<0)f.src='controle-viagens.html';if(m)m.style.display='flex';})()"
+        style="background:#fff;border:1.5px solid #0F6E56;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#E1F5EE';this.style.borderColor='#0F6E56'" onmouseout="this.style.background='#fff';this.style.borderColor='#0F6E56'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">🗺️</div>
+        <div style="font-weight:700;color:#0F6E56;font-size:.88rem;">Controle de Viagens</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Registro de saídas, itinerários e observações</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MODAL GRUPO: Sistemas — Judiciário
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="modal-grupo-jud" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9994;align-items:center;justify-content:center;padding:1.5rem;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#f4f6f9;border-radius:16px;width:100%;max-width:700px;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#312e81,#4338ca);padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;">⚖️ Sistemas — Judiciário</div>
+        <div style="font-size:.75rem;color:#c7d2fe;margin-top:.15rem;">Sistemas do Poder Judiciário de SC</div>
+      </div>
+      <button onclick="document.getElementById('modal-grupo-jud').style.display='none'" style="background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:.35rem .85rem;font-size:.82rem;cursor:pointer;font-weight:600;">✕ Fechar</button>
+    </div>
+    <div style="padding:1.2rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.9rem;">
+
+      <!-- SEEU -->
+      <div onclick="window.open('https://seeu.pje.jus.br/seeu/','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#ede9fe';this.style.borderColor='#818cf8'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">⚖️</div>
+        <div style="font-weight:700;color:#312e81;font-size:.88rem;">SEEU</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Sistema Eletrônico de Execução Unificado</div>
+      </div>
+
+      <!-- EPROC 1o Grau -->
+      <div onclick="window.open('https://eproc1g.tjsc.jus.br/eproc/','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#ede9fe';this.style.borderColor='#818cf8'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">🏛️</div>
+        <div style="font-weight:700;color:#312e81;font-size:.88rem;">EPROC 1º Grau</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Processo eletrônico 1ª instância</div>
+      </div>
+
+      <!-- EPROC 2o Grau -->
+      <div onclick="window.open('https://eproc2g.tjsc.jus.br/eproc/externo_controlador.php?acao=principal','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#ede9fe';this.style.borderColor='#818cf8'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">🏛️</div>
+        <div style="font-weight:700;color:#312e81;font-size:.88rem;">EPROC 2º Grau</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Processo eletrônico 2ª instância</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MODAL GRUPO: Sistemas — Estado
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="modal-grupo-estado" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9994;align-items:center;justify-content:center;padding:1.5rem;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#f4f6f9;border-radius:16px;width:100%;max-width:700px;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#064e3b,#0f6e56);padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;">🏛️ Sistemas — Estado</div>
+        <div style="font-size:.75rem;color:#6ee7b7;margin-top:.15rem;">Sistemas do Estado de Santa Catarina</div>
+      </div>
+      <button onclick="document.getElementById('modal-grupo-estado').style.display='none'" style="background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:.35rem .85rem;font-size:.82rem;cursor:pointer;font-weight:600;">✕ Fechar</button>
+    </div>
+    <div style="padding:1.2rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.9rem;">
+
+      <!-- SIGRHPORTAL -->
+      <div onclick="window.open('https://sigrhportal.sea.sc.gov.br/SIGRHNovoPortal/#/auth','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#ecfdf5';this.style.borderColor='#34d399'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">👤</div>
+        <div style="font-weight:700;color:#064e3b;font-size:.88rem;">SIGRHPORTAL</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Recursos Humanos SC</div>
+      </div>
+
+      <!-- iPEN -->
+      <div onclick="window.open('https://www.sc.gov.br/sap/ipen/signin','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#ecfdf5';this.style.borderColor='#34d399'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">🔑</div>
+        <div style="font-weight:700;color:#064e3b;font-size:.88rem;">iPEN</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Sistema iPEN SC</div>
+      </div>
+
+      <!-- SGPe -->
+      <div onclick="window.open('https://sgpe.sea.sc.gov.br/sgpe/#/container','_blank')"
+        style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.1rem;cursor:pointer;transition:.15s;text-align:center;"
+        onmouseover="this.style.background='#ecfdf5';this.style.borderColor='#34d399'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:1.6rem;margin-bottom:.4rem;">📂</div>
+        <div style="font-weight:700;color:#064e3b;font-size:.88rem;">SGPe</div>
+        <div style="font-size:.73rem;color:#6b7280;margin-top:.25rem;">Sistema de Gestão de Processos Eletrônicos</div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- ========== MODAL USM CONTROLE ========== -->
 <div id="modal-usm-controle" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9992;flex-direction:column;" onclick="if(event.target===this)fecharUSMControle()">
@@ -4601,6 +4689,18 @@ function abrirUSMControle() {
 
 function fecharControleViagens() {
   document.getElementById('modal-controle-viagens').style.display = 'none';
+}
+
+function abrirGrupoCRV() {
+  document.getElementById('modal-grupo-crv').style.display = 'flex';
+}
+
+function abrirGrupoJud() {
+  document.getElementById('modal-grupo-jud').style.display = 'flex';
+}
+
+function abrirGrupoEstado() {
+  document.getElementById('modal-grupo-estado').style.display = 'flex';
 }
 
 function fecharUSMControle() {
